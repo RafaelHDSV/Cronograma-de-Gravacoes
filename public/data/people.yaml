@@ -1,0 +1,248 @@
+people:
+  - id: joao-carlos
+    name: João Carlos
+    topics:
+      - letter: a
+        title: Cadastro de Masters e Configuração de Aparência (front-end)
+      - letter: b
+        title: Autocontratação (auto-x)
+      - letter: c
+        title: CRUD de Recursos da AC
+      - letter: d
+        title: Configurações especiais de passo
+      - letter: e
+        title: Detalhes da Proposta e como é renderizado
+      - letter: f
+        title: Simulações (Exibição e conceitos)
+      - letter: g
+        title: Análise de Crédito Normal
+      - letter: h
+        title: Análise de Crédito com Validacao Humana
+      - letter: i
+        title: Departamentos Paralelos (após deploy)
+      - letter: j
+        title: Credenciais (configuracao e feature)
+      - letter: k
+        title: Agente Certificado (configuracao e feature)
+      - letter: l
+        title: Customização da exibição de Documentoscopia/Documentos pós-ajuste de OCR
+      - letter: m
+        title: Notificações Web Push
+      - letter: 'n'
+        title: Corporação Exclusiva
+      - letter: o
+        title: Travamento/Destravamento de Auto-Contratações
+  - id: janderson
+    name: Janderson
+    topics:
+      - letter: a
+        title: Autocontratação (back-end)
+      - letter: b
+        title: Criação de Fluxos de AC
+      - letter: c
+        title: Consumo de Gateways
+      - letter: d
+        title: Inspeção (bkapireqs e bkapireqerrors)
+      - letter: e
+        title: Passos especiais de Simulacao
+      - letter: f
+        title: Configuração de Campos Filhos
+      - letter: g
+        title: Inserção de propostas em parceiros
+      - letter: h
+        title: Tratamento de webhook para atualização de propostas
+      - letter: i
+        title: Timeout e como lidamos, digital ocean e travas de duplicacao
+      - letter: j
+        title: Refazer Simulação
+      - letter: k
+        title: Postman APIs
+      - letter: l
+        title: Atualização de Steps
+      - letter: m
+        title: Middlewares do ProductSelfContract
+      - letter: 'n'
+        title: Aplicacao de OverrideFields
+  - id: vinicius
+    name: Vinicius
+    topics:
+      - letter: a
+        title: Passo de Upload de Documento
+      - letter: b
+        title: S3 Bucket e Segurança com Signed URLs
+      - letter: c
+        title: Geração de Contrato Automático Plataforma
+      - letter: d
+        title: Envio de Documentos para Terceiros via API
+      - letter: e
+        title: Geolocalização no back-end
+      - letter: f
+        title: Passo de Liveness
+      - letter: g
+        title: Passo de Facematch
+      - letter: h
+        title: Documentoscopia
+      - letter: i
+        title: Integrações com Onbase
+      - letter: j
+        title: Rodobens EGI
+      - letter: k
+        title: SignIn / Sign-In / SSO
+      - letter: l
+        title: Auth-OIDC (separado do SSO genérico)
+      - letter: m
+        title: Importação de Leads
+      - letter: 'n'
+        title: Configuração de eventos de Postback
+  - id: robson
+    name: Robson
+    topics:
+      - letter: a
+        title: Criação de Produto
+      - letter: b
+        title: Produto e naturezas
+      - letter: c
+        title: Produto CRM
+      - letter: d
+        title: Produto de Fornecedor
+      - letter: e
+        title: Atualização de Propostas Importação
+      - letter: f
+        title: Atualização de Propostas Síncrona/Update
+      - letter: g
+        title: Atualização de Propostas via Hook
+      - letter: h
+        title: Queries em Proposals
+      - letter: i
+        title: Rotinas no Core
+      - letter: j
+        title: Rotinas no Nexus
+      - letter: k
+        title: Filas no Core
+      - letter: l
+        title: Filas no Nexus
+      - letter: m
+        title: Precificação
+      - letter: 'n'
+        title: CRUD de Status Table / Status base para produtos
+      - letter: o
+        title: 'Catálogo de Produtos e busca de meta-produtos — #1232, #1115'
+      - letter: p
+        title: Status Lineares
+      - letter: q
+        title: Expiração de Status
+      - letter: r
+        title: Atribuição de Comissão
+  - id: vieira
+    name: Vieira
+    topics:
+      - letter: a
+        title: Grupos de acesso
+      - letter: b
+        title: Permissões de escrita e leitura (agx)
+      - letter: c
+        title: Hierarquia de Níveis
+      - letter: d
+        title: Criação de usuários e fluxos derivados
+      - letter: e
+        title: Antifraude na AC
+      - letter: f
+        title: Passo de restrição
+      - letter: g
+        title: Sobreescrita de retorno de paths por grupo (CUSTOM PATHS)
+      - letter: h
+        title: Usuários Adicionais e Customização do comportamento
+      - letter: i
+        title: Lista de Restrição (Blocklist)
+      - letter: j
+        title: Importação de Usuários Corporação e Loja
+      - letter: k
+        title: API de Criação de Usuários
+      - letter: l
+        title: Chat Web
+      - letter: m
+        title: Projeto coneXia (Consórcio)
+      - letter: 'n'
+        title: Refinanciamento LINE
+      - letter: o
+        title: Multi-Factor Authentication (MFA)
+      - letter: p
+        title: Controle de Nota Fiscal
+      - letter: q
+        title: Tradução i18n
+      - letter: r
+        title: Promocao de Seller, Supervisor e Equipes
+      - letter: s
+        title: Cadastro Orgânico de Vendedores
+  - id: marcus
+    name: Marcus
+    topics:
+      - letter: a
+        title: Behaviour Score
+      - letter: b
+        title: Visualização e ordenação do BHS
+      - letter: c
+        title: Pricing BHS (depreciação de risco)
+      - letter: d
+        title: Ordenação de fallback entre regras
+      - letter: e
+        title: Logs, trava e código único por regra de reprova
+      - letter: f
+        title: Bilhetagem BHS
+      - letter: g
+        title: Cache do BHS e tratamento de exceção
+      - letter: h
+        title: Multiplos celulares na proposta
+      - letter: i
+        title: Autopreenchimento de Campos
+      - letter: j
+        title: Exportacao de Relatório
+      - letter: k
+        title: MultiBancos
+      - letter: l
+        title: Mapeamento de Status de reprova e relacao com BHS e Restricao
+      - letter: m
+        title: Bank Tools e Hub de Averbadoras
+      - letter: 'n'
+        title: Link Semi-Autenticado
+      - letter: o
+        title: Follow-Up
+      - letter: p
+        title: CHAT
+  - id: davi
+    name: Davi
+    topics:
+      - letter: a
+        title: Omnichannel
+      - letter: b
+        title: Omnichannel sob demanda
+      - letter: c
+        title: Configuração de mensagem WhatsApp por produto/master
+      - letter: d
+        title: Máquina de estados da AC WhatsApp
+      - letter: e
+        title: Distribuição Automática de Ligação CallCenter
+      - letter: f
+        title: Comunicação central WhatsApp
+      - letter: g
+        title: Integrações com Twilio e Meta
+      - letter: h
+        title: OCR
+      - letter: i
+        title: RH400
+      - letter: j
+        title: WhatsApp Flows
+      - letter: k
+        title: Disparos de WhatsApp
+      - letter: l
+        title: Mailer
+      - letter: m
+        title: SMS
+      - letter: 'n'
+        title: URA
+      - letter: o
+        title: Campanhas de Mensageria
+      - letter: p
+        title: Feature de Gestores
+      - letter: q
+        title: Distribuição de Leads Automática

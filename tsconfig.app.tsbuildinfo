@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/sessionlist.tsx","./src/components/statusbadge.tsx","./src/lib/api.ts","./src/lib/discord.ts","./src/lib/schedule.ts","./src/lib/types.ts","./src/pages/calendarpage.tsx","./src/pages/personpage.tsx","./src/pages/summarypage.tsx"],"version":"5.9.3"}

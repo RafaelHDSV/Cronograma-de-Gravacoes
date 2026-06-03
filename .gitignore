@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-server
+data/sessions.json
+*.local
+.DS_Store
+.vite
+
+.cursor
+.issues
