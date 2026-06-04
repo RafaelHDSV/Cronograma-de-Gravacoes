@@ -12,7 +12,6 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-data/sessions.json
 
 # allow vendor SDK dist
 !vendor/vieira-analytics/dist/

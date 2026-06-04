@@ -8,7 +8,7 @@
 
 ## Objetivo
 
-Painel interno para acompanhar o cronograma de gravações de vídeo das funcionalidades do sistema: quem grava cada tópico, quantas sessões já foram concluídas e quantas faltam. Substitui o texto corrido da planilha/chat por dados estruturados, com visão de resumo, calendário mensal e progresso por pessoa. A equipe de coordenação usa o painel para remarcar, marcar como gravado e adiar sessões sem editar YAML manualmente no dia a dia.
+Painel interno para acompanhar o cronograma de gravações de vídeo das funcionalidades do sistema: quem grava cada tópico, quantas sessões já foram concluídas e quantas faltam. Substitui o texto corrido da planilha/chat por dados estruturados, com visão de resumo, calendário mensal e progresso por pessoa. A equipe de coordenação usa o painel para remarcar, marcar como gravado e adiar sessões.
 
 ---
 
@@ -17,10 +17,13 @@ Painel interno para acompanhar o cronograma de gravações de vídeo das funcion
 | Camada | Tecnologia / nota |
 |--------|-------------------|
 | Front | React 18, Vite 5, TypeScript, CSS em `src/index.css` |
-| Back | Node 22, Express 5, `tsx` (dev e produção) |
-| Dados | YAML versionado (`public/data/`) + JSON de runtime (`data/sessions.json`, gitignored) |
-| Banco | N/A — persistência em arquivo local via API |
-| Tooling | npm, Node 22 (`.nvmrc`), `concurrently` no dev |
+| Back | Node 22, Express 5, `tsx`, `dotenv` |
+| Banco | Supabase (PostgreSQL), tabela `public.sessions` |
+| Catálogo | `public/data/people.yaml` (não está no Supabase) |
+| Seed agenda | `public/data/sessions.yaml` → Supabase na 1ª subida ou reset |
+| Tooling | Yarn (classic), Node 22 (`.nvmrc`), `concurrently` no dev |
+
+**Setup Supabase:** `docs/supabase-setup.md`
 
 ---
 
@@ -30,23 +33,21 @@ Painel interno para acompanhar o cronograma de gravações de vídeo das funcion
 |---------|-------------|
 | Front (Vite) | http://localhost:3333 — proxy `/api` → backend |
 | API (Express) | http://127.0.0.1:3334 |
-| Produção (`npm start`) | Um processo: API + `dist/` estático na mesma porta (`PORT`, padrão 3334) |
+| Produção (`yarn start`) | API + `dist/` na mesma porta (`PORT`, padrão 3334) |
 
-Variável opcional no front: `VITE_API_URL` (prefixo da API quando front e back estão em origens diferentes).
+Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no front: `VITE_API_URL`.
 
 ---
 
 ## Modelo de dados
 
-| Arquivo | Papel |
-|---------|--------|
-| `public/data/people.yaml` | Catálogo: pessoas e tópicos (letra + título). Muda raramente; versionado no git. |
-| `public/data/sessions.yaml` | Agenda inicial (seed). Usado na primeira subida do servidor ou em `POST /api/schedule/reset`. |
-| `data/sessions.json` | Estado vivo das sessões (status, datas, notas). Criado/atualizado pela API; não vai para o git. |
+| Fonte | Papel |
+|-------|--------|
+| `public/data/people.yaml` | Pessoas e tópicos — versionado no git |
+| `public/data/sessions.yaml` | Agenda seed — versionado no git |
+| Supabase `sessions` | Estado vivo (status, datas, notas) |
 
-**Status de sessão (implementados):** `scheduled`, `done`, `postponed`. Não há `cancelled` no código.
-
-**Fuso horário de exibição e chaves de dia:** `America/Sao_Paulo`.
+**Status:** `scheduled`, `done`, `postponed`. **Fuso:** `America/Sao_Paulo`.
 
 ---
 
@@ -54,31 +55,30 @@ Variável opcional no front: `VITE_API_URL` (prefixo da API quando front e back 
 
 | Método | Rota | Função |
 |--------|------|--------|
-| GET | `/api/schedule` | Retorna `{ people, sessions }` |
-| PATCH | `/api/sessions/:id` | Atualiza `status`, `scheduledAt`, `recordedAt` |
-| POST | `/api/sessions/swap-time` | Troca horário entre duas sessões (`sessionIdA`, `sessionIdB`) |
-| POST | `/api/schedule/reset` | Recarrega sessões a partir de `sessions.yaml` |
+| GET | `/api/schedule` | `{ people, sessions }` |
+| PATCH | `/api/sessions/:id` | Atualiza sessão no Supabase |
+| POST | `/api/sessions/swap-time` | Troca horário entre duas sessões |
+| POST | `/api/schedule/reset` | Repõe sessões a partir de `sessions.yaml` |
 
 ---
 
-## UI (abas atuais)
+## UI (abas)
 
-1. **Resumo** — totais globais, barra de progresso, tabela por pessoa.
-2. **Calendário** — grade mensal, arrastar sessão para outro dia, detalhe do dia (marcar gravado, adiar, trocar horário), lista de adiadas com reagendamento.
-3. **Por pessoa** — progresso expansível, checklist por tópico.
-
-Cabeçalho exibe contadores: gravadas, faltam, adiadas, total.
+1. **Resumo** — totais e tabela por pessoa.
+2. **Calendário** — grade mensal, drag-and-drop, adiadas, swap de horário.
+3. **Por pessoa** — progresso e checklist por tópico.
 
 ---
 
 ## Decisões fixas
 
-1. **Fonte de verdade em runtime:** alterações pela UI persistem em `data/sessions.json`; YAML de sessões é seed/reset, não edição contínua em produção.
-2. **Dev em dois processos:** `npm run dev` sobe Vite (3333) e API (3334) com proxy.
-3. **Produção monolítica:** `npm run build` + `npm start` serve front buildado e API no mesmo servidor.
-4. **`base: './'` no Vite** — compatível com GitHub Pages em subpath e deploy na raiz.
-5. **Sem autenticação, Docker ou banco** na v1 — painel de uso interno/confiança na rede.
-6. **Regenerar YAML do zero:** `npm run import` (`scripts/import-initial-schedule.ts`) a partir do texto embutido no script.
+1. **Sessões no Supabase; pessoas no YAML.**
+2. **Seed inicial:** só `sessions.yaml` se tabela vazia (não migra `data/sessions.json`).
+3. **Dev:** `yarn dev` — Vite 3333 + API 3334.
+4. **Chave `service_role` só no servidor** — nunca no bundle Vite.
+5. **Auth:** fora do escopo v1; reset da API aberto por enquanto.
+6. **`base: './'`** no Vite para GitHub Pages / raiz.
+7. **`yarn import`** regenera YAMLs do script legado.
 
 ---
 
@@ -86,27 +86,19 @@ Cabeçalho exibe contadores: gravadas, faltam, adiadas, total.
 
 | Tipo | URL |
 |------|-----|
-| Repositório | (organização `AGX-Software` — preencher URL quando publicado) |
-| Epic / board | (preencher quando existir) |
-| Documentação | `docs/especificacao.md`, `README.md` |
+| Repositório | (AGX-Software — preencher) |
+| Epic / board | (preencher) |
+| Documentação | `docs/especificacao.md`, `docs/supabase-setup.md` |
 
 ---
 
-## Fora de escopo (v1 atual)
+## Fora de escopo (v1)
 
-- Status `cancelled` e fluxo de cancelamento.
-- Botão “Copiar resumo” no UI (`src/lib/discord.ts` existe, mas não está ligado à interface).
-- Deep link `?date=` na URL do calendário.
-- GitHub Pages **somente estático** (workflow atual): não expõe a API; painel interativo exige host Node com `npm start` ou deploy full-stack (ex.: Vercel com função/server, VM, etc.).
-- Multiusuário, permissões, histórico de auditoria, notificações automáticas.
-
----
-
-## Pendências conhecidas (doc ↔ código)
-
-- `README.md` ainda descreve quatro abas (inclui “Hoje” / “Por data”) e edição manual só via YAML; o app tem três abas e API para mutações.
-- Workflow `.github/workflows/deploy.yml` publica só `dist/` — alinhar README/deploy com ambiente que rode o Express se a edição no painel for obrigatória em produção.
+- Autenticação (planejada em versão próxima).
+- `people` / tópicos no Supabase.
+- Botão Discord no UI; deep link `?date=`.
+- GitHub Pages com API (só estático no workflow atual).
 
 ---
 
-*Atualizado com base no código em jun/2026. Origem: scaffold Vieira CLI.*
+*Atualizado jun/2026 — Supabase + Yarn.*

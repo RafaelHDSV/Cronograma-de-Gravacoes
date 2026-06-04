@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { load } from 'js-yaml'
+import { supabase } from './supabase'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -29,18 +30,48 @@ export interface Session {
   recordedAt?: string
 }
 
+interface SessionRow {
+  id: string
+  scheduled_at: string
+  person_id: string
+  topic_letter: string
+  status: SessionStatus
+  notes: string | null
+  recorded_at: string | null
+}
+
 const ROOT = path.resolve(__dirname, '..')
-const DATA_DIR = path.join(ROOT, 'data')
-const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json')
 const PEOPLE_YAML = path.join(ROOT, 'public', 'data', 'people.yaml')
 const SESSIONS_YAML = path.join(ROOT, 'public', 'data', 'sessions.yaml')
 
 let people: Person[] = []
 let sessions: Session[] = []
 
-function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true })
+function rowToSession(row: SessionRow): Session {
+  const scheduledAt =
+    typeof row.scheduled_at === 'string'
+      ? row.scheduled_at
+      : new Date(row.scheduled_at).toISOString()
+  return {
+    id: row.id,
+    scheduledAt,
+    personId: row.person_id,
+    topicLetter: row.topic_letter,
+    status: row.status,
+    notes: row.notes ?? undefined,
+    recordedAt: row.recorded_at ?? undefined,
+  }
+}
+
+function sessionToRow(session: Session): SessionRow {
+  return {
+    id: session.id,
+    scheduled_at: session.scheduledAt,
+    person_id: session.personId,
+    topic_letter: session.topicLetter,
+    status: session.status,
+    notes: session.notes ?? '',
+    recorded_at: session.recordedAt?.trim() ? session.recordedAt : null,
   }
 }
 
@@ -50,7 +81,7 @@ function loadPeople(): Person[] {
   return parsed.people ?? []
 }
 
-function seedSessionsFromYaml(): Session[] {
+export function seedSessionsFromYaml(): Session[] {
   const text = fs.readFileSync(SESSIONS_YAML, 'utf-8')
   const parsed = load(text) as { sessions: Session[] }
   const raw = parsed.sessions ?? []
@@ -61,25 +92,50 @@ function seedSessionsFromYaml(): Session[] {
   }))
 }
 
-function persistSessions() {
-  ensureDataDir()
-  fs.writeFileSync(SESSIONS_FILE, JSON.stringify(sessions, null, 2), 'utf-8')
+async function loadSessionsFromDb(): Promise<Session[]> {
+  const { data, error } = await supabase
+    .from('sessions')
+    .select('*')
+    .order('scheduled_at', { ascending: true })
+
+  if (error) throw new Error(`[data] Falha ao carregar sessoes: ${error.message}`)
+  return (data as SessionRow[]).map(rowToSession)
 }
 
-export function initData() {
+async function insertSessions(rows: Session[]): Promise<void> {
+  if (rows.length === 0) return
+  const { error } = await supabase.from('sessions').insert(rows.map(sessionToRow))
+  if (error) throw new Error(`[data] Falha ao inserir sessoes: ${error.message}`)
+}
+
+async function deleteAllSessions(): Promise<void> {
+  const { error } = await supabase.from('sessions').delete().neq('id', '')
+  if (error) throw new Error(`[data] Falha ao limpar sessoes: ${error.message}`)
+}
+
+async function countSessions(): Promise<number> {
+  const { count, error } = await supabase
+    .from('sessions')
+    .select('*', { count: 'exact', head: true })
+
+  if (error) throw new Error(`[data] Falha ao contar sessoes: ${error.message}`)
+  return count ?? 0
+}
+
+export async function initData(): Promise<void> {
   people = loadPeople()
 
-  if (fs.existsSync(SESSIONS_FILE)) {
-    const raw = fs.readFileSync(SESSIONS_FILE, 'utf-8')
-    sessions = JSON.parse(raw) as Session[]
-    console.log(`[data] Loaded ${sessions.length} sessions from sessions.json`)
-  } else {
+  const total = await countSessions()
+  if (total === 0) {
     sessions = seedSessionsFromYaml()
-    persistSessions()
-    console.log(`[data] Seeded ${sessions.length} sessions from YAML`)
+    await insertSessions(sessions)
+    console.log(`[data] Seed: ${sessions.length} sessoes de sessions.yaml -> Supabase`)
+  } else {
+    sessions = await loadSessionsFromDb()
+    console.log(`[data] Carregadas ${sessions.length} sessoes do Supabase`)
   }
 
-  console.log(`[data] Loaded ${people.length} people from YAML`)
+  console.log(`[data] ${people.length} pessoas de people.yaml`)
 }
 
 export function getPeople(): Person[] {
@@ -94,36 +150,53 @@ export function findSession(id: string): Session | undefined {
   return sessions.find((s) => s.id === id)
 }
 
-export function updateSession(id: string, patch: { status?: SessionStatus; scheduledAt?: string; recordedAt?: string }): Session | null {
+export async function updateSession(
+  id: string,
+  patch: { status?: SessionStatus; scheduledAt?: string; recordedAt?: string },
+): Promise<Session | null> {
   const idx = sessions.findIndex((s) => s.id === id)
   if (idx === -1) return null
 
-  const session = sessions[idx]
+  const session = { ...sessions[idx] }
   if (patch.status !== undefined) session.status = patch.status
   if (patch.scheduledAt !== undefined) session.scheduledAt = patch.scheduledAt
-  if (patch.recordedAt !== undefined) session.recordedAt = patch.recordedAt
+  if (patch.recordedAt !== undefined) {
+    session.recordedAt = patch.recordedAt.trim() ? patch.recordedAt : undefined
+  }
+
+  const { error } = await supabase.from('sessions').update(sessionToRow(session)).eq('id', id)
+  if (error) throw new Error(`[data] Falha ao atualizar sessao: ${error.message}`)
 
   sessions[idx] = session
-  persistSessions()
   return session
 }
 
-export function resetSessionsFromYaml(): Session[] {
+export async function resetSessionsFromYaml(): Promise<Session[]> {
+  await deleteAllSessions()
   sessions = seedSessionsFromYaml()
-  persistSessions()
-  console.log(`[data] Reset ${sessions.length} sessions from YAML`)
+  await insertSessions(sessions)
+  console.log(`[data] Reset: ${sessions.length} sessoes de sessions.yaml -> Supabase`)
   return sessions
 }
 
-export function swapSessionTimes(idA: string, idB: string): [Session, Session] | null {
-  const a = sessions.find((s) => s.id === idA)
-  const b = sessions.find((s) => s.id === idB)
-  if (!a || !b) return null
+export async function swapSessionTimes(idA: string, idB: string): Promise<[Session, Session] | null> {
+  const idxA = sessions.findIndex((s) => s.id === idA)
+  const idxB = sessions.findIndex((s) => s.id === idB)
+  if (idxA === -1 || idxB === -1) return null
 
+  const a = { ...sessions[idxA] }
+  const b = { ...sessions[idxB] }
   const tempAt = a.scheduledAt
   a.scheduledAt = b.scheduledAt
   b.scheduledAt = tempAt
 
-  persistSessions()
+  const { error: errA } = await supabase.from('sessions').update(sessionToRow(a)).eq('id', idA)
+  if (errA) throw new Error(`[data] Falha ao trocar horario: ${errA.message}`)
+
+  const { error: errB } = await supabase.from('sessions').update(sessionToRow(b)).eq('id', idB)
+  if (errB) throw new Error(`[data] Falha ao trocar horario: ${errB.message}`)
+
+  sessions[idxA] = a
+  sessions[idxB] = b
   return [a, b]
 }
