@@ -26,8 +26,8 @@ export async function fetchSchedule(): Promise<ScheduleData> {
   return request<ScheduleData>('/api/schedule')
 }
 
-export async function fetchAuthMe(): Promise<{ editor: boolean }> {
-  return request<{ editor: boolean }>('/api/auth/me')
+export async function fetchAuthMe(): Promise<{ editor: boolean; authDisabled?: boolean }> {
+  return request<{ editor: boolean; authDisabled?: boolean }>('/api/auth/me')
 }
 
 export async function loginEditor(

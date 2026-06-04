@@ -115,7 +115,9 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 **Nunca** armazenar a senha em localStorage, sessionStorage ou cookies acessiveis por script.
 
-Ao abrir o app: se existir token -> `GET /api/auth/me` -> habilita UI de edicao.
+Ao abrir o app: `GET /api/auth/me` define se a UI de edicao esta ativa (token valido ou `AUTH_DISABLED=true` no servidor).
+
+Com `AUTH_DISABLED=true` no `.env` do **backend**, reinicie `yarn dev`: o front detecta `authDisabled` e libera edicao sem botao "Modo editor".
 
 Botao **Sair do modo editor** remove a chave do localStorage.
 

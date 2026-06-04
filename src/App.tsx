@@ -30,6 +30,7 @@ export function App() {
   const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState<Tab>('summary')
   const [isEditor, setIsEditor] = useState(false)
+  const [authDisabled, setAuthDisabled] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [pending, setPending] = useState<Map<string, PendingEntry>>(new Map())
@@ -42,16 +43,15 @@ export function App() {
   }, [])
 
   useEffect(() => {
-    const token = getEditorToken()
-    if (!token) {
-      setIsEditor(false)
-      return
-    }
     fetchAuthMe()
-      .then((r) => setIsEditor(r.editor))
+      .then((r) => {
+        setIsEditor(r.editor)
+        setAuthDisabled(r.authDisabled === true)
+      })
       .catch(() => {
-        clearEditorToken()
+        if (getEditorToken()) clearEditorToken()
         setIsEditor(false)
+        setAuthDisabled(false)
       })
   }, [])
 
@@ -207,9 +207,8 @@ export function App() {
               <h1>Cronograma de Gravações</h1>
               {stats && (
                 <span className="header-stats">
-                  {stats.done} gravadas · {stats.remaining} faltam
-                  {stats.postponed > 0 && ` · ${stats.postponed} adiadas`} · {stats.total} no total
-                  {!isEditor && ' · modo leitura'}
+                  {!isEditor && !authDisabled && 'modo leitura'}
+                  {authDisabled && 'modo edição'}
                 </span>
               )}
             </div>
@@ -218,31 +217,30 @@ export function App() {
             {pendingCount > 0 && (
               <span className="dirty-badge">{pendingCount} alteração(ões) pendente(s)</span>
             )}
-            {isEditor ? (
+            {isEditor && pendingCount > 0 && (
               <>
-                {pendingCount > 0 && (
-                  <>
-                    <button type="button" className="btn ghost" onClick={discardPending}>
-                      Descartar
-                    </button>
-                    <button
-                      type="button"
-                      className="btn primary"
-                      onClick={() => setShowConfirm(true)}
-                    >
-                      Confirmar alterações
-                    </button>
-                  </>
-                )}
+                <button type="button" className="btn ghost" onClick={discardPending}>
+                  Descartar
+                </button>
+                <button
+                  type="button"
+                  className="btn primary"
+                  onClick={() => setShowConfirm(true)}
+                >
+                  Confirmar alterações
+                </button>
+              </>
+            )}
+            {!authDisabled &&
+              (isEditor ? (
                 <button type="button" className="btn ghost" onClick={handleLogoutEditor}>
                   Sair do modo editor
                 </button>
-              </>
-            ) : (
-              <button type="button" className="btn primary" onClick={() => setShowLogin(true)}>
-                Modo editor
-              </button>
-            )}
+              ) : (
+                <button type="button" className="btn primary" onClick={() => setShowLogin(true)}>
+                  Modo editor
+                </button>
+              ))}
           </div>
         </div>
         <nav className="tabs" role="tablist">

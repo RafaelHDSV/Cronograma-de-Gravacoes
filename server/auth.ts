@@ -109,5 +109,8 @@ export function handleLogin(req: Request, res: Response): void {
 }
 
 export function handleAuthMe(req: Request, res: Response): void {
-  res.json({ editor: isEditorRequest(req) })
+  res.json({
+    editor: isEditorRequest(req),
+    authDisabled: isAuthDisabled(),
+  })
 }
