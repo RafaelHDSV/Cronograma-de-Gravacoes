@@ -78,13 +78,6 @@ body {
   letter-spacing: -0.02em;
 }
 
-.header-stats {
-  display: block;
-  color: var(--muted);
-  font-size: 14px;
-  margin-top: 4px;
-}
-
 .header-actions {
   display: flex;
   align-items: center;

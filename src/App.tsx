@@ -11,7 +11,7 @@ import {
   type PendingEntry,
   type SessionPatch,
 } from './lib/pending'
-import { buildPersonIndex, buildScheduledAt, dayKey, globalStats } from './lib/schedule'
+import { buildPersonIndex, buildScheduledAt, dayKey } from './lib/schedule'
 import type { ScheduleData } from './lib/types'
 import { CalendarPage } from './pages/CalendarPage'
 import { PersonPage } from './pages/PersonPage'
@@ -81,7 +81,6 @@ export function App() {
     () => (data ? buildPersonIndex(data.people) : new Map()),
     [data],
   )
-  const stats = useMemo(() => globalStats(displaySessions), [displaySessions])
   const pendingCount = pending.size
   const pendingRows = useMemo(
     () => buildPendingRows(baselineSessions, pending),
@@ -203,15 +202,7 @@ export function App() {
         <div className="header-top">
           <div className="brand">
             <img src="./logo.svg" alt="" className="brand-logo" width={36} height={36} />
-            <div>
-              <h1>Cronograma de Gravações</h1>
-              {stats && (
-                <span className="header-stats">
-                  {!isEditor && !authDisabled && 'modo leitura'}
-                  {authDisabled && 'modo edição'}
-                </span>
-              )}
-            </div>
+            <h1>Cronograma de Gravações</h1>
           </div>
           <div className="header-actions">
             {pendingCount > 0 && (
