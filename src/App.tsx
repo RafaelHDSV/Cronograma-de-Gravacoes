@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ConfirmChangesModal } from './components/ConfirmChangesModal'
+import { Tooltip } from './components/Tooltip'
 import { EditorLoginModal } from './components/EditorLoginModal'
 import { PersonCompleteCelebration } from './components/PersonCompleteCelebration'
 import { applySessionBatch, fetchAuthMe, fetchSchedule } from './lib/api'
@@ -216,18 +217,19 @@ export function App() {
             <h1>Cronograma de Gravações</h1>
           </div>
           <div className="header-actions">
-            <button
-              type="button"
-              className="btn ghost btn-icon"
-              onClick={onRefresh}
-              disabled={refreshing || !data}
-              title="Atualizar cronograma"
-              aria-label="Atualizar cronograma"
-            >
-              <span className={`reload-icon${refreshing ? ' spinning' : ''}`} aria-hidden="true">
-                ↻
-              </span>
-            </button>
+            <Tooltip label="Atualizar cronograma">
+              <button
+                type="button"
+                className="btn ghost btn-icon"
+                onClick={onRefresh}
+                disabled={refreshing || !data}
+                aria-label="Atualizar cronograma"
+              >
+                <span className={`reload-icon${refreshing ? ' spinning' : ''}`} aria-hidden="true">
+                  ↻
+                </span>
+              </button>
+            </Tooltip>
             {pendingCount > 0 && (
               <span className="dirty-badge">{formatAlteracoesPendentes(pendingCount)}</span>
             )}
