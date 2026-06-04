@@ -1,6 +1,8 @@
 # Cronograma-de-Gravacoes — contexto do projeto
 
-> Contexto primário para assistentes de IA (regra `ai-context.mdc`). Atualize este arquivo ao evoluir o produto.
+> Contexto primário para assistentes de IA (regra `ai-context.mdc`) e para quem implementa ou opera o sistema. Atualize este arquivo ao evoluir o produto.
+>
+> Visão de produto e pitch para visitantes do repositório: **[README.md](../README.md)**. Setup Supabase, deploy e segurança: guias em `docs/*.md` abaixo.
 
 **Pacote npm:** `gravacoes-treinamento` | **Ano:** 2026
 
