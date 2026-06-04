@@ -20,7 +20,11 @@ Cole e execute o conteudo do arquivo:
 
 `supabase/migrations/20260604120000_sessions.sql`
 
-Isso cria a tabela `public.sessions`, indices e habilita RLS (sem policies para usuario anonimo — apenas o backend com **service role** acessa os dados).
+Isso cria a tabela `public.sessions` e indices.
+
+Se voce ja rodou uma versao antiga do SQL que **ligava RLS**, execute tambem:
+
+`supabase/migrations/20260604130000_sessions_disable_rls.sql`
 
 Confira em **Table Editor** se a tabela `sessions` aparece vazia.
 
@@ -118,6 +122,10 @@ GitHub Pages **so publica o front estatico**; mutacoes exigem o Express com Supa
 | Sintoma | Causa provavel | Solucao |
 |---------|----------------|---------|
 | `Defina SUPABASE_URL...` ao subir | `.env` ausente ou incompleto | Copiar `.env.example` e preencher |
+| `SUPABASE_SERVICE_ROLE_KEY invalida (curta...)` | Chave errada ou placeholder | Em API, copiar **service_role** (JWT longo, comeca com `eyJ`), nao anon |
+| `Falha ao contar sessoes` com mensagem vazia | Quase sempre chave errada ou tabela inexistente | Conferir service_role + rodar migration SQL |
+| `row-level security policy` (42501) no insert | Chave **anon** no `.env` ou RLS ligado na tabela | Usar JWT com role `service_role`; rodar `20260604130000_sessions_disable_rls.sql` |
+| `SUPABASE_SERVICE_ROLE_KEY e chave "anon"` | Colou publishable/anon | Settings -> API -> **service_role** (secret) |
 | `relation "sessions" does not exist` | Migration nao aplicada | Rodar SQL em `supabase/migrations/` |
 | `Falha ao carregar sessoes` | URL/chave erradas ou projeto pausado | Conferir API keys e status do projeto |
 | Painel vazio apos seed | YAML sem sessoes | Conferir `public/data/sessions.yaml` |

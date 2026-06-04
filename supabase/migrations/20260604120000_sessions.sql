@@ -15,5 +15,4 @@ create table if not exists public.sessions (
 create index if not exists sessions_person_id_idx on public.sessions (person_id);
 create index if not exists sessions_scheduled_at_idx on public.sessions (scheduled_at);
 
--- Opcional: RLS ligado sem policies para anon = somente service_role (backend) acessa
-alter table public.sessions enable row level security;
+-- RLS desligado na v1 (backend unico com service_role). Ver 20260604130000 se ja ligou RLS antes.
