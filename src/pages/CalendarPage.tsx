@@ -143,7 +143,7 @@ export function CalendarPage({
 
       <p className="calendar-hint">
         {canEdit
-          ? 'Arraste para outro dia (mantém o horário). Use Horário para ajustar a faixa.'
+          ? 'Arraste um chip na grade para outro dia (mantém o horário). No detalhe, use o ícone ao lado do horário para editar a faixa.'
           : 'Modo leitura — ative o modo editor para alterar o cronograma.'}
       </p>
 
@@ -251,62 +251,68 @@ export function CalendarPage({
                       />
                       <span className="checkmark" />
                     </label>
-                    <span className="detail-time">{formatTime(s.scheduledAt)}</span>
-                    <span className="detail-who">
-                      <strong>{person?.name ?? s.personId}</strong>
-                      <span className="letter">({s.topicLetter})</span>
-                    </span>
-                    <span className="detail-topic">{topic?.title ?? '—'}</span>
-                    <span className="detail-meta">
-                      <StatusBadge status={s.status} />
-                    </span>
-                    {canEdit && isScheduled && (
-                      <button
-                        className="btn ghost postpone-btn"
-                        onClick={() => onPostpone(s.id)}
-                        title="Adiar gravação"
-                      >
-                        Adiar
-                      </button>
-                    )}
-                    {canEdit && !isScheduled && <span className="postpone-placeholder" />}
-                    {canEdit && (
-                      <button
-                        type="button"
-                        className="btn ghost time-edit-btn"
-                        onClick={() => setEditingTimeId(showTimeEdit ? null : s.id)}
-                      >
-                        Horario
-                      </button>
-                    )}
-                    {canEdit && canSwapDown && (
-                      <button
-                        className="btn ghost swap-btn"
-                        onClick={() => handleSwap(idx)}
-                        title="Trocar horário com a gravação de baixo"
-                        aria-label="Trocar horário"
-                      >
-                        ↕
-                      </button>
-                    )}
-                    {canEdit && !canSwapDown && <span className="swap-placeholder" />}
-                    {canEdit && (
-                      <div
-                        className="drag-handle"
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, s.id)}
-                        title="Arraste para mover de dia"
-                      >
-                        ⠿
+                    <div className="detail-main">
+                      <div className="detail-primary">
+                        <div className="detail-time-group">
+                          <span className="detail-time">{formatTime(s.scheduledAt)}</span>
+                          {canEdit && isScheduled && (
+                            <button
+                              type="button"
+                              className={`btn-icon-sm time-edit-btn${showTimeEdit ? ' active' : ''}`}
+                              onClick={() => setEditingTimeId(showTimeEdit ? null : s.id)}
+                              title="Alterar horário"
+                              aria-label="Alterar horário"
+                              aria-expanded={showTimeEdit}
+                            >
+                              ✎
+                            </button>
+                          )}
+                        </div>
+                        <div className="detail-person">
+                          <strong>{person?.name ?? s.personId}</strong>
+                          <span className="letter">({s.topicLetter})</span>
+                        </div>
+                        <span className="detail-topic">{topic?.title ?? '—'}</span>
+                        {isDone && (
+                          <span className="detail-status">
+                            <StatusBadge status={s.status} />
+                          </span>
+                        )}
                       </div>
-                    )}
-                    {showTimeEdit && canEdit && (
-                      <div className="detail-time-edit">
-                        <TimeSlotPicker
-                          hour={hour}
-                          minute={minute}
-                          onChange={(h, m) => onChangeTime(s.id, h, m)}
-                        />
+                      {showTimeEdit && canEdit && (
+                        <div className="detail-time-edit">
+                          <TimeSlotPicker
+                            hour={hour}
+                            minute={minute}
+                            onChange={(h, m) => onChangeTime(s.id, h, m)}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    {canEdit && (
+                      <div className="detail-actions">
+                        {isScheduled && (
+                          <button
+                            type="button"
+                            className="btn-icon-sm postpone-btn"
+                            onClick={() => onPostpone(s.id)}
+                            title="Adiar gravação"
+                            aria-label="Adiar gravação"
+                          >
+                            ⏳
+                          </button>
+                        )}
+                        {canSwapDown && (
+                          <button
+                            type="button"
+                            className="btn-icon-sm swap-btn"
+                            onClick={() => handleSwap(idx)}
+                            title="Trocar horário com a gravação de baixo"
+                            aria-label="Trocar horário"
+                          >
+                            ↕
+                          </button>
+                        )}
                       </div>
                     )}
                   </li>
@@ -371,33 +377,47 @@ function PostponedRow({
 
   return (
     <li className="postponed-row">
-      <div className="postponed-info">
-        <span className="postponed-time">{formatTime(session.scheduledAt)}</span>
-        <span className="postponed-who">
-          <strong>{person?.name ?? session.personId}</strong>
-          <span className="letter">({session.topicLetter})</span>
-        </span>
-        <span className="postponed-topic">{topic?.title ?? '—'}</span>
-        <span className="postponed-was">Era {formatDateLong(originalDay).split(',')[1]?.trim()}</span>
+      <div className="postponed-main">
+        <div className="postponed-head">
+          <span className="postponed-time">{formatTime(session.scheduledAt)}</span>
+          <span className="postponed-who">
+            <strong>{person?.name ?? session.personId}</strong>
+            <span className="letter">({session.topicLetter})</span>
+          </span>
+        </div>
+        <p className="postponed-topic">{topic?.title ?? '—'}</p>
+        <p className="postponed-was">
+          Era {formatDateLong(originalDay).split(',')[1]?.trim() ?? formatDateLong(originalDay)}
+        </p>
       </div>
       {canEdit && (
-        <div className="postponed-actions">
-          <input
-            type="date"
-            className="date-input"
-            value={newDate}
-            onChange={(e) => setNewDate(e.target.value)}
-            aria-label="Nova data da gravação"
-          />
-          <TimeSlotPicker
-            hour={slotHour}
-            minute={slotMinute}
-            onChange={(h, m) => {
-              setSlotHour(h)
-              setSlotMinute(m)
-            }}
-          />
-          <button className="btn sm" onClick={handleSchedule} disabled={!newDate}>
+        <div className="postponed-reschedule">
+          <label className="reschedule-field">
+            <span className="reschedule-label">Nova data</span>
+            <input
+              type="date"
+              className="date-input"
+              value={newDate}
+              onChange={(e) => setNewDate(e.target.value)}
+            />
+          </label>
+          <div className="reschedule-field reschedule-field--time">
+            <span className="reschedule-label">Horário</span>
+            <TimeSlotPicker
+              hour={slotHour}
+              minute={slotMinute}
+              onChange={(h, m) => {
+                setSlotHour(h)
+                setSlotMinute(m)
+              }}
+            />
+          </div>
+          <button
+            type="button"
+            className="btn primary sm reschedule-submit"
+            onClick={handleSchedule}
+            disabled={!newDate}
+          >
             Agendar
           </button>
         </div>
