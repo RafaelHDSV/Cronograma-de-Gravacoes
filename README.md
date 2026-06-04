@@ -49,6 +49,8 @@ yarn import
 
 ## Publicação
 
-A API precisa das variáveis Supabase no host. GitHub Pages sozinho publica só o front estático — para edição no painel, use um host com `yarn build` + `yarn start` (ou equivalente).
+**Render (recomendado se você já usa):** [docs/deploy-render.md](docs/deploy-render.md)
+
+A API precisa das variáveis Supabase no host. GitHub Pages sozinho publica só o front estático.
 
 Workflow comentado: `.github/workflows/deploy.yml` (usa `yarn` quando reativado).

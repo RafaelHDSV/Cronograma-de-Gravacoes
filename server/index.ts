@@ -16,6 +16,8 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const PORT = Number(process.env.PORT ?? 3334)
+// Render e outros PaaS exigem 0.0.0.0; em dev local mantemos 127.0.0.1
+const HOST = process.env.RENDER === 'true' ? '0.0.0.0' : '127.0.0.1'
 
 const app = express()
 app.use(cors())
@@ -81,8 +83,8 @@ async function main() {
     process.exit(1)
   }
 
-  app.listen(PORT, '127.0.0.1', () => {
-    console.log(`[server] Running on http://127.0.0.1:${PORT}`)
+  app.listen(PORT, HOST, () => {
+    console.log(`[server] Running on http://${HOST}:${PORT}`)
   })
 }
 

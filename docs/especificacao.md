@@ -157,6 +157,7 @@ Host da API precisa de `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`.
 |---------|-----|
 | `docs/context.md` | Contexto IA — stack, portas, decisões |
 | `docs/supabase-setup.md` | Criar projeto, SQL, `.env` |
+| `docs/deploy-render.md` | Publicar no Render (migracao da v1 YAML) |
 | Este arquivo | Produto, fluxos, API, deploy |
 | `README.md` | Início rápido |
 
