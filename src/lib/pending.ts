@@ -1,5 +1,11 @@
 import type { Session, SessionStatus } from './types'
-import { STATUS_LABEL, dayKey, formatTime, localTimeParts } from './schedule'
+import {
+  STATUS_LABEL,
+  dayKey,
+  formatTime,
+  localTimeParts,
+  scheduledAtEqual,
+} from './schedule'
 
 export type SessionPatch = {
   status?: SessionStatus
@@ -28,7 +34,7 @@ export function sessionsEqual(a: Session, b: Session): boolean {
   const y = normalizeSession(b)
   return (
     x.status === y.status &&
-    x.scheduledAt === y.scheduledAt &&
+    scheduledAtEqual(x.scheduledAt, y.scheduledAt) &&
     x.recordedAt === y.recordedAt
   )
 }
@@ -44,7 +50,7 @@ export function deriveChangeLabels(before: Session, after: Session): string[] {
       labels.push('Reagendar')
     } else labels.push('Alterar status')
   }
-  if (before.scheduledAt !== after.scheduledAt) {
+  if (!scheduledAtEqual(before.scheduledAt, after.scheduledAt)) {
     const dayBefore = dayKey(before.scheduledAt)
     const dayAfter = dayKey(after.scheduledAt)
     if (dayBefore !== dayAfter) {
@@ -82,6 +88,22 @@ export function applyPendingPatches(
   })
 }
 
+export function pruneNoopPending(
+  baseline: Session[],
+  pending: Map<string, PendingEntry>,
+): Map<string, PendingEntry> {
+  const next = new Map<string, PendingEntry>()
+  for (const [sessionId, entry] of pending) {
+    const before = baseline.find((s) => s.id === sessionId)
+    if (!before) continue
+    const after = applyPendingPatches([before], new Map([[sessionId, entry]]))[0]
+    if (!sessionsEqual(before, after)) {
+      next.set(sessionId, entry)
+    }
+  }
+  return next
+}
+
 export function upsertPendingEntry(
   baseline: Session[],
   pending: Map<string, PendingEntry>,
@@ -103,6 +125,18 @@ export function upsertPendingEntry(
     next.delete(sessionId)
   } else {
     next.set(sessionId, { patch: mergedPatch })
+  }
+  return pruneNoopPending(baseline, next)
+}
+
+export function applyPendingPatchesBatch(
+  baseline: Session[],
+  pending: Map<string, PendingEntry>,
+  changes: Array<{ sessionId: string; patch: SessionPatch }>,
+): Map<string, PendingEntry> {
+  let next = pending
+  for (const { sessionId, patch } of changes) {
+    next = upsertPendingEntry(baseline, next, sessionId, patch)
   }
   return next
 }

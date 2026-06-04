@@ -124,6 +124,15 @@ export function buildScheduledAt(dayKeyStr: string, hour: number, minute: number
   return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}T${hh}:${mm}:00-03:00`
 }
 
+/** Mesmo dia e horario no fuso do cronograma (ignora diferenca de formato ISO). */
+export function scheduledAtEqual(a: string, b: string): boolean {
+  if (a === b) return true
+  if (dayKey(a) !== dayKey(b)) return false
+  const ta = localTimeParts(a)
+  const tb = localTimeParts(b)
+  return ta.hour === tb.hour && ta.minute === tb.minute
+}
+
 export function rescheduleSession(session: Session, targetDayKey: string): string {
   const { hour, minute } = localTimeParts(session.scheduledAt)
   return buildScheduledAt(targetDayKey, hour, minute)

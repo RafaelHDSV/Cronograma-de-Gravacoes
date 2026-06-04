@@ -7,6 +7,7 @@ import { applySessionBatch, fetchAuthMe, fetchSchedule } from './lib/api'
 import { clearEditorToken, getEditorToken } from './lib/authStorage'
 import {
   applyPendingPatches,
+  applyPendingPatchesBatch,
   buildPendingRows,
   mergeSessionsFromServer,
   type PendingEntry,
@@ -71,6 +72,14 @@ export function App() {
     (sessionId: string, patch: SessionPatch) => {
       if (!isEditor) return
       setPending((prev) => upsertPendingEntry(baselineSessions, prev, sessionId, patch))
+    },
+    [isEditor, baselineSessions],
+  )
+
+  const queueChangeBatch = useCallback(
+    (changes: Array<{ sessionId: string; patch: SessionPatch }>) => {
+      if (!isEditor || changes.length === 0) return
+      setPending((prev) => applyPendingPatchesBatch(baselineSessions, prev, changes))
     },
     [isEditor, baselineSessions],
   )
@@ -140,10 +149,12 @@ export function App() {
       const a = findDisplaySession(idA)
       const b = findDisplaySession(idB)
       if (!a || !b) return
-      queueChange(idA, { scheduledAt: b.scheduledAt })
-      queueChange(idB, { scheduledAt: a.scheduledAt })
+      queueChangeBatch([
+        { sessionId: idA, patch: { scheduledAt: b.scheduledAt } },
+        { sessionId: idB, patch: { scheduledAt: a.scheduledAt } },
+      ])
     },
-    [findDisplaySession, queueChange],
+    [findDisplaySession, queueChangeBatch],
   )
 
   const onPostpone = useCallback(
