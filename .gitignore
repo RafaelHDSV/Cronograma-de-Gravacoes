@@ -1,10 +1,49 @@
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
 node_modules
 dist
-dist-server
+dist-ssr
 data/sessions.json
-*.local
-.DS_Store
-.vite
 
-.cursor
+# allow vendor SDK dist
+!vendor/vieira-analytics/dist/
+!vendor/vieira-analytics/dist/**
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+versions/*
+out/*
+
+# Issues
+issues
 .issues
+.issues/
+.issues/*
+*.issues
+*.issues/*
+
+# AI Tools
+cursor
+.cursor
+.cursor/
+.cursor/*
+*.cursor
+*.cursor/*
