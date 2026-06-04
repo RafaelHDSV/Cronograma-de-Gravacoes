@@ -63,6 +63,8 @@ Em **Environment** -> **Add Environment Variable**:
 | `SUPABASE_URL` | `https://xxxx.supabase.co` | Project Settings -> API |
 | `SUPABASE_SERVICE_ROLE_KEY` | JWT longo (`eyJ...`) | Chave **service_role** (secret) |
 | `NODE_ENV` | `production` | Recomendado |
+| `EDITOR_PASSWORD` | senha forte da equipe | Modo editor (ver [seguranca.md](seguranca.md)) |
+| `SESSION_SECRET` | string aleatoria 32+ chars | Assina token do editor |
 
 O Render define **`PORT`** e **`RENDER=true`** automaticamente — nao precisa criar `PORT` manualmente.
 

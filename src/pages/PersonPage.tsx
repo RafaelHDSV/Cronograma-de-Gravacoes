@@ -5,10 +5,11 @@ import { formatDateLong, dayKey, personProgress, STATUS_LABEL } from '../lib/sch
 interface Props {
   people: Person[]
   sessions: Session[]
+  canEdit: boolean
   onToggleDone: (id: string) => void
 }
 
-export function PersonPage({ people, sessions, onToggleDone }: Props) {
+export function PersonPage({ people, sessions, canEdit, onToggleDone }: Props) {
   const progress = useMemo(() => personProgress(people, sessions), [people, sessions])
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
@@ -61,7 +62,7 @@ export function PersonPage({ people, sessions, onToggleDone }: Props) {
                       return (
                         <tr key={t.letter} className={`topic-row ${status ?? 'unscheduled'}`}>
                           <td className="col-check">
-                            {session && (
+                            {session && canEdit && (
                               <label className="session-check">
                                 <input
                                   type="checkbox"

@@ -2,6 +2,9 @@ import type { Person, Session, SessionStatus, Topic } from './types'
 
 const TZ = 'America/Sao_Paulo'
 
+/** Inicios padrao das janelas 14-16h e 16-18h */
+export const DEFAULT_SLOT_HOURS = [14, 16] as const
+
 export function buildPersonIndex(people: Person[]): Map<string, Person> {
   return new Map(people.map((p) => [p.id, p]))
 }

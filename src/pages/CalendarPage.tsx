@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
-import type { Person, Session } from '../lib/types'
+import { StatusBadge } from '../components/StatusBadge'
+import { TimeSlotPicker } from '../components/TimeSlotPicker'
 import {
   activeSessions,
   buildCalendarMonth,
@@ -7,21 +8,24 @@ import {
   findTopic,
   formatDateLong,
   formatTime,
+  localTimeParts,
   monthLabel,
   sessionMonthRange,
   sessionsForDay,
   todayKey,
 } from '../lib/schedule'
-import { StatusBadge } from '../components/StatusBadge'
+import type { Person, Session } from '../lib/types'
 
 interface Props {
   sessions: Session[]
   personIndex: Map<string, Person>
+  canEdit: boolean
   onMoveSession: (id: string, targetDayKey: string) => void
   onToggleDone: (id: string) => void
   onSwapTime: (idA: string, idB: string) => void
   onPostpone: (id: string) => void
-  onReschedule: (id: string, targetDayKey: string) => void
+  onReschedule: (id: string, targetDayKey: string, hour: number, minute: number) => void
+  onChangeTime: (id: string, hour: number, minute: number) => void
 }
 
 const WEEKDAYS_SHORT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -29,12 +33,15 @@ const WEEKDAYS_SHORT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 export function CalendarPage({
   sessions,
   personIndex,
+  canEdit,
   onMoveSession,
   onToggleDone,
   onSwapTime,
   onPostpone,
   onReschedule,
+  onChangeTime,
 }: Props) {
+  const [editingTimeId, setEditingTimeId] = useState<string | null>(null)
   const calendarSessions = useMemo(() => activeSessions(sessions), [sessions])
   const postponedSessions = useMemo(
     () =>
@@ -134,7 +141,11 @@ export function CalendarPage({
         </button>
       </div>
 
-      <p className="calendar-hint">Arraste uma gravação para outro dia para remarcar.</p>
+      <p className="calendar-hint">
+        {canEdit
+          ? 'Arraste para outro dia (mantém o horário). Use Horário para ajustar a faixa.'
+          : 'Modo leitura — ative o modo editor para alterar o cronograma.'}
+      </p>
 
       <div className="calendar-grid">
         {WEEKDAYS_SHORT.map((wd) => (
@@ -157,11 +168,12 @@ export function CalendarPage({
               className={`calendar-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${dragOverDay === day ? 'drag-over' : ''}`}
               onClick={() => setSelectedDay(day)}
               onDragOver={(e) => {
+                if (!canEdit) return
                 e.preventDefault()
                 setDragOverDay(day)
               }}
               onDragLeave={() => setDragOverDay((d) => (d === day ? null : d))}
-              onDrop={(e) => handleDrop(e, day)}
+              onDrop={(e) => canEdit && handleDrop(e, day)}
             >
               <div className="cell-header">
                 <span className="cell-day">{Number(day.split('-')[2])}</span>
@@ -179,8 +191,8 @@ export function CalendarPage({
                     <div
                       key={s.id}
                       className={`session-chip ${s.status}`}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, s.id)}
+                      draggable={canEdit}
+                      onDragStart={(e) => canEdit && handleDragStart(e, s.id)}
                       onClick={(e) => e.stopPropagation()}
                       title={`${person?.name} — ${topic?.title ?? s.topicLetter} · ${formatTime(s.scheduledAt)}`}
                     >
@@ -226,13 +238,15 @@ export function CalendarPage({
                 const isDone = s.status === 'done'
                 const isScheduled = s.status === 'scheduled'
                 const canSwapDown = idx < selectedSessions.length - 1
+                const { hour, minute } = localTimeParts(s.scheduledAt)
+                const showTimeEdit = editingTimeId === s.id
                 return (
                   <li key={s.id} className={`calendar-detail-row ${s.status}`}>
                     <label className="session-check" title={isDone ? 'Desmarcar' : 'Marcar como gravada'}>
                       <input
                         type="checkbox"
                         checked={isDone}
-                        disabled={!isDone && !isScheduled}
+                        disabled={!canEdit || (!isDone && !isScheduled)}
                         onChange={() => onToggleDone(s.id)}
                       />
                       <span className="checkmark" />
@@ -246,7 +260,7 @@ export function CalendarPage({
                     <span className="detail-meta">
                       <StatusBadge status={s.status} />
                     </span>
-                    {isScheduled && (
+                    {canEdit && isScheduled && (
                       <button
                         className="btn ghost postpone-btn"
                         onClick={() => onPostpone(s.id)}
@@ -255,8 +269,17 @@ export function CalendarPage({
                         Adiar
                       </button>
                     )}
-                    {!isScheduled && <span className="postpone-placeholder" />}
-                    {canSwapDown && (
+                    {canEdit && !isScheduled && <span className="postpone-placeholder" />}
+                    {canEdit && (
+                      <button
+                        type="button"
+                        className="btn ghost time-edit-btn"
+                        onClick={() => setEditingTimeId(showTimeEdit ? null : s.id)}
+                      >
+                        Horario
+                      </button>
+                    )}
+                    {canEdit && canSwapDown && (
                       <button
                         className="btn ghost swap-btn"
                         onClick={() => handleSwap(idx)}
@@ -266,15 +289,26 @@ export function CalendarPage({
                         ↕
                       </button>
                     )}
-                    {!canSwapDown && <span className="swap-placeholder" />}
-                    <div
-                      className="drag-handle"
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, s.id)}
-                      title="Arraste para mover de dia"
-                    >
-                      ⠿
-                    </div>
+                    {canEdit && !canSwapDown && <span className="swap-placeholder" />}
+                    {canEdit && (
+                      <div
+                        className="drag-handle"
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, s.id)}
+                        title="Arraste para mover de dia"
+                      >
+                        ⠿
+                      </div>
+                    )}
+                    {showTimeEdit && canEdit && (
+                      <div className="detail-time-edit">
+                        <TimeSlotPicker
+                          hour={hour}
+                          minute={minute}
+                          onChange={(h, m) => onChangeTime(s.id, h, m)}
+                        />
+                      </div>
+                    )}
                   </li>
                 )
               })}
@@ -299,6 +333,7 @@ export function CalendarPage({
                 key={s.id}
                 session={s}
                 personIndex={personIndex}
+                canEdit={canEdit}
                 onReschedule={onReschedule}
               />
             ))}
@@ -312,20 +347,25 @@ export function CalendarPage({
 function PostponedRow({
   session,
   personIndex,
+  canEdit,
   onReschedule,
 }: {
   session: Session
   personIndex: Map<string, Person>
-  onReschedule: (id: string, targetDayKey: string) => void
+  canEdit: boolean
+  onReschedule: (id: string, targetDayKey: string, hour: number, minute: number) => void
 }) {
   const person = personIndex.get(session.personId)
   const topic = findTopic(person, session.topicLetter)
   const [newDate, setNewDate] = useState('')
+  const { hour, minute } = localTimeParts(session.scheduledAt)
+  const [slotHour, setSlotHour] = useState(hour)
+  const [slotMinute, setSlotMinute] = useState(minute)
   const originalDay = dayKey(session.scheduledAt)
 
   const handleSchedule = () => {
     if (!newDate) return
-    onReschedule(session.id, newDate)
+    onReschedule(session.id, newDate, slotHour, slotMinute)
     setNewDate('')
   }
 
@@ -340,18 +380,28 @@ function PostponedRow({
         <span className="postponed-topic">{topic?.title ?? '—'}</span>
         <span className="postponed-was">Era {formatDateLong(originalDay).split(',')[1]?.trim()}</span>
       </div>
-      <div className="postponed-actions">
-        <input
-          type="date"
-          className="date-input"
-          value={newDate}
-          onChange={(e) => setNewDate(e.target.value)}
-          aria-label="Nova data da gravação"
-        />
-        <button className="btn sm" onClick={handleSchedule} disabled={!newDate}>
-          Agendar
-        </button>
-      </div>
+      {canEdit && (
+        <div className="postponed-actions">
+          <input
+            type="date"
+            className="date-input"
+            value={newDate}
+            onChange={(e) => setNewDate(e.target.value)}
+            aria-label="Nova data da gravação"
+          />
+          <TimeSlotPicker
+            hour={slotHour}
+            minute={slotMinute}
+            onChange={(h, m) => {
+              setSlotHour(h)
+              setSlotMinute(m)
+            }}
+          />
+          <button className="btn sm" onClick={handleSchedule} disabled={!newDate}>
+            Agendar
+          </button>
+        </div>
+      )}
     </li>
   )
 }

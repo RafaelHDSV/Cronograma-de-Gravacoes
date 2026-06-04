@@ -76,9 +76,11 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 2. **Seed inicial:** só `sessions.yaml` se tabela vazia (não migra `data/sessions.json`).
 3. **Dev:** `yarn dev` — Vite 3333 + API 3334.
 4. **Chave `service_role` só no servidor** — nunca no bundle Vite.
-5. **Auth:** fora do escopo v1; reset da API aberto por enquanto.
-6. **`base: './'`** no Vite para GitHub Pages / raiz.
-7. **`yarn import`** regenera YAMLs do script legado.
+5. **Leitura publica; escrita com modo editor** — JWT em `localStorage` apos senha (`docs/seguranca.md`).
+6. **Alteracoes em rascunho** — confirmacao em modal antes de `apply-batch`.
+7. **Horarios padrao 14h e 16h** — slot custom via picker.
+8. **`base: './'`** no Vite para GitHub Pages / raiz.
+9. **`yarn import`** regenera YAMLs do script legado.
 
 ---
 
@@ -88,13 +90,13 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 |------|-----|
 | Repositório | (AGX-Software — preencher) |
 | Epic / board | (preencher) |
-| Documentação | `docs/especificacao.md`, `docs/supabase-setup.md`, `docs/deploy-render.md` |
+| Documentação | `docs/especificacao.md`, `docs/supabase-setup.md`, `docs/deploy-render.md`, `docs/seguranca.md` |
 
 ---
 
 ## Fora de escopo (v1)
 
-- Autenticação (planejada em versão próxima).
+- Contas individuais / OAuth por usuario.
 - `people` / tópicos no Supabase.
 - Botão Discord no UI; deep link `?date=`.
 - GitHub Pages com API (só estático no workflow atual).

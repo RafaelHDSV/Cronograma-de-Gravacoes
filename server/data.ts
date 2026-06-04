@@ -179,6 +179,23 @@ export async function resetSessionsFromYaml(): Promise<Session[]> {
   return sessions
 }
 
+export type SessionPatch = {
+  status?: SessionStatus
+  scheduledAt?: string
+  recordedAt?: string
+}
+
+export async function applySessionPatches(
+  patches: Array<{ id: string } & SessionPatch>,
+): Promise<Session[]> {
+  const updated: Session[] = []
+  for (const { id, ...patch } of patches) {
+    const session = await updateSession(id, patch)
+    if (session) updated.push(session)
+  }
+  return updated
+}
+
 export async function swapSessionTimes(idA: string, idB: string): Promise<[Session, Session] | null> {
   const idxA = sessions.findIndex((s) => s.id === idA)
   const idxB = sessions.findIndex((s) => s.id === idB)

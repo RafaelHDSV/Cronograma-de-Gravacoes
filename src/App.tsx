@@ -1,10 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { ScheduleData, Session } from './lib/types'
-import { buildPersonIndex, dayKey, globalStats, rescheduleSession } from './lib/schedule'
-import { fetchSchedule, patchSession, swapSessionTimes } from './lib/api'
-import { SummaryPage } from './pages/SummaryPage'
+import { ConfirmChangesModal } from './components/ConfirmChangesModal'
+import { EditorLoginModal } from './components/EditorLoginModal'
+import { applySessionBatch, fetchAuthMe, fetchSchedule } from './lib/api'
+import { clearEditorToken, getEditorToken } from './lib/authStorage'
+import {
+  applyPendingPatches,
+  buildPendingRows,
+  mergePatch,
+  mergeSessionsFromServer,
+  type PendingEntry,
+  type SessionPatch,
+} from './lib/pending'
+import { buildPersonIndex, buildScheduledAt, dayKey, globalStats } from './lib/schedule'
+import type { ScheduleData } from './lib/types'
 import { CalendarPage } from './pages/CalendarPage'
 import { PersonPage } from './pages/PersonPage'
+import { SummaryPage } from './pages/SummaryPage'
 
 type Tab = 'summary' | 'calendar' | 'person'
 
@@ -18,6 +29,11 @@ export function App() {
   const [data, setData] = useState<ScheduleData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState<Tab>('summary')
+  const [isEditor, setIsEditor] = useState(false)
+  const [showLogin, setShowLogin] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [pending, setPending] = useState<Map<string, PendingEntry>>(new Map())
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     fetchSchedule()
@@ -25,96 +41,207 @@ export function App() {
       .catch((e) => setError(String(e)))
   }, [])
 
-  const replaceSession = useCallback((updated: Session) => {
-    setData((prev) => {
-      if (!prev) return prev
-      return {
-        ...prev,
-        sessions: prev.sessions.map((s) => (s.id === updated.id ? updated : s)),
-      }
-    })
+  useEffect(() => {
+    const token = getEditorToken()
+    if (!token) {
+      setIsEditor(false)
+      return
+    }
+    fetchAuthMe()
+      .then((r) => setIsEditor(r.editor))
+      .catch(() => {
+        clearEditorToken()
+        setIsEditor(false)
+      })
   }, [])
 
-  const replaceSessions = useCallback((updated: Session[]) => {
-    setData((prev) => {
-      if (!prev) return prev
-      const map = new Map(updated.map((s) => [s.id, s]))
-      return {
-        ...prev,
-        sessions: prev.sessions.map((s) => map.get(s.id) ?? s),
-      }
-    })
-  }, [])
+  const queueChange = useCallback(
+    (sessionId: string, patch: SessionPatch, label: string) => {
+      if (!isEditor) return
+      setPending((prev) => {
+        const next = new Map(prev)
+        const cur = next.get(sessionId)
+        next.set(sessionId, {
+          patch: mergePatch(cur?.patch ?? {}, patch),
+          labels: [...(cur?.labels ?? []), label],
+        })
+        return next
+      })
+    },
+    [isEditor],
+  )
+
+  const baselineSessions = data?.sessions ?? []
+  const displaySessions = useMemo(
+    () => applyPendingPatches(baselineSessions, pending),
+    [baselineSessions, pending],
+  )
+
+  const personIndex = useMemo(
+    () => (data ? buildPersonIndex(data.people) : new Map()),
+    [data],
+  )
+  const stats = useMemo(() => globalStats(displaySessions), [displaySessions])
+  const pendingCount = pending.size
+  const pendingRows = useMemo(
+    () => buildPendingRows(baselineSessions, pending),
+    [baselineSessions, pending],
+  )
+
+  const findDisplaySession = useCallback(
+    (id: string) => displaySessions.find((s) => s.id === id),
+    [displaySessions],
+  )
 
   const onToggleDone = useCallback(
-    async (id: string) => {
-      const session = data?.sessions.find((s) => s.id === id)
+    (id: string) => {
+      const session = findDisplaySession(id)
       if (!session) return
       const newStatus = session.status === 'done' ? 'scheduled' : 'done'
-      const recordedAt = newStatus === 'done' ? dayKey(new Date().toISOString()) : undefined
-      const updated = await patchSession(id, {
-        status: newStatus,
-        recordedAt: recordedAt ?? '',
-      })
-      replaceSession(updated)
+      const recordedAt = newStatus === 'done' ? dayKey(new Date().toISOString()) : ''
+      queueChange(
+        id,
+        { status: newStatus, recordedAt },
+        newStatus === 'done' ? 'Marcar como gravada' : 'Desmarcar gravação',
+      )
     },
-    [data, replaceSession],
+    [findDisplaySession, queueChange],
   )
 
   const onMoveSession = useCallback(
-    async (id: string, targetDayKey: string) => {
-      const session = data?.sessions.find((s) => s.id === id)
+    (id: string, targetDayKey: string) => {
+      const session = findDisplaySession(id)
       if (!session) return
       const timeParts = session.scheduledAt.split('T')[1]
       const [y, m, d] = targetDayKey.split('-')
       const newScheduledAt = `${y}-${m}-${d}T${timeParts}`
-      const updated = await patchSession(id, { scheduledAt: newScheduledAt })
-      replaceSession(updated)
+      queueChange(id, { scheduledAt: newScheduledAt }, `Mover para ${targetDayKey}`)
     },
-    [data, replaceSession],
+    [findDisplaySession, queueChange],
   )
 
   const onSwapTime = useCallback(
-    async (idA: string, idB: string) => {
-      const [a, b] = await swapSessionTimes(idA, idB)
-      replaceSessions([a, b])
+    (idA: string, idB: string) => {
+      const a = findDisplaySession(idA)
+      const b = findDisplaySession(idB)
+      if (!a || !b) return
+      queueChange(idA, { scheduledAt: b.scheduledAt }, 'Trocar horário')
+      queueChange(idB, { scheduledAt: a.scheduledAt }, 'Trocar horário')
     },
-    [replaceSessions],
+    [findDisplaySession, queueChange],
   )
 
   const onPostpone = useCallback(
-    async (id: string) => {
-      const updated = await patchSession(id, { status: 'postponed' })
-      replaceSession(updated)
+    (id: string) => {
+      queueChange(id, { status: 'postponed' }, 'Adiar gravação')
     },
-    [replaceSession],
+    [queueChange],
   )
 
   const onReschedule = useCallback(
-    async (id: string, targetDayKey: string) => {
-      const session = data?.sessions.find((s) => s.id === id)
+    (id: string, targetDayKey: string, hour: number, minute: number) => {
+      const session = findDisplaySession(id)
       if (!session) return
-      const scheduledAt = rescheduleSession(session, targetDayKey)
-      const updated = await patchSession(id, { status: 'scheduled', scheduledAt })
-      replaceSession(updated)
+      const scheduledAt = buildScheduledAt(targetDayKey, hour, minute)
+      queueChange(
+        id,
+        { status: 'scheduled', scheduledAt },
+        `Reagendar para ${targetDayKey}`,
+      )
     },
-    [data, replaceSession],
+    [findDisplaySession, queueChange],
   )
 
-  const personIndex = useMemo(() => (data ? buildPersonIndex(data.people) : new Map()), [data])
-  const stats = useMemo(() => (data ? globalStats(data.sessions) : null), [data])
+  const onChangeTime = useCallback(
+    (id: string, hour: number, minute: number) => {
+      const session = findDisplaySession(id)
+      if (!session) return
+      const dk = dayKey(session.scheduledAt)
+      const scheduledAt = buildScheduledAt(dk, hour, minute)
+      queueChange(id, { scheduledAt }, 'Alterar horário')
+    },
+    [findDisplaySession, queueChange],
+  )
+
+  const discardPending = useCallback(() => {
+    setPending(new Map())
+    setShowConfirm(false)
+  }, [])
+
+  const commitPending = useCallback(async () => {
+    if (pending.size === 0) return
+    setSaving(true)
+    try {
+      const changes = Array.from(pending.entries()).map(([id, { patch }]) => ({
+        id,
+        ...patch,
+      }))
+      const updated = await applySessionBatch(changes)
+      setData((prev) =>
+        prev
+          ? { ...prev, sessions: mergeSessionsFromServer(prev.sessions, updated) }
+          : prev,
+      )
+      setPending(new Map())
+      setShowConfirm(false)
+    } catch (e) {
+      setError(String(e))
+    } finally {
+      setSaving(false)
+    }
+  }, [pending])
+
+  const handleLogoutEditor = useCallback(() => {
+    clearEditorToken()
+    setIsEditor(false)
+    discardPending()
+  }, [discardPending])
 
   return (
     <div className="app">
       <header className="app-header">
         <div className="header-top">
           <div className="brand">
-            <h1>Cronograma de Gravações</h1>
-            {stats && (
-              <span className="header-stats">
-                {stats.done} gravadas · {stats.remaining} faltam
-                {stats.postponed > 0 && ` · ${stats.postponed} adiadas`} · {stats.total} no total
-              </span>
+            <img src="./logo.svg" alt="" className="brand-logo" width={36} height={36} />
+            <div>
+              <h1>Cronograma de Gravações</h1>
+              {stats && (
+                <span className="header-stats">
+                  {stats.done} gravadas · {stats.remaining} faltam
+                  {stats.postponed > 0 && ` · ${stats.postponed} adiadas`} · {stats.total} no total
+                  {!isEditor && ' · modo leitura'}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="header-actions">
+            {pendingCount > 0 && (
+              <span className="dirty-badge">{pendingCount} alteração(ões) pendente(s)</span>
+            )}
+            {isEditor ? (
+              <>
+                {pendingCount > 0 && (
+                  <>
+                    <button type="button" className="btn ghost" onClick={discardPending}>
+                      Descartar
+                    </button>
+                    <button
+                      type="button"
+                      className="btn primary"
+                      onClick={() => setShowConfirm(true)}
+                    >
+                      Confirmar alterações
+                    </button>
+                  </>
+                )}
+                <button type="button" className="btn ghost" onClick={handleLogoutEditor}>
+                  Sair do modo editor
+                </button>
+              </>
+            ) : (
+              <button type="button" className="btn primary" onClick={() => setShowLogin(true)}>
+                Modo editor
+              </button>
             )}
           </div>
         </div>
@@ -138,28 +265,47 @@ export function App() {
         {!data && !error && <p className="empty">Carregando…</p>}
         {data && (
           <>
-            {tab === 'summary' && <SummaryPage people={data.people} sessions={data.sessions} />}
+            {tab === 'summary' && (
+              <SummaryPage people={data.people} sessions={displaySessions} />
+            )}
             {tab === 'calendar' && (
               <CalendarPage
-                sessions={data.sessions}
+                sessions={displaySessions}
                 personIndex={personIndex}
+                canEdit={isEditor}
                 onMoveSession={onMoveSession}
                 onToggleDone={onToggleDone}
                 onSwapTime={onSwapTime}
                 onPostpone={onPostpone}
                 onReschedule={onReschedule}
+                onChangeTime={onChangeTime}
               />
             )}
             {tab === 'person' && (
               <PersonPage
                 people={data.people}
-                sessions={data.sessions}
+                sessions={displaySessions}
+                canEdit={isEditor}
                 onToggleDone={onToggleDone}
               />
             )}
           </>
         )}
       </main>
+
+      <EditorLoginModal
+        open={showLogin}
+        onClose={() => setShowLogin(false)}
+        onSuccess={() => setIsEditor(true)}
+      />
+      <ConfirmChangesModal
+        open={showConfirm}
+        rows={pendingRows}
+        personIndex={personIndex}
+        loading={saving}
+        onConfirm={commitPending}
+        onCancel={() => setShowConfirm(false)}
+      />
     </div>
   )
 }

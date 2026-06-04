@@ -10,24 +10,28 @@ import {
   updateSession,
   swapSessionTimes,
   resetSessionsFromYaml,
+  applySessionPatches,
 } from './data'
+import { handleAuthMe, handleLogin, requireEditor } from './auth'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const PORT = Number(process.env.PORT ?? 3334)
-// Render e outros PaaS exigem 0.0.0.0; em dev local mantemos 127.0.0.1
 const HOST = process.env.RENDER === 'true' ? '0.0.0.0' : '127.0.0.1'
 
 const app = express()
 app.use(cors())
 app.use(express.json())
 
+app.get('/api/auth/me', handleAuthMe)
+app.post('/api/auth/login', handleLogin)
+
 app.get('/api/schedule', (_req, res) => {
   res.json({ people: getPeople(), sessions: getSessions() })
 })
 
-app.patch('/api/sessions/:id', async (req, res) => {
+app.patch('/api/sessions/:id', requireEditor, async (req, res) => {
   try {
     const { id } = req.params
     const { status, scheduledAt, recordedAt } = req.body
@@ -42,7 +46,23 @@ app.patch('/api/sessions/:id', async (req, res) => {
   }
 })
 
-app.post('/api/sessions/swap-time', async (req, res) => {
+app.post('/api/sessions/apply-batch', requireEditor, async (req, res) => {
+  try {
+    const { changes } = req.body as {
+      changes?: Array<{ id: string; status?: string; scheduledAt?: string; recordedAt?: string }>
+    }
+    if (!Array.isArray(changes) || changes.length === 0) {
+      return res.status(400).json({ error: 'changes array is required' })
+    }
+    const sessions = await applySessionPatches(changes)
+    res.json({ sessions })
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ error: String(e) })
+  }
+})
+
+app.post('/api/sessions/swap-time', requireEditor, async (req, res) => {
   try {
     const { sessionIdA, sessionIdB } = req.body
     if (!sessionIdA || !sessionIdB) {
@@ -59,7 +79,7 @@ app.post('/api/sessions/swap-time', async (req, res) => {
   }
 })
 
-app.post('/api/schedule/reset', async (_req, res) => {
+app.post('/api/schedule/reset', requireEditor, async (_req, res) => {
   try {
     const sessions = await resetSessionsFromYaml()
     res.json({ people: getPeople(), sessions })

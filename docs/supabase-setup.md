@@ -142,4 +142,4 @@ GitHub Pages **so publica o front estatico**; mutacoes exigem o Express com Supa
 | `server/index.ts` | Carrega `dotenv` e rotas REST |
 | `.env.example` | Modelo de variaveis |
 
-Documentacao geral: `docs/context.md`, `docs/especificacao.md`.
+Documentacao geral: `docs/context.md`, `docs/especificacao.md`, `docs/seguranca.md`, `docs/deploy-render.md`.

@@ -1,10 +1,18 @@
 import type { ScheduleData, Session, SessionStatus } from './types'
+import { getEditorToken } from './authStorage'
 
 const BASE = import.meta.env.VITE_API_URL ?? ''
 
+function buildHeaders(): HeadersInit {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  const token = getEditorToken()
+  if (token) headers.Authorization = `Bearer ${token}`
+  return headers
+}
+
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${url}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildHeaders(),
     ...options,
   })
   if (!res.ok) {
@@ -18,24 +26,31 @@ export async function fetchSchedule(): Promise<ScheduleData> {
   return request<ScheduleData>('/api/schedule')
 }
 
-export async function patchSession(
-  id: string,
-  patch: { status?: SessionStatus; scheduledAt?: string; recordedAt?: string },
-): Promise<Session> {
-  const { session } = await request<{ session: Session }>(`/api/sessions/${id}`, {
-    method: 'PATCH',
-    body: JSON.stringify(patch),
-  })
-  return session
+export async function fetchAuthMe(): Promise<{ editor: boolean }> {
+  return request<{ editor: boolean }>('/api/auth/me')
 }
 
-export async function swapSessionTimes(
-  sessionIdA: string,
-  sessionIdB: string,
-): Promise<[Session, Session]> {
-  const { sessions } = await request<{ sessions: [Session, Session] }>('/api/sessions/swap-time', {
+export async function loginEditor(
+  password: string,
+): Promise<{ token: string; expiresAt: string }> {
+  return request<{ token: string; expiresAt: string }>('/api/auth/login', {
     method: 'POST',
-    body: JSON.stringify({ sessionIdA, sessionIdB }),
+    body: JSON.stringify({ password }),
+  })
+}
+
+export type SessionPatchPayload = {
+  status?: SessionStatus
+  scheduledAt?: string
+  recordedAt?: string
+}
+
+export async function applySessionBatch(
+  changes: Array<{ id: string } & SessionPatchPayload>,
+): Promise<Session[]> {
+  const { sessions } = await request<{ sessions: Session[] }>('/api/sessions/apply-batch', {
+    method: 'POST',
+    body: JSON.stringify({ changes }),
   })
   return sessions
 }

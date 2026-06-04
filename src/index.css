@@ -60,6 +60,17 @@ body {
   flex-wrap: wrap;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+
 .brand h1 {
   margin: 0;
   font-size: clamp(20px, 4vw, 26px);
@@ -853,7 +864,7 @@ body {
 
 .calendar-detail-row {
   display: grid;
-  grid-template-columns: auto 52px 150px 1fr auto auto auto auto;
+  grid-template-columns: auto 52px 150px 1fr auto auto auto auto auto;
   gap: 8px;
   align-items: center;
   padding: 12px 14px;
@@ -895,6 +906,164 @@ body {
   font-size: 16px !important;
   line-height: 1;
   border-radius: 6px !important;
+}
+
+.detail-time-edit {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.time-slot-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.time-slot-picker.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.time-slot-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.slot-btn.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.time-input {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.modal-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-width: 560px;
+  width: 100%;
+  max-height: 85vh;
+  overflow: auto;
+  padding: 24px;
+}
+
+.modal-panel-sm {
+  max-width: 400px;
+}
+
+.modal-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.modal-desc {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.modal-error {
+  margin-top: 8px;
+}
+
+.field-label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.text-input {
+  width: 100%;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 15px;
+}
+
+.confirm-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.confirm-item {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.confirm-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.confirm-tag {
+  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.confirm-diff {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.confirm-before {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.confirm-arrow {
+  color: var(--muted);
+  display: none;
+}
+
+.confirm-after {
+  color: var(--text);
 }
 
 .postpone-btn {
