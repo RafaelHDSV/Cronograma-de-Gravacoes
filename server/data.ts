@@ -26,7 +26,6 @@ export interface Session {
   personId: string
   topicLetter: string
   status: SessionStatus
-  notes?: string
   recordedAt?: string
 }
 
@@ -36,7 +35,6 @@ interface SessionRow {
   person_id: string
   topic_letter: string
   status: SessionStatus
-  notes: string | null
   recorded_at: string | null
 }
 
@@ -58,7 +56,6 @@ function rowToSession(row: SessionRow): Session {
     personId: row.person_id,
     topicLetter: row.topic_letter,
     status: row.status,
-    notes: row.notes ?? undefined,
     recordedAt: row.recorded_at ?? undefined,
   }
 }
@@ -70,7 +67,7 @@ function sessionToRow(session: Session): SessionRow {
     person_id: session.personId,
     topic_letter: session.topicLetter,
     status: session.status,
-    notes: session.notes ?? '',
+    notes: '',
     recorded_at: session.recordedAt?.trim() ? session.recordedAt : null,
   }
 }

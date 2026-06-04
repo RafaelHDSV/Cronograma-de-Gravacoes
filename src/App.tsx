@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ConfirmChangesModal } from './components/ConfirmChangesModal'
 import { EditorLoginModal } from './components/EditorLoginModal'
+import { PersonCompleteCelebration } from './components/PersonCompleteCelebration'
 import { applySessionBatch, fetchAuthMe, fetchSchedule } from './lib/api'
 import { clearEditorToken, getEditorToken } from './lib/authStorage'
 import {
@@ -11,6 +12,7 @@ import {
   type SessionPatch,
   upsertPendingEntry,
 } from './lib/pending'
+import { willCompletePersonOnMarkDone } from './lib/personComplete'
 import { formatAlteracoesPendentes } from './lib/ptPlural'
 import { buildPersonIndex, buildScheduledAt, dayKey } from './lib/schedule'
 import type { ScheduleData } from './lib/types'
@@ -36,12 +38,18 @@ export function App() {
   const [showConfirm, setShowConfirm] = useState(false)
   const [pending, setPending] = useState<Map<string, PendingEntry>>(new Map())
   const [saving, setSaving] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [celebration, setCelebration] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetchSchedule()
+  const loadSchedule = useCallback(() => {
+    return fetchSchedule()
       .then(setData)
       .catch((e) => setError(String(e)))
   }, [])
+
+  useEffect(() => {
+    loadSchedule()
+  }, [loadSchedule])
 
   useEffect(() => {
     fetchAuthMe()
@@ -92,10 +100,27 @@ export function App() {
       if (!session) return
       const newStatus = session.status === 'done' ? 'scheduled' : 'done'
       const recordedAt = newStatus === 'done' ? dayKey(new Date().toISOString()) : ''
+      if (newStatus === 'done') {
+        const hit = willCompletePersonOnMarkDone(displaySessions, id)
+        if (hit) {
+          const name = personIndex.get(hit.personId)?.name ?? hit.personId
+          setCelebration(name)
+        }
+      }
       queueChange(id, { status: newStatus, recordedAt })
     },
-    [findDisplaySession, queueChange],
+    [findDisplaySession, queueChange, displaySessions, personIndex],
   )
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true)
+    setError(null)
+    try {
+      await loadSchedule()
+    } finally {
+      setRefreshing(false)
+    }
+  }, [loadSchedule])
 
   const onMoveSession = useCallback(
     (id: string, targetDayKey: string) => {
@@ -191,6 +216,18 @@ export function App() {
             <h1>Cronograma de Gravações</h1>
           </div>
           <div className="header-actions">
+            <button
+              type="button"
+              className="btn ghost btn-icon"
+              onClick={onRefresh}
+              disabled={refreshing || !data}
+              title="Atualizar cronograma"
+              aria-label="Atualizar cronograma"
+            >
+              <span className={`reload-icon${refreshing ? ' spinning' : ''}`} aria-hidden="true">
+                ↻
+              </span>
+            </button>
             {pendingCount > 0 && (
               <span className="dirty-badge">{formatAlteracoesPendentes(pendingCount)}</span>
             )}
@@ -281,6 +318,12 @@ export function App() {
         onConfirm={commitPending}
         onCancel={() => setShowConfirm(false)}
       />
+      {celebration && (
+        <PersonCompleteCelebration
+          personName={celebration}
+          onDismiss={() => setCelebration(null)}
+        />
+      )}
     </div>
   )
 }

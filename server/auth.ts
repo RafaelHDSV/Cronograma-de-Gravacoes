@@ -1,5 +1,8 @@
 import crypto from 'node:crypto'
 import type { Request, Response, NextFunction } from 'express'
+import { isRateLimited } from './rateLimit'
+
+const LOGIN_LIMIT = { max: 10, windowMs: 15 * 60 * 1000 }
 
 const SESSION_SECRET = process.env.SESSION_SECRET?.trim() ?? ''
 const EDITOR_PASSWORD = process.env.EDITOR_PASSWORD?.trim() ?? ''
@@ -93,6 +96,10 @@ export function requireEditor(req: Request, res: Response, next: NextFunction): 
 }
 
 export function handleLogin(req: Request, res: Response): void {
+  if (isRateLimited(req, 'login', LOGIN_LIMIT.max, LOGIN_LIMIT.windowMs)) {
+    res.status(429).json({ error: 'Muitas tentativas. Aguarde alguns minutos.' })
+    return
+  }
   try {
     requireAuthConfig()
   } catch (e) {

@@ -13,7 +13,7 @@
   --done: #34d399;
   --scheduled: #5b8cff;
   --postponed: #fbbf24;
-  --cancelled: #f87171;
+  --error: #f87171;
   --remaining: #cbd5e1;
   --radius: 12px;
   --radius-sm: 8px;
@@ -219,7 +219,7 @@ body {
 }
 
 .error {
-  color: var(--cancelled);
+  color: var(--error);
 }
 
 /* Session check */
@@ -327,10 +327,6 @@ body {
 .session-row.postponed {
   border-left-color: var(--postponed);
 }
-.session-row.cancelled {
-  border-left-color: var(--cancelled);
-  opacity: 0.65;
-}
 .session-row.closes {
   box-shadow: inset 0 0 0 1px rgba(91, 140, 255, 0.2);
 }
@@ -362,11 +358,6 @@ body {
   justify-content: flex-end;
 }
 
-.note {
-  font-size: 12px;
-  color: var(--postponed);
-}
-
 .badge {
   font-size: 11px;
   padding: 3px 10px;
@@ -386,11 +377,6 @@ body {
   background: rgba(251, 191, 36, 0.15);
   color: var(--postponed);
 }
-.badge-cancelled {
-  background: rgba(248, 113, 113, 0.15);
-  color: var(--cancelled);
-}
-
 /* Person list (accordion) */
 .person-list {
   display: flex;
@@ -803,11 +789,6 @@ body {
 
 .session-chip.postponed {
   border-left-color: var(--postponed);
-}
-
-.session-chip.cancelled {
-  border-left-color: var(--cancelled);
-  opacity: 0.5;
 }
 
 .session-chip.mini {
@@ -1276,6 +1257,65 @@ body {
   .postponed-actions .date-input {
     flex: 1;
   }
+}
+
+.btn-icon {
+  padding: 8px 10px;
+  min-width: 40px;
+}
+
+.reload-icon {
+  display: inline-block;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.reload-icon.spinning {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.celebration-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.celebration-panel {
+  max-width: 400px;
+  width: 100%;
+  padding: 32px 28px;
+  text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.celebration-emoji {
+  margin: 0 0 12px;
+  font-size: 3rem;
+}
+
+.celebration-title {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+}
+
+.celebration-desc {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 0.95rem;
 }
 
 @media (max-width: 480px) {

@@ -13,6 +13,9 @@ import {
   applySessionPatches,
 } from './data'
 import { handleAuthMe, handleLogin, requireEditor } from './auth'
+import { isRateLimited } from './rateLimit'
+
+const BATCH_LIMIT = { max: 60, windowMs: 60 * 1000 }
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -53,6 +56,9 @@ app.patch('/api/sessions/:id', requireEditor, async (req, res) => {
 })
 
 app.post('/api/sessions/apply-batch', requireEditor, async (req, res) => {
+  if (isRateLimited(req, 'apply-batch', BATCH_LIMIT.max, BATCH_LIMIT.windowMs)) {
+    return res.status(429).json({ error: 'Muitas alteracoes em pouco tempo. Aguarde um momento.' })
+  }
   try {
     const { changes } = req.body as {
       changes?: Array<{ id: string; status?: string; scheduledAt?: string; recordedAt?: string }>

@@ -152,7 +152,7 @@ Isso reduz erros de clique e nao substitui auth (ambos se complementam).
 
 1. **Cookie HttpOnly** em paralelo ao Bearer (hibrido).
 2. **Supabase Auth** ou **GitHub OAuth** por editor identificado.
-3. **Rate limiting** em login e apply-batch.
+3. ~~**Rate limiting** em login e apply-batch.~~ **Implementado:** login 10 / 15 min por IP; apply-batch 60 / min por IP (`server/rateLimit.ts`).
 4. **Log de auditoria** (tabela `session_audit` no Supabase).
 5. **2FA** ou senhas por pessoa (vault da equipe).
 

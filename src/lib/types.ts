@@ -17,7 +17,6 @@ export interface Session {
   personId: string
   topicLetter: string
   status: SessionStatus
-  notes?: string
   recordedAt?: string
 }
 

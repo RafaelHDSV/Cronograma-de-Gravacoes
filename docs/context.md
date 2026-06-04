@@ -80,6 +80,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 4. **Chave `service_role` só no servidor** — nunca no bundle Vite.
 5. **Leitura publica; escrita com modo editor** — JWT em `localStorage` apos senha (`docs/seguranca.md`).
 6. **Alteracoes em rascunho** — confirmacao em modal antes de `apply-batch`; acoes que voltam ao estado do servidor saem da fila; textos de contagem com plural pt-BR (`1 sessao` / `N sessoes`).
+7. **Atualizar** — botao reload no header; **celebracao** ao marcar ultima gravacao de uma pessoa; rate limit login/batch (`server/rateLimit.ts`).
 7. **Horarios padrao 14h e 16h** — slot custom via picker.
 8. **`base: './'`** no Vite para GitHub Pages / raiz.
 9. **`yarn import`** regenera YAMLs do script legado.
@@ -100,7 +101,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 
 - Contas individuais / OAuth por usuario.
 - `people` / tópicos no Supabase.
-- Botão Discord no UI; deep link `?date=`.
+- Botão Discord no UI; deep link `?date=`; campo `notes` na UI; status `cancelled`.
 - GitHub Pages com API (só estático no workflow atual).
 
 ---
