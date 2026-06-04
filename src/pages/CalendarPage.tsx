@@ -117,52 +117,56 @@ export function CalendarPage({
   )
 
   return (
-    <section className="calendar-page">
-      <div className="page-head">
-        <div className="calendar-nav">
+    <section className='calendar-page'>
+      <div className='page-head'>
+        <div className='calendar-nav'>
           <button
-            className="btn ghost"
+            className='btn ghost'
             onClick={() => setMonthIndex((i) => Math.max(0, i - 1))}
             disabled={monthIndex === 0}
-            aria-label="Mês anterior"
+            aria-label='Mês anterior'
           >
             ‹
           </button>
-          <h2 className="calendar-title">{monthLabel(year, month)}</h2>
+          <h2 className='calendar-title'>{monthLabel(year, month)}</h2>
           <button
-            className="btn ghost"
-            onClick={() => setMonthIndex((i) => Math.min(monthRange.length - 1, i + 1))}
+            className='btn ghost'
+            onClick={() =>
+              setMonthIndex((i) => Math.min(monthRange.length - 1, i + 1))
+            }
             disabled={monthIndex >= monthRange.length - 1}
-            aria-label="Próximo mês"
+            aria-label='Próximo mês'
           >
             ›
           </button>
         </div>
-        <button className="btn ghost" onClick={goToToday}>
+        <button className='btn ghost' onClick={goToToday}>
           Ir para hoje
         </button>
       </div>
 
-      <p className="calendar-hint">
+      <p className='calendar-hint'>
         {canEdit
-          ? 'Arraste um chip na grade para outro dia (mantém o horário). No detalhe, use o ícone ao lado do horário para editar a faixa.'
+          ? ''
           : 'Modo leitura — ative o modo editor para alterar o cronograma.'}
       </p>
 
-      <div className="calendar-grid">
+      <div className='calendar-grid'>
         {WEEKDAYS_SHORT.map((wd) => (
-          <div key={wd} className="calendar-weekday">
+          <div key={wd} className='calendar-weekday'>
             {wd}
           </div>
         ))}
         {calendar.weeks.flat().map((day, i) => {
           if (!day) {
-            return <div key={`empty-${i}`} className="calendar-cell empty" />
+            return <div key={`empty-${i}`} className='calendar-cell empty' />
           }
           const daySessions = sessionsByDay.get(day) ?? []
           const isToday = day === today
           const isSelected = day === selectedDay
-          const doneCount = daySessions.filter((s) => s.status === 'done').length
+          const doneCount = daySessions.filter(
+            (s) => s.status === 'done'
+          ).length
 
           return (
             <div
@@ -177,15 +181,15 @@ export function CalendarPage({
               onDragLeave={() => setDragOverDay((d) => (d === day ? null : d))}
               onDrop={(e) => canEdit && handleDrop(e, day)}
             >
-              <div className="cell-header">
-                <span className="cell-day">{Number(day.split('-')[2])}</span>
+              <div className='cell-header'>
+                <span className='cell-day'>{Number(day.split('-')[2])}</span>
                 {daySessions.length > 0 && (
-                  <span className="cell-count">
+                  <span className='cell-count'>
                     {doneCount}/{daySessions.length}
                   </span>
                 )}
               </div>
-              <div className="cell-sessions">
+              <div className='cell-sessions'>
                 {daySessions.slice(0, 3).map((s) => {
                   const person = personIndex.get(s.personId)
                   const topic = findTopic(person, s.topicLetter)
@@ -198,13 +202,19 @@ export function CalendarPage({
                       onClick={(e) => e.stopPropagation()}
                       title={`${person?.name} — ${topic?.title ?? s.topicLetter} · ${formatTime(s.scheduledAt)}`}
                     >
-                      <span className="chip-time">{formatTime(s.scheduledAt)}</span>
-                      <span className="chip-name">{person?.name?.split(' ')[0] ?? s.personId}</span>
+                      <span className='chip-time'>
+                        {formatTime(s.scheduledAt)}
+                      </span>
+                      <span className='chip-name'>
+                        {person?.name?.split(' ')[0] ?? s.personId}
+                      </span>
                     </div>
                   )
                 })}
                 {daySessions.length > 3 && (
-                  <span className="cell-more">+{daySessions.length - 3} mais</span>
+                  <span className='cell-more'>
+                    +{daySessions.length - 3} mais
+                  </span>
                 )}
               </div>
             </div>
@@ -213,27 +223,29 @@ export function CalendarPage({
       </div>
 
       {selectedDay && (
-        <div className="calendar-detail">
-          <h3 className="section-title">
+        <div className='calendar-detail'>
+          <h3 className='section-title'>
             {new Intl.DateTimeFormat('pt-BR', {
               weekday: 'long',
               day: 'numeric',
-              month: 'long',
+              month: 'long'
             }).format(
               new Date(
                 Date.UTC(
                   Number(selectedDay.split('-')[0]),
                   Number(selectedDay.split('-')[1]) - 1,
                   Number(selectedDay.split('-')[2]),
-                  12,
-                ),
-              ),
+                  12
+                )
+              )
             )}
           </h3>
           {selectedSessions.length === 0 ? (
-            <p className="empty">Nenhuma gravação neste dia. Arraste uma sessão para cá.</p>
+            <p className='empty'>
+              Nenhuma gravação neste dia. Arraste uma sessão para cá.
+            </p>
           ) : (
-            <ul className="calendar-detail-list">
+            <ul className='calendar-detail-list'>
               {selectedSessions.map((s, idx) => {
                 const person = personIndex.get(s.personId)
                 const topic = findTopic(person, s.topicLetter)
@@ -244,51 +256,61 @@ export function CalendarPage({
                 const showTimeEdit = editingTimeId === s.id
                 return (
                   <li key={s.id} className={`calendar-detail-row ${s.status}`}>
-                    <Tooltip label={isDone ? 'Desmarcar gravação' : 'Marcar como gravada'}>
-                      <label className="session-check">
+                    <Tooltip
+                      label={
+                        isDone ? 'Desmarcar gravação' : 'Marcar como gravada'
+                      }
+                    >
+                      <label className='session-check'>
                         <input
-                          type="checkbox"
+                          type='checkbox'
                           checked={isDone}
                           disabled={!canEdit || (!isDone && !isScheduled)}
                           onChange={() => onToggleDone(s.id)}
                         />
-                        <span className="checkmark" />
+                        <span className='checkmark' />
                       </label>
                     </Tooltip>
-                    <div className="detail-body">
-                      <div className="detail-time-group">
-                        <span className="detail-time">{formatTime(s.scheduledAt)}</span>
+                    <div className='detail-body'>
+                      <div className='detail-time-group'>
+                        <span className='detail-time'>
+                          {formatTime(s.scheduledAt)}
+                        </span>
                         {canEdit && isScheduled && (
                           <IconButton
-                            label="Alterar horário"
-                            className="time-edit-btn"
+                            label='Alterar horário'
+                            className='time-edit-btn'
                             active={showTimeEdit}
                             aria-expanded={showTimeEdit}
-                            onClick={() => setEditingTimeId(showTimeEdit ? null : s.id)}
+                            onClick={() =>
+                              setEditingTimeId(showTimeEdit ? null : s.id)
+                            }
                           >
                             <IconEdit />
                           </IconButton>
                         )}
                       </div>
-                      <span className="detail-dot" aria-hidden="true">
+                      <span className='detail-dot' aria-hidden='true'>
                         ·
                       </span>
-                      <span className="detail-person">
+                      <span className='detail-person'>
                         <strong>{person?.name ?? s.personId}</strong>
-                        <span className="letter">({s.topicLetter})</span>
+                        <span className='letter'>({s.topicLetter})</span>
                       </span>
-                      <span className="detail-dot" aria-hidden="true">
+                      <span className='detail-dot' aria-hidden='true'>
                         ·
                       </span>
-                      <span className="detail-topic">{topic?.title ?? '—'}</span>
+                      <span className='detail-topic'>
+                        {topic?.title ?? '—'}
+                      </span>
                       {isDone && <StatusBadge status={s.status} />}
                     </div>
                     {canEdit && (isScheduled || canSwapDown) && (
-                      <div className="detail-actions">
+                      <div className='detail-actions'>
                         {isScheduled && (
                           <IconButton
-                            label="Adiar gravação"
-                            className="postpone-btn"
+                            label='Adiar gravação'
+                            className='postpone-btn'
                             onClick={() => onPostpone(s.id)}
                           >
                             <IconPostpone />
@@ -296,8 +318,8 @@ export function CalendarPage({
                         )}
                         {canSwapDown && (
                           <IconButton
-                            label="Trocar horário com a gravação de baixo"
-                            className="swap-btn"
+                            label='Trocar horário com a gravação de baixo'
+                            className='swap-btn'
                             onClick={() => handleSwap(idx)}
                           >
                             <IconSwapOrder />
@@ -306,7 +328,7 @@ export function CalendarPage({
                       </div>
                     )}
                     {showTimeEdit && canEdit && (
-                      <div className="detail-time-edit">
+                      <div className='detail-time-edit'>
                         <TimeSlotPicker
                           hour={hour}
                           minute={minute}
@@ -322,17 +344,17 @@ export function CalendarPage({
         </div>
       )}
 
-      <div className="postponed-section">
-        <h3 className="section-title">
+      <div className='postponed-section'>
+        <h3 className='section-title'>
           Adiadas
           {postponedSessions.length > 0 && (
-            <span className="postponed-count">{postponedSessions.length}</span>
+            <span className='postponed-count'>{postponedSessions.length}</span>
           )}
         </h3>
         {postponedSessions.length === 0 ? (
-          <p className="empty postponed-empty">Nenhuma gravação adiada.</p>
+          <p className='empty postponed-empty'>Nenhuma gravação adiada.</p>
         ) : (
-          <ul className="postponed-list">
+          <ul className='postponed-list'>
             {postponedSessions.map((s) => (
               <PostponedRow
                 key={s.id}
