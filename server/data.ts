@@ -146,6 +146,12 @@ export function getSessions(): Session[] {
   return sessions
 }
 
+/** Recarrega sessoes do Supabase e atualiza o cache em memoria (uso em GET /api/schedule). */
+export async function reloadSessionsFromDb(): Promise<Session[]> {
+  sessions = await loadSessionsFromDb()
+  return sessions
+}
+
 export function findSession(id: string): Session | undefined {
   return sessions.find((s) => s.id === id)
 }

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import {
   initData,
   getPeople,
-  getSessions,
+  reloadSessionsFromDb,
   updateSession,
   swapSessionTimes,
   resetSessionsFromYaml,
@@ -27,8 +27,14 @@ app.use(express.json())
 app.get('/api/auth/me', handleAuthMe)
 app.post('/api/auth/login', handleLogin)
 
-app.get('/api/schedule', (_req, res) => {
-  res.json({ people: getPeople(), sessions: getSessions() })
+app.get('/api/schedule', async (_req, res) => {
+  try {
+    const sessions = await reloadSessionsFromDb()
+    res.json({ people: getPeople(), sessions })
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ error: String(e) })
+  }
 })
 
 app.patch('/api/sessions/:id', requireEditor, async (req, res) => {

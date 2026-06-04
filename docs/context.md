@@ -57,7 +57,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 
 | Método | Rota | Função |
 |--------|------|--------|
-| GET | `/api/schedule` | `{ people, sessions }` |
+| GET | `/api/schedule` | `{ people, sessions }` — sessoes relidas do Supabase a cada request |
 | PATCH | `/api/sessions/:id` | Atualiza sessão no Supabase |
 | POST | `/api/sessions/swap-time` | Troca horário entre duas sessões |
 | POST | `/api/schedule/reset` | Repõe sessões a partir de `sessions.yaml` |
@@ -91,7 +91,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 | Tipo | URL |
 |------|-----|
 | Repositório | (AGX-Software — preencher) |
-| Epic / board | (preencher) |
+| Epic / board | [Epic #1](https://github.com/RafaelHDSV/Cronograma-de-Gravacoes/issues/1) · [Project Vieira](https://github.com/users/RafaelHDSV/projects/8/views/1) |
 | Documentação | `docs/especificacao.md` (epic/card GitHub), `docs/supabase-setup.md`, `docs/deploy-render.md`, `docs/seguranca.md` |
 
 ---
