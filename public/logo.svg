@@ -1,8 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+  <title>Cronograma de gravações</title>
   <rect width="32" height="32" rx="8" fill="#5b8cff"/>
-  <path
-    d="M10 12h12a2 2 0 0 1 2 2v6.5a1.5 1.5 0 0 1-2.4 1.2L18 20.5l-3.6 2.2A1.5 1.5 0 0 1 12 21.5V14a2 2 0 0 1 2-2Z"
-    fill="#0b0d12"
-  />
-  <circle cx="22" cy="11" r="2.5" fill="#34d399"/>
+  <!-- Calendário -->
+  <rect x="7" y="10" width="18" height="16" rx="3" fill="#0b0d12"/>
+  <path fill="#252b38" d="M7 13a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v3H7v-3z"/>
+  <rect x="11.25" y="7.25" width="2.5" height="4.5" rx="1.25" fill="#eef1f6"/>
+  <rect x="18.25" y="7.25" width="2.5" height="4.5" rx="1.25" fill="#eef1f6"/>
+  <!-- Dias da semana (grade simplificada) -->
+  <circle cx="11" cy="18.5" r="1.35" fill="#3d4659"/>
+  <circle cx="16" cy="18.5" r="1.35" fill="#3d4659"/>
+  <circle cx="21" cy="18.5" r="1.35" fill="#3d4659"/>
+  <circle cx="11" cy="22.5" r="1.35" fill="#3d4659"/>
+  <circle cx="16" cy="22.5" r="1.35" fill="#3d4659"/>
+  <!-- Dia com gravação agendada -->
+  <circle cx="21" cy="22.5" r="2.35" fill="#34d399"/>
+  <path fill="#0b0d12" d="M20.1 21.55 22.55 22.5l-2.45.95v-1.9z"/>
 </svg>
