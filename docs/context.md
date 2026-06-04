@@ -92,7 +92,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 |------|-----|
 | Repositório | (AGX-Software — preencher) |
 | Epic / board | (preencher) |
-| Documentação | `docs/especificacao.md`, `docs/supabase-setup.md`, `docs/deploy-render.md`, `docs/seguranca.md` |
+| Documentação | `docs/especificacao.md` (epic/card GitHub), `docs/supabase-setup.md`, `docs/deploy-render.md`, `docs/seguranca.md` |
 
 ---
 
