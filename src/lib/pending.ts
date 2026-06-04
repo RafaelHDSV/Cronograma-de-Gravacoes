@@ -9,11 +9,57 @@ export type SessionPatch = {
 
 export interface PendingEntry {
   patch: SessionPatch
-  labels: string[]
 }
 
 export function mergePatch(base: SessionPatch, add: SessionPatch): SessionPatch {
   return { ...base, ...add }
+}
+
+function normalizeSession(session: Session): Session {
+  const recordedAt = session.recordedAt?.trim()
+  return {
+    ...session,
+    recordedAt: recordedAt ? recordedAt : undefined,
+  }
+}
+
+export function sessionsEqual(a: Session, b: Session): boolean {
+  const x = normalizeSession(a)
+  const y = normalizeSession(b)
+  return (
+    x.status === y.status &&
+    x.scheduledAt === y.scheduledAt &&
+    x.recordedAt === y.recordedAt
+  )
+}
+
+export function deriveChangeLabels(before: Session, after: Session): string[] {
+  const labels: string[] = []
+  if (before.status !== after.status) {
+    if (after.status === 'done') labels.push('Marcar como gravada')
+    else if (before.status === 'done' && after.status === 'scheduled') {
+      labels.push('Desmarcar gravação')
+    } else if (after.status === 'postponed') labels.push('Adiar gravação')
+    else if (before.status === 'postponed' && after.status === 'scheduled') {
+      labels.push('Reagendar')
+    } else labels.push('Alterar status')
+  }
+  if (before.scheduledAt !== after.scheduledAt) {
+    const dayBefore = dayKey(before.scheduledAt)
+    const dayAfter = dayKey(after.scheduledAt)
+    if (dayBefore !== dayAfter) {
+      labels.push(`Mover para ${dayAfter}`)
+    } else {
+      labels.push('Alterar horário')
+    }
+  }
+  const recBefore = before.recordedAt?.trim() ?? ''
+  const recAfter = after.recordedAt?.trim() ?? ''
+  if (recBefore !== recAfter && !labels.some((l) => l.includes('gravada'))) {
+    if (recAfter) labels.push('Registrar data de gravação')
+    else if (recBefore) labels.push('Limpar data de gravação')
+  }
+  return labels.length > 0 ? labels : ['Alterar sessão']
 }
 
 export function applyPendingPatches(
@@ -25,15 +71,40 @@ export function applyPendingPatches(
     const entry = pending.get(s.id)
     if (!entry) return s
     const p = entry.patch
-    return {
+    return normalizeSession({
       ...s,
       ...(p.status !== undefined ? { status: p.status } : {}),
       ...(p.scheduledAt !== undefined ? { scheduledAt: p.scheduledAt } : {}),
       ...(p.recordedAt !== undefined
         ? { recordedAt: p.recordedAt.trim() ? p.recordedAt : undefined }
         : {}),
-    }
+    })
   })
+}
+
+export function upsertPendingEntry(
+  baseline: Session[],
+  pending: Map<string, PendingEntry>,
+  sessionId: string,
+  patch: SessionPatch,
+): Map<string, PendingEntry> {
+  const before = baseline.find((s) => s.id === sessionId)
+  if (!before) return pending
+
+  const next = new Map(pending)
+  const cur = next.get(sessionId)
+  const mergedPatch = mergePatch(cur?.patch ?? {}, patch)
+  const after = applyPendingPatches(
+    [before],
+    new Map([[sessionId, { patch: mergedPatch }]]),
+  )[0]
+
+  if (sessionsEqual(before, after)) {
+    next.delete(sessionId)
+  } else {
+    next.set(sessionId, { patch: mergedPatch })
+  }
+  return next
 }
 
 export function mergeSessionsFromServer(
@@ -61,9 +132,10 @@ export function buildPendingRows(
     const before = baseline.find((s) => s.id === sessionId)
     if (!before) continue
     const after = applyPendingPatches([before], new Map([[sessionId, entry]]))[0]
+    if (sessionsEqual(before, after)) continue
     rows.push({
       sessionId,
-      labels: entry.labels,
+      labels: deriveChangeLabels(before, after),
       before,
       after,
       patch: entry.patch,

@@ -194,7 +194,7 @@ Regra de negócio **“faltam”:** total de sessões − gravadas − adiadas.
 **Fluxo**
 
 1. Toda ação de edição acumula patch por `sessionId` (merge se mesma sessão).
-2. Cabeçalho mostra contador “N alteração(ões) pendente(s)” e botões **Descartar** / **Confirmar alterações**.
+2. Cabeçalho mostra contador com plural correto (ex.: “1 alteração pendente”, “2 alterações pendentes”) e botões **Descartar** / **Confirmar alterações**.
 3. Modal lista cada sessão com resumo legível (antes → depois) e tags das ações (ex.: “Adiar gravação”).
 4. Confirmar chama API em lote; sucesso limpa fila e atualiza estado; erro mantém fila.
 

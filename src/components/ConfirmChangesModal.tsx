@@ -1,5 +1,6 @@
 import type { PendingRow } from '../lib/pending'
 import { describeSessionSnapshot } from '../lib/pending'
+import { formatSessoesAtualizadas } from '../lib/ptPlural'
 import { findTopic } from '../lib/schedule'
 import type { Person } from '../lib/types'
 
@@ -29,7 +30,7 @@ export function ConfirmChangesModal({
           Confirmar alterações
         </h2>
         <p className="modal-desc">
-          {rows.length} sessão(ões) serão atualizadas no banco. Revise antes de confirmar.
+          {formatSessoesAtualizadas(rows.length)} Revise antes de confirmar.
         </p>
         {rows.length === 0 ? (
           <p className="empty">Nenhuma alteração pendente.</p>

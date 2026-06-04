@@ -6,11 +6,12 @@ import { clearEditorToken, getEditorToken } from './lib/authStorage'
 import {
   applyPendingPatches,
   buildPendingRows,
-  mergePatch,
   mergeSessionsFromServer,
   type PendingEntry,
   type SessionPatch,
+  upsertPendingEntry,
 } from './lib/pending'
+import { formatAlteracoesPendentes } from './lib/ptPlural'
 import { buildPersonIndex, buildScheduledAt, dayKey } from './lib/schedule'
 import type { ScheduleData } from './lib/types'
 import { CalendarPage } from './pages/CalendarPage'
@@ -55,23 +56,16 @@ export function App() {
       })
   }, [])
 
+  const baselineSessions = data?.sessions ?? []
+
   const queueChange = useCallback(
-    (sessionId: string, patch: SessionPatch, label: string) => {
+    (sessionId: string, patch: SessionPatch) => {
       if (!isEditor) return
-      setPending((prev) => {
-        const next = new Map(prev)
-        const cur = next.get(sessionId)
-        next.set(sessionId, {
-          patch: mergePatch(cur?.patch ?? {}, patch),
-          labels: [...(cur?.labels ?? []), label],
-        })
-        return next
-      })
+      setPending((prev) => upsertPendingEntry(baselineSessions, prev, sessionId, patch))
     },
-    [isEditor],
+    [isEditor, baselineSessions],
   )
 
-  const baselineSessions = data?.sessions ?? []
   const displaySessions = useMemo(
     () => applyPendingPatches(baselineSessions, pending),
     [baselineSessions, pending],
@@ -81,11 +75,11 @@ export function App() {
     () => (data ? buildPersonIndex(data.people) : new Map()),
     [data],
   )
-  const pendingCount = pending.size
   const pendingRows = useMemo(
     () => buildPendingRows(baselineSessions, pending),
     [baselineSessions, pending],
   )
+  const pendingCount = pendingRows.length
 
   const findDisplaySession = useCallback(
     (id: string) => displaySessions.find((s) => s.id === id),
@@ -98,11 +92,7 @@ export function App() {
       if (!session) return
       const newStatus = session.status === 'done' ? 'scheduled' : 'done'
       const recordedAt = newStatus === 'done' ? dayKey(new Date().toISOString()) : ''
-      queueChange(
-        id,
-        { status: newStatus, recordedAt },
-        newStatus === 'done' ? 'Marcar como gravada' : 'Desmarcar gravação',
-      )
+      queueChange(id, { status: newStatus, recordedAt })
     },
     [findDisplaySession, queueChange],
   )
@@ -114,7 +104,7 @@ export function App() {
       const timeParts = session.scheduledAt.split('T')[1]
       const [y, m, d] = targetDayKey.split('-')
       const newScheduledAt = `${y}-${m}-${d}T${timeParts}`
-      queueChange(id, { scheduledAt: newScheduledAt }, `Mover para ${targetDayKey}`)
+      queueChange(id, { scheduledAt: newScheduledAt })
     },
     [findDisplaySession, queueChange],
   )
@@ -124,15 +114,15 @@ export function App() {
       const a = findDisplaySession(idA)
       const b = findDisplaySession(idB)
       if (!a || !b) return
-      queueChange(idA, { scheduledAt: b.scheduledAt }, 'Trocar horário')
-      queueChange(idB, { scheduledAt: a.scheduledAt }, 'Trocar horário')
+      queueChange(idA, { scheduledAt: b.scheduledAt })
+      queueChange(idB, { scheduledAt: a.scheduledAt })
     },
     [findDisplaySession, queueChange],
   )
 
   const onPostpone = useCallback(
     (id: string) => {
-      queueChange(id, { status: 'postponed' }, 'Adiar gravação')
+      queueChange(id, { status: 'postponed' })
     },
     [queueChange],
   )
@@ -142,11 +132,7 @@ export function App() {
       const session = findDisplaySession(id)
       if (!session) return
       const scheduledAt = buildScheduledAt(targetDayKey, hour, minute)
-      queueChange(
-        id,
-        { status: 'scheduled', scheduledAt },
-        `Reagendar para ${targetDayKey}`,
-      )
+      queueChange(id, { status: 'scheduled', scheduledAt })
     },
     [findDisplaySession, queueChange],
   )
@@ -157,7 +143,7 @@ export function App() {
       if (!session) return
       const dk = dayKey(session.scheduledAt)
       const scheduledAt = buildScheduledAt(dk, hour, minute)
-      queueChange(id, { scheduledAt }, 'Alterar horário')
+      queueChange(id, { scheduledAt })
     },
     [findDisplaySession, queueChange],
   )
@@ -206,7 +192,7 @@ export function App() {
           </div>
           <div className="header-actions">
             {pendingCount > 0 && (
-              <span className="dirty-badge">{pendingCount} alteração(ões) pendente(s)</span>
+              <span className="dirty-badge">{formatAlteracoesPendentes(pendingCount)}</span>
             )}
             {isEditor && pendingCount > 0 && (
               <>
