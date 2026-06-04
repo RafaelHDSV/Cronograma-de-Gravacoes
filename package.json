@@ -11,7 +11,8 @@
     "build": "tsc -b && vite build",
     "start": "tsx server/index.ts",
     "preview": "vite preview",
-    "import": "tsx scripts/import-initial-schedule.ts"
+    "import": "tsx scripts/import-initial-schedule.ts",
+    "blur-demo": "node scripts/blur-demo-names.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
@@ -31,6 +32,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "sharp": "^0.34.5",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "vite": "^5.4.11"

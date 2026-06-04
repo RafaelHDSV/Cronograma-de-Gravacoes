@@ -4,6 +4,8 @@ Painel web para coordenar as gravações de vídeo das funcionalidades do sistem
 
 Substitui o “texto corrido” da coordenação por um cronograma vivo: quem grava o quê, o que já foi gravado, o que foi adiado e o que ainda falta, em uma única URL que qualquer pessoa da equipe pode abrir.
 
+![Visão geral do painel — aba Resumo](demo.png)
+
 ---
 
 ## O problema que resolve
