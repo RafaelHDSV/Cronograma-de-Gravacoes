@@ -215,7 +215,7 @@ Regra de negócio **“faltam”:** total de sessões − gravadas − adiadas.
 - `POST /api/auth/login` com senha → JWT; `GET /api/auth/me` para validar token.
 - Rotas de mutação protegidas; leitura pública.
 - UI: botão **Modo editor**; após login, token em `localStorage`; **Sair do modo editor** remove token.
-- Variáveis: `EDITOR_PASSWORD`, `SESSION_SECRET` no host; `AUTH_DISABLED=true` apenas dev local.
+- Variáveis: `EDITOR_PASSWORD`, `SESSION_SECRET` no host.
 
 **Critério de aceite**
 
@@ -234,7 +234,7 @@ Regra de negócio **“faltam”:** total de sessões − gravadas − adiadas.
 | Método | Rota | Auth | Função |
 |--------|------|------|--------|
 | GET | `/api/schedule` | Não | Pessoas (YAML) + sessões (DB) |
-| GET | `/api/auth/me` | Não | `{ editor, authDisabled? }` |
+| GET | `/api/auth/me` | Não | `{ editor }` |
 | POST | `/api/auth/login` | Não | Emite token |
 | POST | `/api/sessions/apply-batch` | Sim | Aplica patches em lote |
 | POST | `/api/schedule/reset` | Sim | Repõe sessões do YAML |
