@@ -20,7 +20,7 @@ Painel interno para acompanhar o cronograma de gravações de vídeo das funcion
 |--------|-------------------|
 | Front | React 18, Vite 5, TypeScript, CSS em `src/index.css` |
 | Back | Node 22, Express 5, `tsx`, `dotenv` |
-| Banco | Supabase (PostgreSQL), tabela `public.sessions` |
+| Banco | Supabase (PostgreSQL), tabela `public.cronograma_sessions` (`DB_TABLE_PREFIX=cronograma`) |
 | Catálogo | `public/data/people.yaml` (não está no Supabase) |
 | Seed agenda | `public/data/sessions.yaml` → Supabase na 1ª subida ou reset |
 | Tooling | Yarn (classic), Node 22 (`.nvmrc`), `concurrently` no dev |

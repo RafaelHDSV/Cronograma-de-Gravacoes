@@ -3,6 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { load } from 'js-yaml'
 import { formatSupabaseError, supabase } from './supabase'
+import { tables } from './tables'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -91,7 +92,7 @@ export function seedSessionsFromYaml(): Session[] {
 
 async function loadSessionsFromDb(): Promise<Session[]> {
   const { data, error } = await supabase
-    .from('sessions')
+    .from(tables.sessions)
     .select('*')
     .order('scheduled_at', { ascending: true })
 
@@ -101,18 +102,18 @@ async function loadSessionsFromDb(): Promise<Session[]> {
 
 async function insertSessions(rows: Session[]): Promise<void> {
   if (rows.length === 0) return
-  const { error } = await supabase.from('sessions').insert(rows.map(sessionToRow))
+  const { error } = await supabase.from(tables.sessions).insert(rows.map(sessionToRow))
   if (error) throw new Error(formatSupabaseError('[data] Falha ao inserir sessoes', error))
 }
 
 async function deleteAllSessions(): Promise<void> {
-  const { error } = await supabase.from('sessions').delete().neq('id', '')
+  const { error } = await supabase.from(tables.sessions).delete().neq('id', '')
   if (error) throw new Error(formatSupabaseError('[data] Falha ao limpar sessoes', error))
 }
 
 async function countSessions(): Promise<number> {
   const { count, error } = await supabase
-    .from('sessions')
+    .from(tables.sessions)
     .select('*', { count: 'exact', head: true })
 
   if (error) throw new Error(formatSupabaseError('[data] Falha ao contar sessoes', error))
@@ -167,7 +168,7 @@ export async function updateSession(
     session.recordedAt = patch.recordedAt.trim() ? patch.recordedAt : undefined
   }
 
-  const { error } = await supabase.from('sessions').update(sessionToRow(session)).eq('id', id)
+  const { error } = await supabase.from(tables.sessions).update(sessionToRow(session)).eq('id', id)
   if (error) throw new Error(formatSupabaseError('[data] Falha ao atualizar sessao', error))
 
   sessions[idx] = session
@@ -210,10 +211,10 @@ export async function swapSessionTimes(idA: string, idB: string): Promise<[Sessi
   a.scheduledAt = b.scheduledAt
   b.scheduledAt = tempAt
 
-  const { error: errA } = await supabase.from('sessions').update(sessionToRow(a)).eq('id', idA)
+  const { error: errA } = await supabase.from(tables.sessions).update(sessionToRow(a)).eq('id', idA)
   if (errA) throw new Error(formatSupabaseError('[data] Falha ao trocar horario', errA))
 
-  const { error: errB } = await supabase.from('sessions').update(sessionToRow(b)).eq('id', idB)
+  const { error: errB } = await supabase.from(tables.sessions).update(sessionToRow(b)).eq('id', idB)
   if (errB) throw new Error(formatSupabaseError('[data] Falha ao trocar horario', errB))
 
   sessions[idxA] = a
