@@ -31,6 +31,9 @@ dist-ssr
 versions/*
 out/*
 
+# Backups locais de sessoes (scripts/fix-topic-order.ts)
+data/backups/
+
 # Issues
 issues
 .issues

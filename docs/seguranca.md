@@ -86,7 +86,6 @@ O codigo fonte e publico: **nenhum segredo** no git. Credenciais apenas em varia
 |----------|-----|
 | `EDITOR_PASSWORD` | Senha compartilhada da equipe (forte, 16+ caracteres) |
 | `SESSION_SECRET` | Assina JWT (string aleatoria 32+ caracteres) |
-| `AUTH_DISABLED` | Opcional `true` so em dev local (pula auth) |
 
 Gerar segredo (exemplo local):
 
@@ -115,9 +114,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 **Nunca** armazenar a senha em localStorage, sessionStorage ou cookies acessiveis por script.
 
-Ao abrir o app: `GET /api/auth/me` define se a UI de edicao esta ativa (token valido ou `AUTH_DISABLED=true` no servidor).
-
-Com `AUTH_DISABLED=true` no `.env` do **backend**, reinicie `yarn dev`: o front detecta `authDisabled` e libera edicao sem botao "Modo editor".
+Ao abrir o app: `GET /api/auth/me` define se a UI de edicao esta ativa conforme token valido no `localStorage`.
 
 Botao **Sair do modo editor** remove a chave do localStorage.
 
