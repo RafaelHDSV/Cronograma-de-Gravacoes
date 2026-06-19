@@ -42,6 +42,7 @@ export function App() {
   const [saving, setSaving] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const [celebration, setCelebration] = useState<string | null>(null)
+  const [slowLoad, setSlowLoad] = useState(false)
 
   const loadSchedule = useCallback(() => {
     return fetchSchedule()
@@ -52,6 +53,15 @@ export function App() {
   useEffect(() => {
     loadSchedule()
   }, [loadSchedule])
+
+  useEffect(() => {
+    if (data || error) {
+      setSlowLoad(false)
+      return
+    }
+    const timer = window.setTimeout(() => setSlowLoad(true), 5000)
+    return () => window.clearTimeout(timer)
+  }, [data, error])
 
   useEffect(() => {
     fetchAuthMe()
@@ -287,7 +297,13 @@ export function App() {
 
       <main className="content">
         {error && <p className="error">Falha ao carregar os dados: {error}</p>}
-        {!data && !error && <p className="empty">Carregando…</p>}
+        {!data && !error && (
+          <p className="empty">
+            {slowLoad
+              ? 'O servidor está iniciando (Render). Isso pode levar até 1 minuto na primeira vez do dia…'
+              : 'Carregando…'}
+          </p>
+        )}
         {data && (
           <>
             {tab === 'summary' && (

@@ -1,0 +1,23 @@
+# Evita hibernacao do Render Free (spin-down apos ~15 min sem trafego).
+# Configure o secret RENDER_APP_URL no repo (ex.: https://seu-servico.onrender.com).
+name: Keep Render awake
+
+on:
+  schedule:
+    # Seg-Sex, 8h-20h BRT (11-23 UTC), a cada 10 min
+    - cron: '*/10 11-23 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        env:
+          RENDER_APP_URL: ${{ secrets.RENDER_APP_URL }}
+        run: |
+          if [ -z "$RENDER_APP_URL" ]; then
+            echo "RENDER_APP_URL nao configurado — pulando ping."
+            exit 0
+          fi
+          curl -fsS --max-time 60 "${RENDER_APP_URL%/}/api/health"

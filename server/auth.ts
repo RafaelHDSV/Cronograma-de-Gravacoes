@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 import type { Request, Response, NextFunction } from 'express'
-import { isRateLimited } from './rateLimit'
+import { isRateLimited } from './rateLimit.js'
 
 const LOGIN_LIMIT = { max: 10, windowMs: 15 * 60 * 1000 }
 

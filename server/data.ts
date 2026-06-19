@@ -2,8 +2,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { load } from 'js-yaml'
-import { formatSupabaseError, supabase } from './supabase'
-import { tables } from './tables'
+import { formatSupabaseError, supabase } from './supabase.js'
+import { tables } from './tables.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -36,6 +36,7 @@ interface SessionRow {
   person_id: string
   topic_letter: string
   status: SessionStatus
+  notes: string
   recorded_at: string | null
 }
 

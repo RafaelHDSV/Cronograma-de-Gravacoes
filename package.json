@@ -8,8 +8,8 @@
     "dev": "concurrently -n front,back -c blue,green \"vite\" \"tsx watch server/index.ts\"",
     "dev:front": "vite",
     "dev:back": "tsx watch server/index.ts",
-    "build": "tsc -b && vite build",
-    "start": "tsx server/index.ts",
+    "build": "tsc -b && tsc -p tsconfig.server.json && vite build",
+    "start": "node dist-server/index.js",
     "preview": "vite preview",
     "import": "tsx scripts/import-initial-schedule.ts",
     "blur-demo": "node scripts/blur-demo-names.mjs"

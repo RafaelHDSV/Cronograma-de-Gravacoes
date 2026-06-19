@@ -11,9 +11,10 @@ import {
   swapSessionTimes,
   resetSessionsFromYaml,
   applySessionPatches,
-} from './data'
-import { handleAuthMe, handleLogin, requireEditor } from './auth'
-import { isRateLimited } from './rateLimit'
+  type SessionPatch,
+} from './data.js'
+import { handleAuthMe, handleLogin, requireEditor } from './auth.js'
+import { isRateLimited } from './rateLimit.js'
 
 const BATCH_LIMIT = { max: 60, windowMs: 60 * 1000 }
 
@@ -26,6 +27,12 @@ const HOST = process.env.RENDER === 'true' ? '0.0.0.0' : '127.0.0.1'
 const app = express()
 app.use(cors())
 app.use(express.json())
+
+let dataReady = false
+
+app.get('/api/health', (_req, res) => {
+  res.status(200).json({ ok: true, ready: dataReady })
+})
 
 app.get('/api/auth/me', handleAuthMe)
 app.post('/api/auth/login', handleLogin)
@@ -42,8 +49,8 @@ app.get('/api/schedule', async (_req, res) => {
 
 app.patch('/api/sessions/:id', requireEditor, async (req, res) => {
   try {
-    const { id } = req.params
-    const { status, scheduledAt, recordedAt } = req.body
+    const id = String(req.params.id)
+    const { status, scheduledAt, recordedAt } = req.body as SessionPatch
     const session = await updateSession(id, { status, scheduledAt, recordedAt })
     if (!session) {
       return res.status(404).json({ error: 'Session not found' })
@@ -61,7 +68,7 @@ app.post('/api/sessions/apply-batch', requireEditor, async (req, res) => {
   }
   try {
     const { changes } = req.body as {
-      changes?: Array<{ id: string; status?: string; scheduledAt?: string; recordedAt?: string }>
+      changes?: Array<{ id: string } & SessionPatch>
     }
     if (!Array.isArray(changes) || changes.length === 0) {
       return res.status(400).json({ error: 'changes array is required' })
@@ -108,16 +115,17 @@ app.get('/{*path}', (_req, res) => {
 })
 
 async function main() {
+  app.listen(PORT, HOST, () => {
+    console.log(`[server] Running on http://${HOST}:${PORT}`)
+  })
+
   try {
     await initData()
+    dataReady = true
   } catch (e) {
     console.error('[server] Falha ao inicializar dados:', e)
     process.exit(1)
   }
-
-  app.listen(PORT, HOST, () => {
-    console.log(`[server] Running on http://${HOST}:${PORT}`)
-  })
 }
 
 main()

@@ -3,6 +3,20 @@ import { getEditorToken } from './authStorage'
 
 const BASE = import.meta.env.VITE_API_URL ?? ''
 
+const RETRYABLE_STATUS = new Set([502, 503, 504])
+
+function isRetryableError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false
+  const msg = err.message
+  if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) return true
+  const status = Number(msg.match(/^API (\d{3}):/)?.[1])
+  return RETRYABLE_STATUS.has(status)
+}
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 function buildHeaders(): HeadersInit {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   const token = getEditorToken()
@@ -22,12 +36,30 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
   return res.json()
 }
 
+async function requestWithRetry<T>(
+  url: string,
+  options?: RequestInit,
+  maxAttempts = 12,
+): Promise<T> {
+  let lastError: unknown
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return await request<T>(url, options)
+    } catch (err) {
+      lastError = err
+      if (!isRetryableError(err) || attempt === maxAttempts - 1) throw err
+      await sleep(Math.min(8000, 1500 * (attempt + 1)))
+    }
+  }
+  throw lastError
+}
+
 export async function fetchSchedule(): Promise<ScheduleData> {
-  return request<ScheduleData>('/api/schedule')
+  return requestWithRetry<ScheduleData>('/api/schedule')
 }
 
 export async function fetchAuthMe(): Promise<{ editor: boolean; authDisabled?: boolean }> {
-  return request<{ editor: boolean; authDisabled?: boolean }>('/api/auth/me')
+  return requestWithRetry<{ editor: boolean; authDisabled?: boolean }>('/api/auth/me')
 }
 
 export async function loginEditor(

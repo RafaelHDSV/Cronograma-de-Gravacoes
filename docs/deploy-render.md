@@ -70,9 +70,35 @@ O Render define **`PORT`** e **`RENDER=true`** automaticamente — nao precisa c
 
 > Nunca commite `.env`. Nao use prefixo `VITE_` na chave do Supabase.
 
-### Health check (opcional)
+### Health check (recomendado)
 
-- **Health Check Path:** `/api/schedule` (retorna JSON se o banco estiver ok).
+- **Health Check Path:** `/api/health` (leve; nao consulta o Supabase).
+
+---
+
+## Cold start (tela de carregamento do Render)
+
+No plano **Free**, o servico **hiberna** apos ~15 minutos sem trafego. A primeira visita do dia pode demorar **30s a 3 min** na tela de carregamento do Render antes do painel abrir.
+
+### Solucoes (da mais simples a mais robusta)
+
+| Opcao | Custo | Efeito |
+|-------|--------|--------|
+| **Plano Starter no Render** | ~US$ 7/mes | Servico sempre ligado — elimina cold start |
+| **Keep-alive no GitHub Actions** | Gratis | Ping a cada 10 min em horario comercial (seg-sex 8h-20h BRT) — evita hibernacao no expediente |
+| **Boot mais rapido** (ja no repo) | Gratis | Servidor compilado (`node dist-server`) + `/api/health` antes do Supabase |
+| **Retry no front** (ja no repo) | Gratis | Se a pagina abrir antes da API, tenta de novo automaticamente |
+
+### Configurar keep-alive (recomendado no Free)
+
+1. GitHub -> repositorio -> **Settings** -> **Secrets and variables** -> **Actions**.
+2. **New repository secret:** `RENDER_APP_URL` = URL publica (ex.: `https://seu-servico.onrender.com`, sem barra no final).
+3. O workflow `.github/workflows/keep-render-awake.yml` roda so em dias uteis no horario comercial.
+4. Fora desse horario o servico pode hibernar — primeira visita da manha ainda pode demorar um pouco.
+
+Para testar manualmente: **Actions** -> **Keep Render awake** -> **Run workflow**.
+
+### Health check (opcional)
 
 ### Deploy
 
@@ -98,7 +124,7 @@ Abra a URL publica do Render (ex.: `https://seu-servico.onrender.com`).
 1. **New +** -> **Web Service**.
 2. Conecte o repositorio.
 3. Preencha Build / Start e env vars como na secao 2.
-4. Plano **Free** funciona para uso interno (servico pode **hibernar** apos inatividade; primeira requisicao demora ~30s).
+4. Plano **Free** funciona para uso interno; configure o keep-alive (secao **Cold start**) ou aceite cold start fora do horario comercial.
 
 ---
 
@@ -139,7 +165,7 @@ Local: `yarn import` -> commit dos YAMLs -> push.
 | Build falha `yarn: not found` | Imagem sem Yarn | Build Command com `corepack enable && corepack prepare yarn@stable --activate` antes do yarn, ou use Node 22 no Render |
 | App sobe e cai no boot | Supabase / chave errada | Ver logs; conferir [supabase-setup.md](supabase-setup.md) |
 | Pagina carrega, API falha | `service_role` ou tabela ausente | Env vars + SQL migrations |
-| 502 / timeout no cold start | Plano free hibernou | Aguardar ou plano pago |
+| 502 / timeout no cold start | Plano free hibernou | Keep-alive, plano Starter, ou aguardar retry do front |
 | Site abre, lista vazia | Seed nao rodou ou banco vazio | Logs de seed; conferir `sessions.yaml` |
 
 Logs: Render -> servico -> **Logs** (build e runtime).
