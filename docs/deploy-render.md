@@ -86,21 +86,16 @@ No plano **Free**, o servico **hiberna** apos ~15 minutos sem trafego. A primeir
 |-------|--------|--------|
 | **Plano Starter no Render** | ~US$ 7/mes | Servico sempre ligado — elimina cold start |
 | **Keep-alive interno** | Gratis | Servidor pinga `/api/health` a cada 10 min (`RENDER_EXTERNAL_URL` no Render) |
-| **GitHub Actions** | Gratis | Workflows `keep-render-awake.yml` + `keep-render-awake-offset.yml` (horarios fixos UTC; `*/10` **nao** roda de 10 em 10 min) |
 | **Boot mais rapido** (ja no repo) | Gratis | Servidor compilado (`node dist-server`) + `/api/health` antes do Supabase |
 | **Retry no front** (ja no repo) | Gratis | Se a pagina abrir antes da API, tenta de novo automaticamente |
 
 ### Configurar keep-alive (recomendado no Free)
 
-1. **Deploy** com o codigo atual — o backend inicia o self-ping sozinho no Render.
-2. GitHub -> **Settings** -> **Secrets and variables** -> **Actions**:
-   - Secret ou variable `RENDER_APP_URL` = URL publica (ex.: `https://cronograma-gravacoes.onrender.com`, sem barra no final).
-3. Workflows rodam **24/7** em horarios fixos (nao so horario comercial).
-4. Nos logs do Render, confira: `[keep-alive] ativo: https://.../api/health a cada 10 min`.
+1. **Deploy** com o codigo atual — o backend inicia o self-ping sozinho no Render (`RENDER_EXTERNAL_URL` e definida automaticamente).
+2. Opcional: `KEEP_ALIVE_INTERVAL_MIN` (padrao 10) ou `KEEP_ALIVE_URL` se quiser sobrescrever a URL.
+3. Nos logs do Render, confira: `[keep-alive] ativo: https://.../api/health a cada 10 min`.
 
-Para testar manualmente: **Actions** -> **Keep Render awake** -> **Run workflow**.
-
-Alternativa se ficar horas parado: [UptimeRobot](https://uptimerobot.com) em `/api/health` a cada 5 min.
+Alternativa externa se ficar horas parado: [UptimeRobot](https://uptimerobot.com) em `/api/health` a cada 5 min.
 
 ### Health check (opcional)
 

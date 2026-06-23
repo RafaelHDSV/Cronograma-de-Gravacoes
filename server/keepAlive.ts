@@ -1,6 +1,6 @@
 /**
- * Render free dorme apos ~15 min sem trafego. GitHub Actions cron e irregular.
- * Ping interno mantem a instancia acordada enquanto o processo estiver no ar.
+ * Render free dorme apos ~15 min sem trafego.
+ * Ping interno em /api/health mantem a instancia acordada enquanto o processo estiver no ar.
  */
 
 const DEFAULT_INTERVAL_MIN = 10

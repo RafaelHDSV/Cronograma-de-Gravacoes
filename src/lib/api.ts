@@ -143,9 +143,3 @@ export async function fixDayCapacity(
     },
   )
 }
-
-export async function resetFromYaml(): Promise<{ sessions: Session[]; preservedCount: number }> {
-  return request<{ sessions: Session[]; preservedCount: number }>('/api/schedule/reset', {
-    method: 'POST',
-  })
-}

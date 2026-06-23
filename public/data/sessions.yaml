@@ -1,592 +1,583 @@
 sessions:
-  - id: 2026-05-28-16-joao-carlos-a
+  - id: 2026-05-28-16-joao-carlos-b
     scheduledAt: '2026-05-28T16:00:00-03:00'
     personId: joao-carlos
+    topicLetter: b
+    status: scheduled
+  - id: 2026-05-29-14-janderson-a
+    scheduledAt: '2026-05-29T14:00:00-03:00'
+    personId: janderson
     topicLetter: a
     status: done
-    recordedAt: '2026-06-04'
+    recordedAt: '2026-05-29'
   - id: 2026-06-01-14-robson-a
     scheduledAt: '2026-06-01T14:00:00-03:00'
     personId: robson
     topicLetter: a
     status: done
-    recordedAt: '2026-06-04'
+    recordedAt: '2026-06-01'
   - id: 2026-06-01-16-marcus-a
     scheduledAt: '2026-06-01T16:00:00-03:00'
     personId: marcus
     topicLetter: a
     status: done
-    recordedAt: '2026-06-04'
-  - id: 2026-06-02-14-vieira-a
-    scheduledAt: '2026-06-02T14:00:00-03:00'
-    personId: vieira
-    topicLetter: a
-    status: done
-    recordedAt: '2026-06-11'
-  - id: 2026-06-02-16-davi-a
+    recordedAt: '2026-06-01'
+  - id: 2026-06-02-16-joao-carlos-a
     scheduledAt: '2026-06-02T16:00:00-03:00'
-    personId: davi
-    topicLetter: a
-    status: done
-    recordedAt: '2026-06-10'
-  - id: 2026-06-03-14-joao-carlos-b
-    scheduledAt: '2026-06-03T14:00:00-03:00'
     personId: joao-carlos
-    topicLetter: b
-    status: scheduled
-  - id: 2026-06-03-16-janderson-a
-    scheduledAt: '2026-06-03T16:00:00-03:00'
-    personId: janderson
     topicLetter: a
     status: done
-    recordedAt: '2026-06-04'
+    recordedAt: '2026-06-02'
+  - id: 2026-06-03-14-vinicius-b
+    scheduledAt: '2026-06-03T14:00:00-03:00'
+    personId: vinicius
+    topicLetter: b
+    status: done
+    recordedAt: '2026-06-03'
+  - id: 2026-06-03-16-robson-b
+    scheduledAt: '2026-06-03T16:00:00-03:00'
+    personId: robson
+    topicLetter: b
+    status: done
+    recordedAt: '2026-06-03'
   - id: 2026-06-04-14-vinicius-a
     scheduledAt: '2026-06-04T14:00:00-03:00'
     personId: vinicius
     topicLetter: a
-    status: done
-    recordedAt: '2026-06-04'
-  - id: 2026-06-04-16-robson-b
+    status: scheduled
+  - id: 2026-06-04-16-robson-c
     scheduledAt: '2026-06-04T16:00:00-03:00'
     personId: robson
-    topicLetter: b
-    status: done
-    recordedAt: '2026-06-04'
-  - id: 2026-06-08-14-joao-carlos-c
-    scheduledAt: '2026-06-08T14:00:00-03:00'
-    personId: joao-carlos
     topicLetter: c
-    status: done
-    recordedAt: '2026-06-10'
-  - id: 2026-06-08-16-davi-b
-    scheduledAt: '2026-06-08T16:00:00-03:00'
-    personId: davi
-    topicLetter: b
     status: scheduled
-  - id: 2026-06-09-14-janderson-b
-    scheduledAt: '2026-06-09T14:00:00-03:00'
-    personId: janderson
-    topicLetter: b
-    status: done
-    recordedAt: '2026-06-10'
-  - id: 2026-06-09-16-vinicius-b
-    scheduledAt: '2026-06-09T16:00:00-03:00'
-    personId: vinicius
-    topicLetter: b
-    status: done
-    recordedAt: '2026-06-04'
-  - id: 2026-06-10-14-robson-c
-    scheduledAt: '2026-06-10T14:00:00-03:00'
-    personId: robson
-    topicLetter: c
-    status: done
-    recordedAt: '2026-06-11'
-  - id: 2026-06-10-16-marcus-b
-    scheduledAt: '2026-06-10T16:00:00-03:00'
+  - id: 2026-06-05-14-marcus-b
+    scheduledAt: '2026-06-05T14:00:00-03:00'
     personId: marcus
     topicLetter: b
     status: done
     recordedAt: '2026-06-05'
-  - id: 2026-06-11-14-vieira-b
-    scheduledAt: '2026-06-11T14:00:00-03:00'
-    personId: vieira
+  - id: 2026-06-05-16-janderson-b
+    scheduledAt: '2026-06-05T16:00:00-03:00'
+    personId: janderson
     topicLetter: b
     status: done
-    recordedAt: '2026-06-16'
-  - id: 2026-06-11-16-davi-c
-    scheduledAt: '2026-06-11T16:00:00-03:00'
+    recordedAt: '2026-06-05'
+  - id: 2026-06-08-14-davi-b
+    scheduledAt: '2026-06-08T14:00:00-03:00'
     personId: davi
+    topicLetter: b
+    status: scheduled
+  - id: 2026-06-08-16-joao-carlos-c
+    scheduledAt: '2026-06-08T16:00:00-03:00'
+    personId: joao-carlos
     topicLetter: c
     status: scheduled
-  - id: 2026-06-15-14-vinicius-c
-    scheduledAt: '2026-06-15T14:00:00-03:00'
+  - id: 2026-06-09-14-janderson-l
+    scheduledAt: '2026-06-09T14:00:00-03:00'
+    personId: janderson
+    topicLetter: l
+    status: done
+    recordedAt: '2026-06-09'
+  - id: 2026-06-09-16-vinicius-c
+    scheduledAt: '2026-06-09T16:00:00-03:00'
     personId: vinicius
     topicLetter: c
     status: done
-    recordedAt: '2026-06-10'
-  - id: 2026-06-15-16-robson-d
-    scheduledAt: '2026-06-15T16:00:00-03:00'
+    recordedAt: '2026-06-09'
+  - id: 2026-06-10-14-robson-d
+    scheduledAt: '2026-06-10T14:00:00-03:00'
     personId: robson
     topicLetter: d
     status: scheduled
-  - id: 2026-06-16-14-marcus-c
-    scheduledAt: '2026-06-16T14:00:00-03:00'
+  - id: 2026-06-10-16-vieira-a
+    scheduledAt: '2026-06-10T16:00:00-03:00'
+    personId: vieira
+    topicLetter: a
+    status: done
+    recordedAt: '2026-06-10'
+  - id: 2026-06-11-14-marcus-c
+    scheduledAt: '2026-06-11T14:00:00-03:00'
     personId: marcus
     topicLetter: c
     status: done
     recordedAt: '2026-06-11'
-  - id: 2026-06-16-16-vieira-c
-    scheduledAt: '2026-06-16T16:00:00-03:00'
-    personId: vieira
-    topicLetter: c
+  - id: 2026-06-11-16-davi-a
+    scheduledAt: '2026-06-11T16:00:00-03:00'
+    personId: davi
+    topicLetter: a
     status: done
-    notes: Fiz a gravação completa do tópico C - Hierarquia de Níveis e finalizei a edição da última gravação (tópico B - Permissões de Escrita e Leitura AGX)
-    recordedAt: '2026-06-23'
-  - id: 2026-06-17-14-joao-carlos-d
-    scheduledAt: '2026-06-17T14:00:00-03:00'
-    personId: joao-carlos
+    recordedAt: '2026-06-11'
+  - id: 2026-06-12-16-janderson-m
+    scheduledAt: '2026-06-12T16:00:00-03:00'
+    personId: janderson
+    topicLetter: m
+    status: done
+    recordedAt: '2026-06-12'
+  - id: 2026-06-15-14-robson-e
+    scheduledAt: '2026-06-15T14:00:00-03:00'
+    personId: robson
+    topicLetter: e
+    status: scheduled
+  - id: 2026-06-15-16-vieira-b
+    scheduledAt: '2026-06-15T16:00:00-03:00'
+    personId: vieira
+    topicLetter: b
+    status: done
+    recordedAt: '2026-06-15'
+  - id: 2026-06-16-16-vinicius-d
+    scheduledAt: '2026-06-16T16:00:00-03:00'
+    personId: vinicius
     topicLetter: d
     status: scheduled
-  - id: 2026-06-17-16-davi-d
+  - id: 2026-06-17-14-marcus-d
+    scheduledAt: '2026-06-17T14:00:00-03:00'
+    personId: marcus
+    topicLetter: d
+    status: scheduled
+  - id: 2026-06-17-16-davi-c
     scheduledAt: '2026-06-17T16:00:00-03:00'
     personId: davi
-    topicLetter: d
+    topicLetter: c
     status: scheduled
-  - id: 2026-06-18-14-janderson-l
+  - id: 2026-06-18-14-janderson-n
     scheduledAt: '2026-06-18T14:00:00-03:00'
     personId: janderson
-    topicLetter: l
-    status: scheduled
-  - id: 2026-06-18-16-vinicius-d
+    topicLetter: 'n'
+    status: done
+    recordedAt: '2026-06-18'
+  - id: 2026-06-18-16-vinicius-e
     scheduledAt: '2026-06-18T16:00:00-03:00'
     personId: vinicius
-    topicLetter: d
+    topicLetter: e
     status: scheduled
-  - id: 2026-06-22-14-vieira-d
+  - id: 2026-06-22-14-vieira-c
     scheduledAt: '2026-06-22T14:00:00-03:00'
     personId: vieira
-    topicLetter: d
-    status: scheduled
-  - id: 2026-06-22-16-davi-e
-    scheduledAt: '2026-06-22T16:00:00-03:00'
-    personId: davi
-    topicLetter: e
-    status: scheduled
-  - id: 2026-06-23-14-joao-carlos-e
-    scheduledAt: '2026-06-23T14:00:00-03:00'
-    personId: joao-carlos
-    topicLetter: e
-    status: scheduled
-  - id: 2026-06-23-16-janderson-m
-    scheduledAt: '2026-06-23T16:00:00-03:00'
-    personId: janderson
-    topicLetter: m
-    status: scheduled
-  - id: 2026-06-24-14-vinicius-e
-    scheduledAt: '2026-06-24T14:00:00-03:00'
-    personId: vinicius
-    topicLetter: e
-    status: scheduled
-  - id: 2026-06-24-16-robson-e
-    scheduledAt: '2026-06-24T16:00:00-03:00'
-    personId: robson
-    topicLetter: e
-    status: scheduled
-  - id: 2026-06-25-14-marcus-d
-    scheduledAt: '2026-06-25T14:00:00-03:00'
-    personId: marcus
-    topicLetter: d
-    status: scheduled
-  - id: 2026-06-25-16-vieira-e
-    scheduledAt: '2026-06-25T16:00:00-03:00'
-    personId: vieira
-    topicLetter: e
-    status: scheduled
-  - id: 2026-06-29-14-janderson-n
-    scheduledAt: '2026-06-29T14:00:00-03:00'
-    personId: janderson
-    topicLetter: 'n'
-    status: scheduled
-  - id: 2026-06-29-16-vinicius-f
-    scheduledAt: '2026-06-29T16:00:00-03:00'
-    personId: vinicius
-    topicLetter: f
-    status: scheduled
-  - id: 2026-06-30-14-robson-f
-    scheduledAt: '2026-06-30T14:00:00-03:00'
-    personId: robson
-    topicLetter: f
-    status: scheduled
-  - id: 2026-06-30-16-marcus-e
-    scheduledAt: '2026-06-30T16:00:00-03:00'
-    personId: marcus
-    topicLetter: e
-    status: scheduled
-  - id: 2026-07-01-14-vieira-f
-    scheduledAt: '2026-07-01T14:00:00-03:00'
-    personId: vieira
-    topicLetter: f
-    status: scheduled
-  - id: 2026-07-01-16-davi-f
-    scheduledAt: '2026-07-01T16:00:00-03:00'
-    personId: davi
-    topicLetter: f
-    status: scheduled
-  - id: 2026-07-02-14-joao-carlos-f
-    scheduledAt: '2026-07-02T14:00:00-03:00'
-    personId: joao-carlos
-    topicLetter: f
-    status: scheduled
-  - id: 2026-07-02-16-janderson-f
-    scheduledAt: '2026-07-02T16:00:00-03:00'
-    personId: janderson
-    topicLetter: f
-    status: scheduled
-  - id: 2026-07-06-14-marcus-f
-    scheduledAt: '2026-07-06T14:00:00-03:00'
-    personId: marcus
-    topicLetter: f
-    status: scheduled
-  - id: 2026-07-06-16-vieira-g
-    scheduledAt: '2026-07-06T16:00:00-03:00'
-    personId: vieira
-    topicLetter: g
-    status: scheduled
-  - id: 2026-07-07-14-joao-carlos-g
-    scheduledAt: '2026-07-07T14:00:00-03:00'
-    personId: joao-carlos
-    topicLetter: g
-    status: scheduled
-  - id: 2026-07-07-16-davi-g
-    scheduledAt: '2026-07-07T16:00:00-03:00'
-    personId: davi
-    topicLetter: g
-    status: scheduled
-  - id: 2026-07-08-14-janderson-e
-    scheduledAt: '2026-07-08T14:00:00-03:00'
-    personId: janderson
-    topicLetter: e
-    status: scheduled
-  - id: 2026-07-08-16-vinicius-g
-    scheduledAt: '2026-07-08T16:00:00-03:00'
-    personId: vinicius
-    topicLetter: g
-    status: scheduled
-  - id: 2026-07-09-14-robson-g
-    scheduledAt: '2026-07-09T14:00:00-03:00'
-    personId: robson
-    topicLetter: g
-    status: scheduled
-  - id: 2026-07-09-16-marcus-g
-    scheduledAt: '2026-07-09T16:00:00-03:00'
-    personId: marcus
-    topicLetter: g
-    status: scheduled
-  - id: 2026-07-13-14-joao-carlos-h
-    scheduledAt: '2026-07-13T14:00:00-03:00'
-    personId: joao-carlos
-    topicLetter: h
-    status: scheduled
-  - id: 2026-07-13-16-janderson-c
-    scheduledAt: '2026-07-13T16:00:00-03:00'
-    personId: janderson
     topicLetter: c
     status: done
-    recordedAt: '2026-06-10'
-  - id: 2026-07-14-14-vinicius-h
-    scheduledAt: '2026-07-14T14:00:00-03:00'
+    recordedAt: '2026-06-22'
+  - id: 2026-06-22-16-davi-d
+    scheduledAt: '2026-06-22T16:00:00-03:00'
+    personId: davi
+    topicLetter: d
+    status: scheduled
+  - id: 2026-06-23-14-joao-carlos-d
+    scheduledAt: '2026-06-23T14:00:00-03:00'
+    personId: joao-carlos
+    topicLetter: d
+    status: scheduled
+  - id: 2026-06-23-16-janderson-f
+    scheduledAt: '2026-06-23T16:00:00-03:00'
+    personId: janderson
+    topicLetter: f
+    status: scheduled
+  - id: 2026-06-24-14-vinicius-f
+    scheduledAt: '2026-06-24T14:00:00-03:00'
     personId: vinicius
-    topicLetter: h
+    topicLetter: f
     status: scheduled
-  - id: 2026-07-14-16-robson-h
-    scheduledAt: '2026-07-14T16:00:00-03:00'
+  - id: 2026-06-24-16-robson-f
+    scheduledAt: '2026-06-24T16:00:00-03:00'
     personId: robson
-    topicLetter: h
+    topicLetter: f
     status: scheduled
-  - id: 2026-07-15-14-marcus-h
-    scheduledAt: '2026-07-15T14:00:00-03:00'
+  - id: 2026-06-25-14-marcus-e
+    scheduledAt: '2026-06-25T14:00:00-03:00'
     personId: marcus
-    topicLetter: h
+    topicLetter: e
     status: scheduled
-  - id: 2026-07-15-16-vieira-h
-    scheduledAt: '2026-07-15T16:00:00-03:00'
+  - id: 2026-06-25-16-vieira-d
+    scheduledAt: '2026-06-25T16:00:00-03:00'
     personId: vieira
-    topicLetter: h
+    topicLetter: d
     status: scheduled
-  - id: 2026-07-16-14-joao-carlos-i
-    scheduledAt: '2026-07-16T14:00:00-03:00'
-    personId: joao-carlos
-    topicLetter: i
+  - id: 2026-06-29-14-janderson-e
+    scheduledAt: '2026-06-29T14:00:00-03:00'
+    personId: janderson
+    topicLetter: e
     status: scheduled
-  - id: 2026-07-16-16-davi-h
-    scheduledAt: '2026-07-16T16:00:00-03:00'
-    personId: davi
-    topicLetter: h
+  - id: 2026-06-29-16-vinicius-g
+    scheduledAt: '2026-06-29T16:00:00-03:00'
+    personId: vinicius
+    topicLetter: g
     status: scheduled
-  - id: 2026-07-20-14-robson-i
-    scheduledAt: '2026-07-20T14:00:00-03:00'
+  - id: 2026-06-30-14-robson-g
+    scheduledAt: '2026-06-30T14:00:00-03:00'
     personId: robson
-    topicLetter: i
+    topicLetter: g
     status: scheduled
-  - id: 2026-07-20-16-marcus-i
-    scheduledAt: '2026-07-20T16:00:00-03:00'
+  - id: 2026-06-30-16-marcus-f
+    scheduledAt: '2026-06-30T16:00:00-03:00'
     personId: marcus
-    topicLetter: i
+    topicLetter: f
     status: scheduled
-  - id: 2026-07-21-14-vieira-i
-    scheduledAt: '2026-07-21T14:00:00-03:00'
+  - id: 2026-07-01-14-vieira-e
+    scheduledAt: '2026-07-01T14:00:00-03:00'
     personId: vieira
-    topicLetter: i
+    topicLetter: e
     status: scheduled
-  - id: 2026-07-21-16-davi-i
-    scheduledAt: '2026-07-21T16:00:00-03:00'
+  - id: 2026-07-01-16-davi-e
+    scheduledAt: '2026-07-01T16:00:00-03:00'
     personId: davi
-    topicLetter: i
+    topicLetter: e
     status: scheduled
-  - id: 2026-07-22-14-joao-carlos-j
-    scheduledAt: '2026-07-22T14:00:00-03:00'
+  - id: 2026-07-02-14-joao-carlos-e
+    scheduledAt: '2026-07-02T14:00:00-03:00'
     personId: joao-carlos
-    topicLetter: j
+    topicLetter: e
     status: scheduled
-  - id: 2026-07-22-16-janderson-d
-    scheduledAt: '2026-07-22T16:00:00-03:00'
+  - id: 2026-07-02-16-janderson-c
+    scheduledAt: '2026-07-02T16:00:00-03:00'
+    personId: janderson
+    topicLetter: c
+    status: scheduled
+  - id: 2026-07-06-14-marcus-g
+    scheduledAt: '2026-07-06T14:00:00-03:00'
+    personId: marcus
+    topicLetter: g
+    status: scheduled
+  - id: 2026-07-06-16-vieira-f
+    scheduledAt: '2026-07-06T16:00:00-03:00'
+    personId: vieira
+    topicLetter: f
+    status: scheduled
+  - id: 2026-07-07-14-davi-f
+    scheduledAt: '2026-07-07T14:00:00-03:00'
+    personId: davi
+    topicLetter: f
+    status: scheduled
+  - id: 2026-07-07-16-joao-carlos-f
+    scheduledAt: '2026-07-07T16:00:00-03:00'
+    personId: joao-carlos
+    topicLetter: f
+    status: scheduled
+  - id: 2026-07-08-14-janderson-d
+    scheduledAt: '2026-07-08T14:00:00-03:00'
     personId: janderson
     topicLetter: d
     status: scheduled
-  - id: 2026-07-23-14-vinicius-i
-    scheduledAt: '2026-07-23T14:00:00-03:00'
+  - id: 2026-07-08-16-vinicius-h
+    scheduledAt: '2026-07-08T16:00:00-03:00'
     personId: vinicius
-    topicLetter: i
+    topicLetter: h
     status: scheduled
-  - id: 2026-07-23-16-robson-j
-    scheduledAt: '2026-07-23T16:00:00-03:00'
+  - id: 2026-07-09-14-robson-h
+    scheduledAt: '2026-07-09T14:00:00-03:00'
     personId: robson
-    topicLetter: j
+    topicLetter: h
     status: scheduled
-  - id: 2026-07-27-14-joao-carlos-k
-    scheduledAt: '2026-07-27T14:00:00-03:00'
+  - id: 2026-07-09-16-marcus-h
+    scheduledAt: '2026-07-09T16:00:00-03:00'
+    personId: marcus
+    topicLetter: h
+    status: scheduled
+  - id: 2026-07-13-14-joao-carlos-g
+    scheduledAt: '2026-07-13T14:00:00-03:00'
     personId: joao-carlos
-    topicLetter: k
+    topicLetter: g
     status: scheduled
-  - id: 2026-07-27-16-davi-j
-    scheduledAt: '2026-07-27T16:00:00-03:00'
-    personId: davi
-    topicLetter: j
-    status: scheduled
-  - id: 2026-07-28-14-janderson-g
-    scheduledAt: '2026-07-28T14:00:00-03:00'
+  - id: 2026-07-13-16-janderson-g
+    scheduledAt: '2026-07-13T16:00:00-03:00'
     personId: janderson
     topicLetter: g
     status: scheduled
-  - id: 2026-07-28-16-vinicius-j
-    scheduledAt: '2026-07-28T16:00:00-03:00'
+  - id: 2026-07-14-14-vinicius-i
+    scheduledAt: '2026-07-14T14:00:00-03:00'
     personId: vinicius
+    topicLetter: i
+    status: scheduled
+  - id: 2026-07-14-16-robson-i
+    scheduledAt: '2026-07-14T16:00:00-03:00'
+    personId: robson
+    topicLetter: i
+    status: scheduled
+  - id: 2026-07-15-14-marcus-i
+    scheduledAt: '2026-07-15T14:00:00-03:00'
+    personId: marcus
+    topicLetter: i
+    status: scheduled
+  - id: 2026-07-15-16-vieira-g
+    scheduledAt: '2026-07-15T16:00:00-03:00'
+    personId: vieira
+    topicLetter: g
+    status: scheduled
+  - id: 2026-07-16-14-davi-g
+    scheduledAt: '2026-07-16T14:00:00-03:00'
+    personId: davi
+    topicLetter: g
+    status: scheduled
+  - id: 2026-07-16-16-joao-carlos-h
+    scheduledAt: '2026-07-16T16:00:00-03:00'
+    personId: joao-carlos
+    topicLetter: h
+    status: scheduled
+  - id: 2026-07-20-14-robson-j
+    scheduledAt: '2026-07-20T14:00:00-03:00'
+    personId: robson
     topicLetter: j
     status: scheduled
-  - id: 2026-07-29-14-robson-k
-    scheduledAt: '2026-07-29T14:00:00-03:00'
-    personId: robson
-    topicLetter: k
-    status: scheduled
-  - id: 2026-07-29-16-marcus-j
-    scheduledAt: '2026-07-29T16:00:00-03:00'
+  - id: 2026-07-20-16-marcus-j
+    scheduledAt: '2026-07-20T16:00:00-03:00'
     personId: marcus
     topicLetter: j
     status: scheduled
-  - id: 2026-07-30-14-vieira-j
-    scheduledAt: '2026-07-30T14:00:00-03:00'
+  - id: 2026-07-21-14-vieira-h
+    scheduledAt: '2026-07-21T14:00:00-03:00'
     personId: vieira
-    topicLetter: j
+    topicLetter: h
     status: scheduled
-  - id: 2026-07-30-16-davi-k
-    scheduledAt: '2026-07-30T16:00:00-03:00'
+  - id: 2026-07-21-16-davi-h
+    scheduledAt: '2026-07-21T16:00:00-03:00'
     personId: davi
-    topicLetter: k
+    topicLetter: h
     status: scheduled
-  - id: 2026-08-03-14-janderson-h
-    scheduledAt: '2026-08-03T14:00:00-03:00'
+  - id: 2026-07-22-14-joao-carlos-i
+    scheduledAt: '2026-07-22T14:00:00-03:00'
+    personId: joao-carlos
+    topicLetter: i
+    status: scheduled
+  - id: 2026-07-22-16-janderson-h
+    scheduledAt: '2026-07-22T16:00:00-03:00'
     personId: janderson
     topicLetter: h
     status: scheduled
-  - id: 2026-08-03-14-robson-l
-    scheduledAt: '2026-08-03T14:00:00-03:00'
-    personId: robson
-    topicLetter: l
-    status: scheduled
-  - id: 2026-08-03-16-vinicius-k
-    scheduledAt: '2026-08-03T16:00:00-03:00'
+  - id: 2026-07-23-14-vinicius-j
+    scheduledAt: '2026-07-23T14:00:00-03:00'
     personId: vinicius
+    topicLetter: j
+    status: scheduled
+  - id: 2026-07-23-16-robson-k
+    scheduledAt: '2026-07-23T16:00:00-03:00'
+    personId: robson
     topicLetter: k
     status: scheduled
-  - id: 2026-08-04-14-marcus-k
-    scheduledAt: '2026-08-04T14:00:00-03:00'
-    personId: marcus
-    topicLetter: k
+  - id: 2026-07-27-14-davi-i
+    scheduledAt: '2026-07-27T14:00:00-03:00'
+    personId: davi
+    topicLetter: i
     status: scheduled
-  - id: 2026-08-04-14-vieira-k
-    scheduledAt: '2026-08-04T14:00:00-03:00'
-    personId: vieira
-    topicLetter: k
+  - id: 2026-07-27-16-joao-carlos-j
+    scheduledAt: '2026-07-27T16:00:00-03:00'
+    personId: joao-carlos
+    topicLetter: j
     status: scheduled
-  - id: 2026-08-04-14-janderson-i
-    scheduledAt: '2026-08-04T14:00:00-03:00'
+  - id: 2026-07-28-14-janderson-i
+    scheduledAt: '2026-07-28T14:00:00-03:00'
     personId: janderson
     topicLetter: i
     status: scheduled
-  - id: 2026-08-04-16-vinicius-l
-    scheduledAt: '2026-08-04T16:00:00-03:00'
+  - id: 2026-07-28-16-vinicius-k
+    scheduledAt: '2026-07-28T16:00:00-03:00'
     personId: vinicius
-    topicLetter: l
-    status: scheduled
-  - id: 2026-08-05-14-joao-carlos-l
-    scheduledAt: '2026-08-05T14:00:00-03:00'
-    personId: joao-carlos
-    topicLetter: l
-    status: scheduled
-  - id: 2026-08-05-14-davi-l
-    scheduledAt: '2026-08-05T14:00:00-03:00'
-    personId: davi
-    topicLetter: l
-    status: scheduled
-  - id: 2026-08-05-14-vinicius-m
-    scheduledAt: '2026-08-05T14:00:00-03:00'
-    personId: vinicius
-    topicLetter: m
-    status: scheduled
-  - id: 2026-08-05-16-janderson-j
-    scheduledAt: '2026-08-05T16:00:00-03:00'
-    personId: janderson
-    topicLetter: j
-    status: scheduled
-  - id: 2026-08-06-14-marcus-l
-    scheduledAt: '2026-08-06T14:00:00-03:00'
-    personId: marcus
-    topicLetter: l
-    status: scheduled
-  - id: 2026-08-06-14-joao-carlos-m
-    scheduledAt: '2026-08-06T14:00:00-03:00'
-    personId: joao-carlos
-    topicLetter: m
-    status: scheduled
-  - id: 2026-08-06-14-robson-m
-    scheduledAt: '2026-08-06T14:00:00-03:00'
-    personId: robson
-    topicLetter: m
-    status: scheduled
-  - id: 2026-08-06-14-vinicius-n
-    scheduledAt: '2026-08-06T14:00:00-03:00'
-    personId: vinicius
-    topicLetter: 'n'
-    status: scheduled
-    notes: encerra Vinicius
-  - id: 2026-08-06-16-janderson-k
-    scheduledAt: '2026-08-06T16:00:00-03:00'
-    personId: janderson
     topicLetter: k
     status: scheduled
-    notes: encerra Janderson
-  - id: 2026-08-10-14-marcus-m
-    scheduledAt: '2026-08-10T14:00:00-03:00'
+  - id: 2026-07-29-14-robson-l
+    scheduledAt: '2026-07-29T14:00:00-03:00'
+    personId: robson
+    topicLetter: l
+    status: scheduled
+  - id: 2026-07-29-16-marcus-k
+    scheduledAt: '2026-07-29T16:00:00-03:00'
     personId: marcus
+    topicLetter: k
+    status: scheduled
+  - id: 2026-07-30-14-vieira-i
+    scheduledAt: '2026-07-30T14:00:00-03:00'
+    personId: vieira
+    topicLetter: i
+    status: scheduled
+  - id: 2026-07-30-16-davi-j
+    scheduledAt: '2026-07-30T16:00:00-03:00'
+    personId: davi
+    topicLetter: j
+    status: scheduled
+  - id: 2026-08-03-14-vinicius-l
+    scheduledAt: '2026-08-03T14:00:00-03:00'
+    personId: vinicius
+    topicLetter: l
+    status: scheduled
+  - id: 2026-08-03-16-robson-m
+    scheduledAt: '2026-08-03T16:00:00-03:00'
+    personId: robson
     topicLetter: m
     status: scheduled
-  - id: 2026-08-10-14-joao-carlos-n
-    scheduledAt: '2026-08-10T14:00:00-03:00'
-    personId: joao-carlos
-    topicLetter: 'n'
+  - id: 2026-08-04-14-marcus-l
+    scheduledAt: '2026-08-04T14:00:00-03:00'
+    personId: marcus
+    topicLetter: l
     status: scheduled
-  - id: 2026-08-10-16-robson-n
-    scheduledAt: '2026-08-10T16:00:00-03:00'
+  - id: 2026-08-04-16-vieira-j
+    scheduledAt: '2026-08-04T16:00:00-03:00'
+    personId: vieira
+    topicLetter: j
+    status: scheduled
+  - id: 2026-08-05-14-davi-k
+    scheduledAt: '2026-08-05T14:00:00-03:00'
+    personId: davi
+    topicLetter: k
+    status: scheduled
+  - id: 2026-08-05-16-joao-carlos-k
+    scheduledAt: '2026-08-05T16:00:00-03:00'
+    personId: joao-carlos
+    topicLetter: k
+    status: scheduled
+  - id: 2026-08-06-14-robson-n
+    scheduledAt: '2026-08-06T14:00:00-03:00'
     personId: robson
     topicLetter: 'n'
     status: scheduled
-  - id: 2026-08-11-14-vieira-l
+  - id: 2026-08-06-16-marcus-m
+    scheduledAt: '2026-08-06T16:00:00-03:00'
+    personId: marcus
+    topicLetter: m
+    status: scheduled
+  - id: 2026-08-10-14-robson-o
+    scheduledAt: '2026-08-10T14:00:00-03:00'
+    personId: robson
+    topicLetter: o
+    status: scheduled
+  - id: 2026-08-10-16-marcus-n
+    scheduledAt: '2026-08-10T16:00:00-03:00'
+    personId: marcus
+    topicLetter: 'n'
+    status: scheduled
+  - id: 2026-08-11-14-vieira-k
     scheduledAt: '2026-08-11T14:00:00-03:00'
+    personId: vieira
+    topicLetter: k
+    status: scheduled
+  - id: 2026-08-11-16-davi-l
+    scheduledAt: '2026-08-11T16:00:00-03:00'
+    personId: davi
+    topicLetter: l
+    status: scheduled
+  - id: 2026-08-12-14-robson-p
+    scheduledAt: '2026-08-12T14:00:00-03:00'
+    personId: robson
+    topicLetter: p
+    status: scheduled
+  - id: 2026-08-12-16-vieira-l
+    scheduledAt: '2026-08-12T16:00:00-03:00'
     personId: vieira
     topicLetter: l
     status: scheduled
-  - id: 2026-08-11-14-davi-m
-    scheduledAt: '2026-08-11T14:00:00-03:00'
+  - id: 2026-08-13-14-davi-m
+    scheduledAt: '2026-08-13T14:00:00-03:00'
     personId: davi
     topicLetter: m
     status: scheduled
-  - id: 2026-08-11-14-joao-carlos-o
-    scheduledAt: '2026-08-11T14:00:00-03:00'
-    personId: joao-carlos
-    topicLetter: o
-    status: scheduled
-    notes: encerra João Carlos
-  - id: 2026-08-11-16-marcus-n
-    scheduledAt: '2026-08-11T16:00:00-03:00'
-    personId: marcus
-    topicLetter: 'n'
-    status: scheduled
-  - id: 2026-08-12-14-vieira-m
-    scheduledAt: '2026-08-12T14:00:00-03:00'
-    personId: vieira
-    topicLetter: m
-    status: scheduled
-  - id: 2026-08-12-14-robson-o
-    scheduledAt: '2026-08-12T14:00:00-03:00'
-    personId: robson
-    topicLetter: o
-    status: scheduled
-  - id: 2026-08-12-16-marcus-o
-    scheduledAt: '2026-08-12T16:00:00-03:00'
-    personId: marcus
-    topicLetter: o
-    status: scheduled
-  - id: 2026-08-13-14-davi-n
-    scheduledAt: '2026-08-13T14:00:00-03:00'
-    personId: davi
-    topicLetter: 'n'
-    status: scheduled
-  - id: 2026-08-13-14-robson-p
-    scheduledAt: '2026-08-13T14:00:00-03:00'
-    personId: robson
-    topicLetter: p
-    status: scheduled
-  - id: 2026-08-13-16-marcus-p
+  - id: 2026-08-13-16-robson-q
     scheduledAt: '2026-08-13T16:00:00-03:00'
-    personId: marcus
-    topicLetter: p
-    status: scheduled
-    notes: encerra Marcus
-  - id: 2026-08-17-14-davi-o
-    scheduledAt: '2026-08-17T14:00:00-03:00'
-    personId: davi
-    topicLetter: o
-    status: scheduled
-  - id: 2026-08-17-14-robson-q
-    scheduledAt: '2026-08-17T14:00:00-03:00'
     personId: robson
     topicLetter: q
     status: scheduled
-  - id: 2026-08-17-16-vieira-n
-    scheduledAt: '2026-08-17T16:00:00-03:00'
-    personId: vieira
-    topicLetter: 'n'
+  - id: 2026-08-17-14-joao-carlos-l
+    scheduledAt: '2026-08-17T14:00:00-03:00'
+    personId: joao-carlos
+    topicLetter: l
     status: scheduled
-  - id: 2026-08-18-14-davi-p
-    scheduledAt: '2026-08-18T14:00:00-03:00'
-    personId: davi
-    topicLetter: p
+  - id: 2026-08-17-16-janderson-j
+    scheduledAt: '2026-08-17T16:00:00-03:00'
+    personId: janderson
+    topicLetter: j
     status: scheduled
   - id: 2026-08-18-14-robson-r
     scheduledAt: '2026-08-18T14:00:00-03:00'
     personId: robson
     topicLetter: r
     status: scheduled
-    notes: encerra Robson
-  - id: 2026-08-18-16-vieira-o
+  - id: 2026-08-18-16-marcus-o
     scheduledAt: '2026-08-18T16:00:00-03:00'
+    personId: marcus
+    topicLetter: o
+    status: scheduled
+  - id: 2026-08-19-14-vinicius-m
+    scheduledAt: '2026-08-19T14:00:00-03:00'
+    personId: vinicius
+    topicLetter: m
+    status: scheduled
+  - id: 2026-08-19-16-davi-n
+    scheduledAt: '2026-08-19T16:00:00-03:00'
+    personId: davi
+    topicLetter: 'n'
+    status: scheduled
+  - id: 2026-08-20-14-vieira-m
+    scheduledAt: '2026-08-20T14:00:00-03:00'
+    personId: vieira
+    topicLetter: m
+    status: scheduled
+  - id: 2026-08-20-16-joao-carlos-m
+    scheduledAt: '2026-08-20T16:00:00-03:00'
+    personId: joao-carlos
+    topicLetter: m
+    status: scheduled
+  - id: 2026-08-24-14-janderson-k
+    scheduledAt: '2026-08-24T14:00:00-03:00'
+    personId: janderson
+    topicLetter: k
+    status: scheduled
+  - id: 2026-08-24-16-marcus-p
+    scheduledAt: '2026-08-24T16:00:00-03:00'
+    personId: marcus
+    topicLetter: p
+    status: scheduled
+  - id: 2026-08-25-14-vinicius-n
+    scheduledAt: '2026-08-25T14:00:00-03:00'
+    personId: vinicius
+    topicLetter: 'n'
+    status: scheduled
+  - id: 2026-08-25-16-davi-o
+    scheduledAt: '2026-08-25T16:00:00-03:00'
+    personId: davi
+    topicLetter: o
+    status: scheduled
+  - id: 2026-08-26-14-vieira-n
+    scheduledAt: '2026-08-26T14:00:00-03:00'
+    personId: vieira
+    topicLetter: 'n'
+    status: scheduled
+  - id: 2026-08-26-16-joao-carlos-n
+    scheduledAt: '2026-08-26T16:00:00-03:00'
+    personId: joao-carlos
+    topicLetter: 'n'
+    status: scheduled
+  - id: 2026-08-27-14-joao-carlos-o
+    scheduledAt: '2026-08-27T14:00:00-03:00'
+    personId: joao-carlos
+    topicLetter: o
+    status: scheduled
+  - id: 2026-08-27-16-davi-p
+    scheduledAt: '2026-08-27T16:00:00-03:00'
+    personId: davi
+    topicLetter: p
+    status: scheduled
+  - id: 2026-08-31-14-vieira-o
+    scheduledAt: '2026-08-31T14:00:00-03:00'
     personId: vieira
     topicLetter: o
     status: scheduled
-  - id: 2026-08-19-14-vieira-p
-    scheduledAt: '2026-08-19T14:00:00-03:00'
-    personId: vieira
-    topicLetter: p
-    status: scheduled
-  - id: 2026-08-19-16-davi-q
-    scheduledAt: '2026-08-19T16:00:00-03:00'
+  - id: 2026-08-31-16-davi-q
+    scheduledAt: '2026-08-31T16:00:00-03:00'
     personId: davi
     topicLetter: q
     status: scheduled
-    notes: encerra Davi
-  - id: 2026-08-20-14-vieira-q
-    scheduledAt: '2026-08-20T14:00:00-03:00'
+  - id: 2026-09-01-14-vieira-p
+    scheduledAt: '2026-09-01T14:00:00-03:00'
+    personId: vieira
+    topicLetter: p
+    status: scheduled
+  - id: 2026-09-01-16-vieira-q
+    scheduledAt: '2026-09-01T16:00:00-03:00'
     personId: vieira
     topicLetter: q
     status: scheduled
-  - id: 2026-08-24-14-vieira-r
-    scheduledAt: '2026-08-24T14:00:00-03:00'
+  - id: 2026-09-02-14-vieira-r
+    scheduledAt: '2026-09-02T14:00:00-03:00'
     personId: vieira
     topicLetter: r
     status: scheduled
-  - id: 2026-08-25-14-vieira-s
-    scheduledAt: '2026-08-25T14:00:00-03:00'
+  - id: 2026-09-02-16-vieira-s
+    scheduledAt: '2026-09-02T16:00:00-03:00'
     personId: vieira
     topicLetter: s
     status: scheduled
-    notes: encerra Vieira

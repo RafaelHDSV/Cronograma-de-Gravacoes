@@ -5,7 +5,7 @@ import { ScheduleFixModal } from './components/ScheduleFixModal'
 import { Tooltip } from './components/Tooltip'
 import { EditorLoginModal } from './components/EditorLoginModal'
 import { PersonCompleteCelebration } from './components/PersonCompleteCelebration'
-import { applySessionBatch, createSession, deleteSession, fetchAuthMe, fetchSchedule, fixDayCapacity, fixFridays, resetFromYaml, updatePersonTopicOrder } from './lib/api'
+import { applySessionBatch, createSession, deleteSession, fetchAuthMe, fetchSchedule, fixDayCapacity, fixFridays, updatePersonTopicOrder } from './lib/api'
 import { clearEditorToken, getEditorToken } from './lib/authStorage'
 import {
   applyPendingPatches,
@@ -55,7 +55,6 @@ export function App() {
   const [refreshing, setRefreshing] = useState(false)
   const [celebration, setCelebration] = useState<string | null>(null)
   const [slowLoad, setSlowLoad] = useState(false)
-  const [resetting, setResetting] = useState(false)
   const [showFixFridays, setShowFixFridays] = useState(false)
   const [fixFridaysChanges, setFixFridaysChanges] = useState<FridayFixChange[]>([])
   const [fixFridaysLoading, setFixFridaysLoading] = useState(false)
@@ -140,31 +139,6 @@ export function App() {
     () => hasOverfullDays(baselineSessions),
     [baselineSessions],
   )
-
-  const onResetFromYaml = useCallback(async () => {
-    if (
-      !window.confirm(
-        'Recriar cronograma do YAML?\n\nAs datas serão atualizadas conforme o sessions.yaml. Gravações já concluídas ou adiadas no banco serão preservadas (por pessoa e tópico). Demais alterações locais serão perdidas.',
-      )
-    )
-      return
-    setResetting(true)
-    setScheduleNotice(null)
-    try {
-      const { sessions, preservedCount } = await resetFromYaml()
-      setData((prev) => (prev ? { ...prev, sessions } : prev))
-      setPending(new Map())
-      if (preservedCount > 0) {
-        setScheduleNotice(
-          `Cronograma recriado. ${preservedCount} gravação${preservedCount === 1 ? '' : 'ões'} concluída${preservedCount === 1 ? '' : 's'} preservada${preservedCount === 1 ? '' : 's'}.`,
-        )
-      }
-    } catch (e) {
-      setScheduleNotice(String(e))
-    } finally {
-      setResetting(false)
-    }
-  }, [])
 
   const openFixFridays = useCallback(async () => {
     setFixFridaysLoading(true)
@@ -459,18 +433,6 @@ export function App() {
                 </span>
               </button>
             </Tooltip>
-            {isEditor && (
-              <Tooltip label="Apaga o Supabase e recarrega do sessions.yaml">
-                <button
-                  type="button"
-                  className="btn ghost btn-danger"
-                  onClick={() => void onResetFromYaml()}
-                  disabled={resetting}
-                >
-                  {resetting ? 'Recriando…' : 'Recriar do YAML'}
-                </button>
-              </Tooltip>
-            )}
             {isEditor && needsDayCapacityFix && (
               <button
                 type="button"
