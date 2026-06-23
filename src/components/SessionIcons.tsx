@@ -53,11 +53,39 @@ export function IconPostpone() {
   )
 }
 
-export function IconSwapOrder() {
+export function IconNote() {
+  return (
+    <svg className="session-icon session-note-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <path
+        d="M14 2v6h6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8 13h8M8 17h5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+export function IconDelete() {
   return (
     <svg className="session-icon" viewBox="0 0 24 24" aria-hidden="true">
       <path
-        d="M8 6l-4 4 4 4"
+        d="M3 6h18"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
@@ -65,14 +93,7 @@ export function IconSwapOrder() {
         strokeLinejoin="round"
       />
       <path
-        d="M4 10h9a4 4 0 0 1 4 4v0"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="m16 18 4-4-4-4"
+        d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
@@ -80,11 +101,20 @@ export function IconSwapOrder() {
         strokeLinejoin="round"
       />
       <path
-        d="M20 14H11a4 4 0 0 0-4 4v0"
+        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10 11v6M14 11v6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   )

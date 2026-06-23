@@ -75,6 +75,8 @@ export type SessionPatchPayload = {
   status?: SessionStatus
   scheduledAt?: string
   recordedAt?: string
+  notes?: string
+  topicLetter?: string
 }
 
 export async function applySessionBatch(
@@ -96,4 +98,23 @@ export async function updatePersonTopicOrder(
     body: JSON.stringify({ topicOrder }),
   })
   return person
+}
+
+export type CreateSessionPayload = {
+  personId: string
+  topicLetter: string
+  scheduledAt: string
+  status?: SessionStatus
+}
+
+export async function createSession(payload: CreateSessionPayload): Promise<Session> {
+  const { session } = await request<{ session: Session }>('/api/sessions', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+  return session
+}
+
+export async function deleteSession(id: string): Promise<void> {
+  await request<{ ok: boolean }>(`/api/sessions/${id}`, { method: 'DELETE' })
 }

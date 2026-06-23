@@ -16,6 +16,7 @@ type Placement = 'top' | 'bottom'
 
 interface Props {
   label: string
+  multiline?: boolean
   children: ReactElement
 }
 
@@ -24,7 +25,7 @@ function clampX(centerX: number, popupWidth: number): number {
   return Math.max(VIEWPORT_PAD + half, Math.min(window.innerWidth - VIEWPORT_PAD - half, centerX))
 }
 
-export function Tooltip({ label, children }: Props) {
+export function Tooltip({ label, multiline, children }: Props) {
   const [open, setOpen] = useState(false)
   const [placement, setPlacement] = useState<Placement>('bottom')
   const [coords, setCoords] = useState<CSSProperties>({})
@@ -98,7 +99,7 @@ export function Tooltip({ label, children }: Props) {
         createPortal(
           <span
             ref={popupRef}
-            className={`tooltip-popup tooltip-popup--${placement}`}
+            className={`tooltip-popup tooltip-popup--${placement}${multiline ? ' tooltip-popup--multiline' : ''}`}
             style={coords}
             role="tooltip"
           >

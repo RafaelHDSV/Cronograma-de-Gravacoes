@@ -12,6 +12,9 @@ import {
   resetSessionsFromYaml,
   applySessionPatches,
   updatePersonTopicOrder,
+  createSession,
+  deleteSession,
+  type CreateSessionInput,
   type SessionPatch,
 } from './data.js'
 import { handleAuthMe, handleLogin, requireEditor } from './auth.js'
@@ -52,12 +55,44 @@ app.get('/api/schedule', async (_req, res) => {
 app.patch('/api/sessions/:id', requireEditor, async (req, res) => {
   try {
     const id = String(req.params.id)
-    const { status, scheduledAt, recordedAt } = req.body as SessionPatch
-    const session = await updateSession(id, { status, scheduledAt, recordedAt })
+    const { status, scheduledAt, recordedAt, notes, topicLetter } = req.body as SessionPatch
+    const session = await updateSession(id, { status, scheduledAt, recordedAt, notes, topicLetter })
     if (!session) {
       return res.status(404).json({ error: 'Session not found' })
     }
     res.json({ session })
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ error: String(e) })
+  }
+})
+
+app.post('/api/sessions', requireEditor, async (req, res) => {
+  try {
+    const { personId, topicLetter, scheduledAt, status } = req.body as CreateSessionInput
+    if (!personId || !topicLetter || !scheduledAt) {
+      return res.status(400).json({ error: 'personId, topicLetter e scheduledAt sao obrigatorios' })
+    }
+    const session = await createSession({ personId, topicLetter, scheduledAt, status })
+    res.status(201).json({ session })
+  } catch (e) {
+    console.error(e)
+    const msg = String(e)
+    if (msg.includes('nao encontrada') || msg.includes('invalido')) {
+      return res.status(400).json({ error: msg })
+    }
+    res.status(500).json({ error: msg })
+  }
+})
+
+app.delete('/api/sessions/:id', requireEditor, async (req, res) => {
+  try {
+    const id = String(req.params.id)
+    const removed = await deleteSession(id)
+    if (!removed) {
+      return res.status(404).json({ error: 'Session not found' })
+    }
+    res.status(200).json({ ok: true })
   } catch (e) {
     console.error(e)
     res.status(500).json({ error: String(e) })

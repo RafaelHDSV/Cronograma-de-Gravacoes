@@ -19,6 +19,7 @@ export interface Session {
   topicLetter: string
   status: SessionStatus
   recordedAt?: string
+  notes?: string
 }
 
 export interface ScheduleData {

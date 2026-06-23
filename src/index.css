@@ -522,6 +522,11 @@ body {
   color: var(--muted);
 }
 
+.badge-inline.partial {
+  background: rgba(251, 191, 36, 0.15);
+  color: var(--postponed);
+}
+
 .progress {
   height: 8px;
   background: var(--panel-2);
@@ -852,15 +857,21 @@ body {
 }
 
 .calendar-detail-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   padding: 10px 12px;
   background: var(--panel-2);
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   border-left: 3px solid var(--scheduled);
+}
+
+.calendar-detail-row .detail-main {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px 12px;
 }
 
 .calendar-detail-row.done {
@@ -984,11 +995,124 @@ body {
   color: var(--postponed) !important;
 }
 
-.calendar-detail-row .detail-time-edit {
-  grid-column: 1 / -1;
-  padding-top: 8px;
+.detail-actions .session-delete-btn {
+  color: var(--error) !important;
+  border-color: rgba(248, 113, 113, 0.35) !important;
+}
+
+.detail-actions .session-delete-btn:hover {
+  background: rgba(248, 113, 113, 0.12) !important;
+  color: var(--error) !important;
+}
+
+.calendar-detail-row .detail-time-edit,
+.calendar-detail-row .detail-session-edit,
+.calendar-detail-row .session-notes-read {
+  padding-top: 10px;
   margin-top: 2px;
   border-top: 1px solid var(--border);
+}
+
+.detail-session-edit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+}
+
+.session-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.session-edit-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.session-edit-topic {
+  margin-left: 0;
+  min-width: 220px;
+}
+
+.session-edit-field--notes {
+  flex: 1 1 100%;
+  min-width: 100%;
+}
+
+.session-notes-input {
+  width: 100%;
+  min-height: 72px;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  resize: vertical;
+}
+
+.session-notes-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.session-notes-read {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.session-notes-read--postponed {
+  flex: 1 1 100%;
+  width: 100%;
+  padding: 8px 0 0;
+  border-top: 1px dashed var(--border);
+}
+
+.session-notes-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.session-notes-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.session-note-indicator {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  color: var(--muted);
+  cursor: help;
+}
+
+.session-note-indicator:hover,
+.session-note-indicator:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
+.session-note-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.col-status .session-note-indicator {
+  vertical-align: middle;
 }
 
 /* Tooltips — visibilidade e posicao via Tooltip.tsx (hover + portal) */
@@ -1021,6 +1145,12 @@ body {
   to {
     opacity: 1;
   }
+}
+
+.tooltip-popup--multiline {
+  white-space: pre-wrap;
+  max-width: min(320px, calc(100vw - 16px));
+  line-height: 1.4;
 }
 
 .tooltip-popup::after {
@@ -1351,7 +1481,7 @@ body {
     display: none;
   }
 
-  .calendar-detail-row {
+  .calendar-detail-row .detail-main {
     grid-template-columns: auto 1fr;
   }
 
@@ -1558,4 +1688,140 @@ body {
     justify-content: center;
     font-size: 9px;
   }
+}
+
+.stat-secondary,
+.stat-footnote {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.chip-topic-progress {
+  font-size: 9px;
+  opacity: 0.85;
+  margin-left: 2px;
+}
+
+.topic-progress-badge {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  color: var(--muted);
+  margin-left: 6px;
+}
+
+.calendar-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.calendar-detail-title {
+  margin: 0;
+}
+
+.col-sessions {
+  min-width: 140px;
+}
+
+.topic-session-summary {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.topic-add-btn {
+  margin-top: 6px;
+}
+
+.btn-xs {
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+.topic-row-group td {
+  font-weight: 600;
+  border-bottom: none;
+}
+
+.topic-row-session td {
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.topic-row-session .col-topic {
+  padding-left: 24px;
+  color: var(--muted);
+}
+
+.topic-session-index {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.add-session-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.form-select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  font: inherit;
+}
+
+.topic-edit-select {
+  margin-left: 6px;
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  max-width: min(280px, 100%);
+}
+
+.topic-edit-btn {
+  margin-left: 6px;
+}
+
+.session-edit-actions {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+.session-delete-btn {
+  color: var(--error) !important;
+  border-color: rgba(248, 113, 113, 0.35) !important;
+}
+
+.session-delete-btn:hover {
+  background: rgba(248, 113, 113, 0.12) !important;
 }

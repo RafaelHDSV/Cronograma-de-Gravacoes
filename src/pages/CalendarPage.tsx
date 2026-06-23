@@ -1,12 +1,15 @@
 import { useCallback, useMemo, useState } from 'react'
-import { IconEdit, IconPostpone, IconSwapOrder } from '../components/SessionIcons'
+import { AddSessionModal, type AddSessionDefaults } from '../components/AddSessionModal'
+import { IconEdit, IconPostpone, IconDelete } from '../components/SessionIcons'
 import { StatusBadge } from '../components/StatusBadge'
 import { TimeSlotPicker } from '../components/TimeSlotPicker'
 import { IconButton, Tooltip } from '../components/Tooltip'
+import { hasSessionNotes, sessionNotesText } from '../lib/sessionNotes'
 import {
   activeSessions,
   buildCalendarMonth,
   dayKey,
+  compareSessionsByTime,
   findTopic,
   formatDateLong,
   formatTime,
@@ -14,9 +17,12 @@ import {
   monthLabel,
   sessionMonthRange,
   sessionsForDay,
+  sortPeopleByName,
   todayKey,
 } from '../lib/schedule'
 import type { Person, Session } from '../lib/types'
+import { getOrderedTopics } from '../lib/topicOrder'
+import { topicGroupForSession, topicProgressLabel } from '../lib/topicSessions'
 
 interface Props {
   sessions: Session[]
@@ -24,10 +30,18 @@ interface Props {
   canEdit: boolean
   onMoveSession: (id: string, targetDayKey: string) => void
   onToggleDone: (id: string) => void
-  onSwapTime: (idA: string, idB: string) => void
   onPostpone: (id: string) => void
   onReschedule: (id: string, targetDayKey: string, hour: number, minute: number) => void
   onChangeTime: (id: string, hour: number, minute: number) => void
+  onChangeTopic: (id: string, topicLetter: string) => void
+  onChangeNotes: (id: string, notes: string) => void
+  onCancelSessionEdit: (id: string) => void
+  onCreateSession: (payload: {
+    personId: string
+    topicLetter: string
+    scheduledAt: string
+  }) => Promise<void>
+  onDeleteSession: (id: string) => Promise<void>
 }
 
 const WEEKDAYS_SHORT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -38,12 +52,17 @@ export function CalendarPage({
   canEdit,
   onMoveSession,
   onToggleDone,
-  onSwapTime,
   onPostpone,
   onReschedule,
   onChangeTime,
+  onChangeTopic,
+  onChangeNotes,
+  onCancelSessionEdit,
+  onCreateSession,
+  onDeleteSession,
 }: Props) {
-  const [editingTimeId, setEditingTimeId] = useState<string | null>(null)
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null)
+  const [addSessionDefaults, setAddSessionDefaults] = useState<AddSessionDefaults | null>(null)
   const calendarSessions = useMemo(() => activeSessions(sessions), [sessions])
   const postponedSessions = useMemo(
     () =>
@@ -73,7 +92,7 @@ export function CalendarPage({
       map.set(key, arr)
     }
     for (const [, list] of map) {
-      list.sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt))
+      list.sort(compareSessionsByTime)
     }
     return map
   }, [calendarSessions])
@@ -105,15 +124,22 @@ export function CalendarPage({
   }, [monthRange, ty, tm, today])
 
   const selectedSessions = selectedDay ? sessionsForDay(sessions, selectedDay) : []
+  const peopleList = useMemo(() => sortPeopleByName(Array.from(personIndex.values())), [personIndex])
 
-  const handleSwap = useCallback(
-    (idx: number) => {
-      if (idx >= selectedSessions.length - 1) return
-      const a = selectedSessions[idx]
-      const b = selectedSessions[idx + 1]
-      onSwapTime(a.id, b.id)
+  const handleDeleteSession = useCallback(
+    async (id: string) => {
+      await onDeleteSession(id)
+      setEditingSessionId((current) => (current === id ? null : current))
     },
-    [selectedSessions, onSwapTime],
+    [onDeleteSession],
+  )
+
+  const handleCancelEdit = useCallback(
+    (id: string) => {
+      onCancelSessionEdit(id)
+      setEditingSessionId((current) => (current === id ? null : current))
+    },
+    [onCancelSessionEdit],
   )
 
   return (
@@ -193,6 +219,8 @@ export function CalendarPage({
                 {daySessions.slice(0, 3).map((s) => {
                   const person = personIndex.get(s.personId)
                   const topic = findTopic(person, s.topicLetter)
+                  const group = topicGroupForSession(person, sessions, s)
+                  const progressLabel = group ? topicProgressLabel(group) : null
                   return (
                     <div
                       key={s.id}
@@ -200,7 +228,7 @@ export function CalendarPage({
                       draggable={canEdit}
                       onDragStart={(e) => canEdit && handleDragStart(e, s.id)}
                       onClick={(e) => e.stopPropagation()}
-                      title={`${person?.name} — ${topic?.title ?? s.topicLetter} · ${formatTime(s.scheduledAt)}`}
+                      title={`${person?.name} — ${topic?.title ?? s.topicLetter}${progressLabel ? ` (${progressLabel})` : ''} · ${formatTime(s.scheduledAt)}`}
                     >
                       <span className='chip-time'>
                         {formatTime(s.scheduledAt)}
@@ -208,6 +236,9 @@ export function CalendarPage({
                       <span className='chip-name'>
                         {person?.name?.split(' ')[0] ?? s.personId}
                       </span>
+                      {progressLabel && (
+                        <span className='chip-topic-progress'>{progressLabel}</span>
+                      )}
                     </div>
                   )
                 })}
@@ -224,116 +255,179 @@ export function CalendarPage({
 
       {selectedDay && (
         <div className='calendar-detail'>
-          <h3 className='section-title'>
-            {new Intl.DateTimeFormat('pt-BR', {
-              weekday: 'long',
-              day: 'numeric',
-              month: 'long'
-            }).format(
-              new Date(
-                Date.UTC(
-                  Number(selectedDay.split('-')[0]),
-                  Number(selectedDay.split('-')[1]) - 1,
-                  Number(selectedDay.split('-')[2]),
-                  12
+          <div className="calendar-detail-head">
+            <h3 className='section-title calendar-detail-title'>
+              {new Intl.DateTimeFormat('pt-BR', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long'
+              }).format(
+                new Date(
+                  Date.UTC(
+                    Number(selectedDay.split('-')[0]),
+                    Number(selectedDay.split('-')[1]) - 1,
+                    Number(selectedDay.split('-')[2]),
+                    12
+                  )
                 )
-              )
+              )}
+            </h3>
+            {canEdit && (
+              <button
+                type="button"
+                className="btn ghost btn-sm"
+                onClick={() => setAddSessionDefaults({ dayKey: selectedDay })}
+              >
+                Adicionar sessão
+              </button>
             )}
-          </h3>
+          </div>
           {selectedSessions.length === 0 ? (
             <p className='empty'>
               Nenhuma gravação neste dia. Arraste uma sessão para cá.
             </p>
           ) : (
             <ul className='calendar-detail-list'>
-              {selectedSessions.map((s, idx) => {
+              {selectedSessions.map((s) => {
                 const person = personIndex.get(s.personId)
                 const topic = findTopic(person, s.topicLetter)
+                const group = topicGroupForSession(person, sessions, s)
+                const progressLabel = group ? topicProgressLabel(group) : null
                 const isDone = s.status === 'done'
                 const isScheduled = s.status === 'scheduled'
-                const canSwapDown = idx < selectedSessions.length - 1
                 const { hour, minute } = localTimeParts(s.scheduledAt)
-                const showTimeEdit = editingTimeId === s.id
+                const isEditing = editingSessionId === s.id
+                const personTopics = person ? getOrderedTopics(person) : []
                 return (
                   <li key={s.id} className={`calendar-detail-row ${s.status}`}>
-                    <Tooltip
-                      label={
-                        isDone ? 'Desmarcar gravação' : 'Marcar como gravada'
-                      }
-                    >
-                      <label className='session-check'>
-                        <input
-                          type='checkbox'
-                          checked={isDone}
-                          disabled={!canEdit || (!isDone && !isScheduled)}
-                          onChange={() => onToggleDone(s.id)}
-                        />
-                        <span className='checkmark' />
-                      </label>
-                    </Tooltip>
-                    <div className='detail-body'>
-                      <div className='detail-time-group'>
-                        <span className='detail-time'>
-                          {formatTime(s.scheduledAt)}
+                    <div className="detail-main">
+                      <Tooltip
+                        label={
+                          isDone ? 'Desmarcar gravação' : 'Marcar como gravada'
+                        }
+                      >
+                        <label className='session-check'>
+                          <input
+                            type='checkbox'
+                            checked={isDone}
+                            disabled={!canEdit || (!isDone && !isScheduled)}
+                            onChange={() => onToggleDone(s.id)}
+                          />
+                          <span className='checkmark' />
+                        </label>
+                      </Tooltip>
+                      <div className='detail-body'>
+                        <span className='detail-time'>{formatTime(s.scheduledAt)}</span>
+                        <span className='detail-dot' aria-hidden='true'>
+                          ·
                         </span>
-                        {canEdit && isScheduled && (
+                        <span className='detail-person'>
+                          <strong>{person?.name ?? s.personId}</strong>
+                          <span className='letter'>({s.topicLetter})</span>
+                          {progressLabel && (
+                            <span className="topic-progress-badge">{progressLabel}</span>
+                          )}
+                        </span>
+                        <span className='detail-dot' aria-hidden='true'>
+                          ·
+                        </span>
+                        <span className='detail-topic'>{topic?.title ?? '—'}</span>
+                        {isDone && <StatusBadge status={s.status} />}
+                      </div>
+                      {canEdit && (isScheduled || isDone) && (
+                        <div className='detail-actions'>
                           <IconButton
-                            label='Alterar horário'
-                            className='time-edit-btn'
-                            active={showTimeEdit}
-                            aria-expanded={showTimeEdit}
-                            onClick={() =>
-                              setEditingTimeId(showTimeEdit ? null : s.id)
-                            }
+                            label='Alterar sessão'
+                            className='session-edit-btn'
+                            active={isEditing}
+                            aria-expanded={isEditing}
+                            onClick={() => setEditingSessionId(isEditing ? null : s.id)}
                           >
                             <IconEdit />
                           </IconButton>
-                        )}
-                      </div>
-                      <span className='detail-dot' aria-hidden='true'>
-                        ·
-                      </span>
-                      <span className='detail-person'>
-                        <strong>{person?.name ?? s.personId}</strong>
-                        <span className='letter'>({s.topicLetter})</span>
-                      </span>
-                      <span className='detail-dot' aria-hidden='true'>
-                        ·
-                      </span>
-                      <span className='detail-topic'>
-                        {topic?.title ?? '—'}
-                      </span>
-                      {isDone && <StatusBadge status={s.status} />}
+                          <IconButton
+                            label='Excluir sessão'
+                            className='session-delete-btn'
+                            onClick={() => void handleDeleteSession(s.id)}
+                          >
+                            <IconDelete />
+                          </IconButton>
+                          {isScheduled && (
+                            <>
+                              <IconButton
+                                label='Adiar gravação'
+                                className='postpone-btn'
+                                onClick={() => onPostpone(s.id)}
+                              >
+                                <IconPostpone />
+                              </IconButton>
+                              <IconButton
+                                label="Nova sessão deste tópico"
+                                className="add-session-btn"
+                                onClick={() =>
+                                  setAddSessionDefaults({
+                                    personId: s.personId,
+                                    topicLetter: s.topicLetter,
+                                    dayKey: selectedDay ?? undefined,
+                                  })
+                                }
+                              >
+                                +
+                              </IconButton>
+                            </>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    {canEdit && (isScheduled || canSwapDown) && (
-                      <div className='detail-actions'>
-                        {isScheduled && (
-                          <IconButton
-                            label='Adiar gravação'
-                            className='postpone-btn'
-                            onClick={() => onPostpone(s.id)}
-                          >
-                            <IconPostpone />
-                          </IconButton>
-                        )}
-                        {canSwapDown && (
-                          <IconButton
-                            label='Trocar horário com a gravação de baixo'
-                            className='swap-btn'
-                            onClick={() => handleSwap(idx)}
-                          >
-                            <IconSwapOrder />
-                          </IconButton>
-                        )}
+                    {hasSessionNotes(s.notes) && !isEditing && (
+                      <div className="session-notes-read">
+                        <span className="session-notes-label">Observação</span>
+                        <p className="session-notes-text">{sessionNotesText(s.notes)}</p>
                       </div>
                     )}
-                    {showTimeEdit && canEdit && (
-                      <div className='detail-time-edit'>
-                        <TimeSlotPicker
-                          hour={hour}
-                          minute={minute}
-                          onChange={(h, m) => onChangeTime(s.id, h, m)}
-                        />
+                    {isEditing && canEdit && (
+                      <div className='detail-session-edit'>
+                        <div className="session-edit-field">
+                          <span className="session-edit-label">Horário</span>
+                          <TimeSlotPicker
+                            hour={hour}
+                            minute={minute}
+                            onChange={(h, m) => onChangeTime(s.id, h, m)}
+                          />
+                        </div>
+                        <label className="session-edit-field">
+                          <span className="session-edit-label">Tópico</span>
+                          <select
+                            className="topic-edit-select session-edit-topic"
+                            value={s.topicLetter}
+                            onChange={(e) => onChangeTopic(s.id, e.target.value)}
+                          >
+                            {personTopics.map((t) => (
+                              <option key={t.letter} value={t.letter}>
+                                ({t.letter}) {t.title}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="session-edit-field session-edit-field--notes">
+                          <span className="session-edit-label">Observações</span>
+                          <textarea
+                            className="session-notes-input"
+                            rows={3}
+                            value={s.notes ?? ''}
+                            onChange={(e) => onChangeNotes(s.id, e.target.value)}
+                            placeholder="Ex.: Gravei só a parte 1 — continuar na próxima sessão"
+                          />
+                        </label>
+                        <div className="session-edit-actions">
+                          <button
+                            type="button"
+                            className="btn ghost btn-sm"
+                            onClick={() => handleCancelEdit(s.id)}
+                          >
+                            Cancelar
+                          </button>
+                        </div>
                       </div>
                     )}
                   </li>
@@ -342,6 +436,16 @@ export function CalendarPage({
             </ul>
           )}
         </div>
+      )}
+
+      {addSessionDefaults && (
+        <AddSessionModal
+          open={addSessionDefaults !== null}
+          people={peopleList}
+          defaults={addSessionDefaults}
+          onClose={() => setAddSessionDefaults(null)}
+          onSubmit={onCreateSession}
+        />
       )}
 
       <div className='postponed-section'>
@@ -362,6 +466,7 @@ export function CalendarPage({
                 personIndex={personIndex}
                 canEdit={canEdit}
                 onReschedule={onReschedule}
+                onDelete={handleDeleteSession}
               />
             ))}
           </ul>
@@ -376,11 +481,13 @@ function PostponedRow({
   personIndex,
   canEdit,
   onReschedule,
+  onDelete,
 }: {
   session: Session
   personIndex: Map<string, Person>
   canEdit: boolean
   onReschedule: (id: string, targetDayKey: string, hour: number, minute: number) => void
+  onDelete: (id: string) => Promise<void>
 }) {
   const person = personIndex.get(session.personId)
   const topic = findTopic(person, session.topicLetter)
@@ -416,6 +523,12 @@ function PostponedRow({
         <span className="postponed-topic">{topic?.title ?? '—'}</span>
         <span className="postponed-was">Era {wasDate}</span>
       </div>
+      {hasSessionNotes(session.notes) && (
+        <div className="session-notes-read session-notes-read--postponed">
+          <span className="session-notes-label">Observação</span>
+          <p className="session-notes-text">{sessionNotesText(session.notes)}</p>
+        </div>
+      )}
       {canEdit && (
         <div className="postponed-reschedule">
           <label className="reschedule-field">
@@ -448,6 +561,13 @@ function PostponedRow({
               Agendar
             </button>
           </Tooltip>
+          <IconButton
+            label="Excluir sessão"
+            className="session-delete-btn"
+            onClick={() => void onDelete(session.id)}
+          >
+            <IconDelete />
+          </IconButton>
         </div>
       )}
     </li>

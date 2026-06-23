@@ -1,6 +1,7 @@
 import type { Session, SessionStatus } from './types'
 import {
   STATUS_LABEL,
+  compareSessionsByTime,
   dayKey,
   formatTime,
   localTimeParts,
@@ -11,6 +12,8 @@ export type SessionPatch = {
   status?: SessionStatus
   scheduledAt?: string
   recordedAt?: string
+  topicLetter?: string
+  notes?: string
 }
 
 export interface PendingEntry {
@@ -29,13 +32,19 @@ function normalizeSession(session: Session): Session {
   }
 }
 
+function notesEqual(a?: string, b?: string): boolean {
+  return (a?.trim() ?? '') === (b?.trim() ?? '')
+}
+
 export function sessionsEqual(a: Session, b: Session): boolean {
   const x = normalizeSession(a)
   const y = normalizeSession(b)
   return (
     x.status === y.status &&
+    x.topicLetter === y.topicLetter &&
     scheduledAtEqual(x.scheduledAt, y.scheduledAt) &&
-    x.recordedAt === y.recordedAt
+    x.recordedAt === y.recordedAt &&
+    notesEqual(x.notes, y.notes)
   )
 }
 
@@ -59,11 +68,17 @@ export function deriveChangeLabels(before: Session, after: Session): string[] {
       labels.push('Alterar horário')
     }
   }
+  if (before.topicLetter !== after.topicLetter) {
+    labels.push(`Alterar tópico (${before.topicLetter} → ${after.topicLetter})`)
+  }
   const recBefore = before.recordedAt?.trim() ?? ''
   const recAfter = after.recordedAt?.trim() ?? ''
   if (recBefore !== recAfter && !labels.some((l) => l.includes('gravada'))) {
     if (recAfter) labels.push('Registrar data de gravação')
     else if (recBefore) labels.push('Limpar data de gravação')
+  }
+  if (!notesEqual(before.notes, after.notes)) {
+    labels.push('Alterar notas')
   }
   return labels.length > 0 ? labels : ['Alterar sessão']
 }
@@ -81,8 +96,12 @@ export function applyPendingPatches(
       ...s,
       ...(p.status !== undefined ? { status: p.status } : {}),
       ...(p.scheduledAt !== undefined ? { scheduledAt: p.scheduledAt } : {}),
+      ...(p.topicLetter !== undefined ? { topicLetter: p.topicLetter } : {}),
       ...(p.recordedAt !== undefined
         ? { recordedAt: p.recordedAt.trim() ? p.recordedAt : undefined }
+        : {}),
+      ...(p.notes !== undefined
+        ? { notes: p.notes === '' ? undefined : p.notes }
         : {}),
     })
   })
@@ -175,7 +194,11 @@ export function buildPendingRows(
       patch: entry.patch,
     })
   }
-  return rows.sort((a, b) => a.before.scheduledAt.localeCompare(b.before.scheduledAt))
+  return rows.sort((a, b) => {
+    const dayCmp = dayKey(a.before.scheduledAt).localeCompare(dayKey(b.before.scheduledAt))
+    if (dayCmp !== 0) return dayCmp
+    return compareSessionsByTime(a.before, b.before)
+  })
 }
 
 export function describeSessionSnapshot(
@@ -186,7 +209,13 @@ export function describeSessionSnapshot(
   const date = dayKey(session.scheduledAt)
   const time = formatTime(session.scheduledAt)
   const status = STATUS_LABEL[session.status]
-  return `${personName} (${session.topicLetter}) — ${topicTitle} · ${date} ${time} · ${status}`
+  let line = `${personName} (${session.topicLetter}) — ${topicTitle} · ${date} ${time} · ${status}`
+  const note = session.notes?.trim()
+  if (note) {
+    const preview = note.length > 60 ? `${note.slice(0, 57)}…` : note
+    line += ` · Nota: ${preview}`
+  }
+  return line
 }
 
 export function patchFromTimeChange(

@@ -3,11 +3,10 @@ import { ConfirmChangesModal } from './components/ConfirmChangesModal'
 import { Tooltip } from './components/Tooltip'
 import { EditorLoginModal } from './components/EditorLoginModal'
 import { PersonCompleteCelebration } from './components/PersonCompleteCelebration'
-import { applySessionBatch, fetchAuthMe, fetchSchedule, updatePersonTopicOrder } from './lib/api'
+import { applySessionBatch, createSession, deleteSession, fetchAuthMe, fetchSchedule, updatePersonTopicOrder } from './lib/api'
 import { clearEditorToken, getEditorToken } from './lib/authStorage'
 import {
   applyPendingPatches,
-  applyPendingPatchesBatch,
   buildPendingRows,
   mergeSessionsFromServer,
   type PendingEntry,
@@ -86,14 +85,6 @@ export function App() {
     [isEditor, baselineSessions],
   )
 
-  const queueChangeBatch = useCallback(
-    (changes: Array<{ sessionId: string; patch: SessionPatch }>) => {
-      if (!isEditor || changes.length === 0) return
-      setPending((prev) => applyPendingPatchesBatch(baselineSessions, prev, changes))
-    },
-    [isEditor, baselineSessions],
-  )
-
   const displaySessions = useMemo(
     () => applyPendingPatches(baselineSessions, pending),
     [baselineSessions, pending],
@@ -121,7 +112,7 @@ export function App() {
       const newStatus = session.status === 'done' ? 'scheduled' : 'done'
       const recordedAt = newStatus === 'done' ? dayKey(new Date().toISOString()) : ''
       if (newStatus === 'done') {
-        const hit = willCompletePersonOnMarkDone(displaySessions, id)
+        const hit = willCompletePersonOnMarkDone(data?.people ?? [], displaySessions, id)
         if (hit) {
           const name = personIndex.get(hit.personId)?.name ?? hit.personId
           setCelebration(name)
@@ -129,7 +120,7 @@ export function App() {
       }
       queueChange(id, { status: newStatus, recordedAt })
     },
-    [findDisplaySession, queueChange, displaySessions, personIndex],
+    [findDisplaySession, queueChange, displaySessions, personIndex, data?.people],
   )
 
   const onRefresh = useCallback(async () => {
@@ -154,6 +145,36 @@ export function App() {
     )
   }, [])
 
+  const onCreateSession = useCallback(
+    async (payload: { personId: string; topicLetter: string; scheduledAt: string }) => {
+      const session = await createSession(payload)
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              sessions: [...prev.sessions, session].sort((a, b) =>
+                a.scheduledAt.localeCompare(b.scheduledAt),
+              ),
+            }
+          : prev,
+      )
+    },
+    [],
+  )
+
+  const onDeleteSession = useCallback(async (id: string) => {
+    if (!window.confirm('Excluir esta sessão? Esta ação não pode ser desfeita.')) return
+    await deleteSession(id)
+    setData((prev) =>
+      prev ? { ...prev, sessions: prev.sessions.filter((s) => s.id !== id) } : prev,
+    )
+    setPending((prev) => {
+      const next = new Map(prev)
+      next.delete(id)
+      return next
+    })
+  }, [])
+
   const onMoveSession = useCallback(
     (id: string, targetDayKey: string) => {
       const session = findDisplaySession(id)
@@ -164,19 +185,6 @@ export function App() {
       queueChange(id, { scheduledAt: newScheduledAt })
     },
     [findDisplaySession, queueChange],
-  )
-
-  const onSwapTime = useCallback(
-    (idA: string, idB: string) => {
-      const a = findDisplaySession(idA)
-      const b = findDisplaySession(idB)
-      if (!a || !b) return
-      queueChangeBatch([
-        { sessionId: idA, patch: { scheduledAt: b.scheduledAt } },
-        { sessionId: idB, patch: { scheduledAt: a.scheduledAt } },
-      ])
-    },
-    [findDisplaySession, queueChangeBatch],
   )
 
   const onPostpone = useCallback(
@@ -206,6 +214,30 @@ export function App() {
     },
     [findDisplaySession, queueChange],
   )
+
+  const onChangeTopic = useCallback(
+    (id: string, topicLetter: string) => {
+      const session = findDisplaySession(id)
+      if (!session || session.topicLetter === topicLetter) return
+      queueChange(id, { topicLetter })
+    },
+    [findDisplaySession, queueChange],
+  )
+
+  const onChangeNotes = useCallback(
+    (id: string, notes: string) => {
+      queueChange(id, { notes })
+    },
+    [queueChange],
+  )
+
+  const onCancelSessionEdit = useCallback((sessionId: string) => {
+    setPending((prev) => {
+      const next = new Map(prev)
+      next.delete(sessionId)
+      return next
+    })
+  }, [])
 
   const discardPending = useCallback(() => {
     setPending(new Map())
@@ -328,10 +360,14 @@ export function App() {
                 canEdit={isEditor}
                 onMoveSession={onMoveSession}
                 onToggleDone={onToggleDone}
-                onSwapTime={onSwapTime}
                 onPostpone={onPostpone}
                 onReschedule={onReschedule}
                 onChangeTime={onChangeTime}
+                onChangeTopic={onChangeTopic}
+                onChangeNotes={onChangeNotes}
+                onCancelSessionEdit={onCancelSessionEdit}
+                onCreateSession={onCreateSession}
+                onDeleteSession={onDeleteSession}
               />
             )}
             {tab === 'person' && (
@@ -341,6 +377,7 @@ export function App() {
                 canEdit={isEditor}
                 onToggleDone={onToggleDone}
                 onTopicOrderSave={onTopicOrderSave}
+                onCreateSession={onCreateSession}
               />
             )}
           </>

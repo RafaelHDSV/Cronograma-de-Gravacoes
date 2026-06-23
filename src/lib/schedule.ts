@@ -11,6 +11,10 @@ export function buildPersonIndex(people: Person[]): Map<string, Person> {
   return new Map(people.map((p) => [p.id, p]))
 }
 
+export function sortPeopleByName(people: Person[]): Person[] {
+  return [...people].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
+}
+
 export function findTopic(person: Person | undefined, letter: string): Topic | undefined {
   return person?.topics.find((t) => t.letter === letter)
 }
@@ -51,7 +55,16 @@ export function todayKey(): string {
 export function sessionsForDay(sessions: Session[], key: string): Session[] {
   return sessions
     .filter((s) => s.status !== 'postponed' && dayKey(s.scheduledAt) === key)
-    .sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt))
+    .sort(compareSessionsByTime)
+}
+
+/** Ordena sessoes pelo horario no fuso do cronograma. */
+export function compareSessionsByTime(a: Session, b: Session): number {
+  const ta = localTimeParts(a.scheduledAt)
+  const tb = localTimeParts(b.scheduledAt)
+  if (ta.hour !== tb.hour) return ta.hour - tb.hour
+  if (ta.minute !== tb.minute) return ta.minute - tb.minute
+  return a.scheduledAt.localeCompare(b.scheduledAt)
 }
 
 export function activeSessions(sessions: Session[]): Session[] {

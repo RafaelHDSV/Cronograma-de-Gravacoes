@@ -63,7 +63,7 @@ export function TopicOrderModal({ person, open, onClose, onSave }: Props) {
       await onSave(ordered.map((t) => t.letter))
       onClose()
     } catch {
-      setError('Nao foi possivel salvar a ordem. Tente novamente.')
+      setError('Não foi possível salvar a ordem. Tente novamente.')
     } finally {
       setSaving(false)
     }
@@ -73,11 +73,11 @@ export function TopicOrderModal({ person, open, onClose, onSave }: Props) {
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="topic-order-title">
       <div className="modal-panel">
         <h2 id="topic-order-title" className="modal-title">
-          Ordem de gravacao — {person.name}
+          Ordem de gravação — {person.name}
         </h2>
         <p className="modal-desc">
-          Arraste os topicos para definir a sequencia de gravacao. A ordem vale para o checklist e
-          para validacoes futuras de sequencia.
+          Arraste os tópicos para definir a sequência de gravação. A ordem vale para o checklist e
+          para validações futuras de sequência.
         </p>
         <form onSubmit={handleSubmit}>
           <ol className="topic-order-list">

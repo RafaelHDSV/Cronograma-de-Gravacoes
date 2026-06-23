@@ -47,10 +47,10 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 |-------|--------|
 | `public/data/people.yaml` | Pessoas e tópicos — versionado no git; `topicOrder` opcional (seed) |
 | `public/data/sessions.yaml` | Agenda seed — versionado no git |
-| Supabase `sessions` | Estado vivo (status, datas, notas) |
+| Supabase `sessions` | Estado vivo (status, datas, notas) — N sessoes por topico permitidas |
 | Supabase `person_preferences` | Ordem de gravacao por pessoa (`topic_order`); override editavel no painel |
 
-**Status:** `scheduled`, `done`, `postponed`. **Fuso:** `America/Sao_Paulo`.
+**Status:** `scheduled`, `done`, `postponed`. **Fuso:** `America/Sao_Paulo`. Um topico pode ter **N sessoes**; o video so conta como concluido quando todas estao `done`.
 
 ---
 
@@ -59,6 +59,8 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 | Método | Rota | Função |
 |--------|------|--------|
 | GET | `/api/schedule` | `{ people, sessions }` — sessoes relidas do Supabase a cada request |
+| POST | `/api/sessions` | Cria sessao adicional para topico existente (editor) |
+| DELETE | `/api/sessions/:id` | Remove sessao (editor) |
 | PATCH | `/api/people/:personId/topic-order` | Atualiza ordem de gravacao dos topicos (editor) |
 | PATCH | `/api/sessions/:id` | Atualiza sessão no Supabase |
 | POST | `/api/sessions/swap-time` | Troca horário entre duas sessões |
@@ -68,9 +70,9 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 
 ## UI (abas)
 
-1. **Resumo** — totais e tabela por pessoa.
-2. **Calendário** — grade mensal, drag-and-drop, adiadas, swap de horário.
-3. **Por pessoa** — progresso e checklist por tópico.
+1. **Resumo** — totais por **topico** (catalogo) e sessoes como detalhe.
+2. **Calendario** — grade mensal, drag-and-drop, adiadas, swap de horario; badge de progresso por topico quando N > 1; notas por sessao.
+3. **Por pessoa** — progresso por topico, sub-linhas por sessao, adicionar sessao, indicador de notas.
 
 ---
 
@@ -87,6 +89,8 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 8. **`base: './'`** no Vite para GitHub Pages / raiz.
 9. **`yarn import`** regenera YAMLs do script legado.
 10. **`topicOrder`** — ordem de gravacao por pessoa: seed em `people.yaml`; override em Supabase (`cronograma_person_preferences`). Util `getTopicOrder()` / `getOrderedTopics()` em `src/lib/topicOrder.ts` (reexport em `schedule.ts`).
+11. **Multi-sessao por topico** — agrupamento em `src/lib/topicSessions.ts`; IDs novos com sufixo `-2`, `-3` se colidir no mesmo slot.
+12. **Notas por sessao** — campo `notes` no Supabase; edicao no calendario (painel Alterar sessao, fila de rascunho); leitura para visitantes; indicador com tooltip na aba Por pessoa (`src/lib/sessionNotes.ts`).
 
 ---
 
@@ -104,7 +108,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 
 - Contas individuais / OAuth por usuario.
 - `people` / tópicos no Supabase.
-- Botão Discord no UI; deep link `?date=`; campo `notes` na UI; status `cancelled`.
+- Botão Discord no UI; deep link `?date=`; status `cancelled`.
 - GitHub Pages com API (só estático no workflow atual).
 
 ---

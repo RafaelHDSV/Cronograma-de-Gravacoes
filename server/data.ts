@@ -30,6 +30,7 @@ export interface Session {
   topicLetter: string
   status: SessionStatus
   recordedAt?: string
+  notes?: string
 }
 
 interface SessionRow {
@@ -49,6 +50,8 @@ const SESSIONS_YAML = path.join(ROOT, 'public', 'data', 'sessions.yaml')
 let people: Person[] = []
 let sessions: Session[] = []
 
+const TZ = 'America/Sao_Paulo'
+
 function rowToSession(row: SessionRow): Session {
   const scheduledAt =
     typeof row.scheduled_at === 'string'
@@ -61,6 +64,7 @@ function rowToSession(row: SessionRow): Session {
     topicLetter: row.topic_letter,
     status: row.status,
     recordedAt: row.recorded_at ?? undefined,
+    notes: row.notes?.trim() ? row.notes : undefined,
   }
 }
 
@@ -71,9 +75,39 @@ function sessionToRow(session: Session): SessionRow {
     person_id: session.personId,
     topic_letter: session.topicLetter,
     status: session.status,
-    notes: '',
+    notes: session.notes?.trim() ? session.notes : '',
     recorded_at: session.recordedAt?.trim() ? session.recordedAt : null,
   }
+}
+
+function sessionIdBase(scheduledAt: string, personId: string, topicLetter: string): string {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false,
+  }).formatToParts(new Date(scheduledAt))
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? ''
+  const date = `${get('year')}-${get('month')}-${get('day')}`
+  const hour = get('hour').padStart(2, '0')
+  return `${date}-${hour}-${personId}-${topicLetter}`
+}
+
+export function generateSessionId(
+  scheduledAt: string,
+  personId: string,
+  topicLetter: string,
+  existingIds: Iterable<string>,
+): string {
+  const ids = new Set(existingIds)
+  const base = sessionIdBase(scheduledAt, personId, topicLetter)
+  if (!ids.has(base)) return base
+  let n = 2
+  while (ids.has(`${base}-${n}`)) n++
+  return `${base}-${n}`
 }
 
 interface PreferenceRow {
@@ -204,7 +238,13 @@ export function findSession(id: string): Session | undefined {
 
 export async function updateSession(
   id: string,
-  patch: { status?: SessionStatus; scheduledAt?: string; recordedAt?: string },
+  patch: {
+    status?: SessionStatus
+    scheduledAt?: string
+    recordedAt?: string
+    notes?: string
+    topicLetter?: string
+  },
 ): Promise<Session | null> {
   const idx = sessions.findIndex((s) => s.id === id)
   if (idx === -1) return null
@@ -214,6 +254,17 @@ export async function updateSession(
   if (patch.scheduledAt !== undefined) session.scheduledAt = patch.scheduledAt
   if (patch.recordedAt !== undefined) {
     session.recordedAt = patch.recordedAt.trim() ? patch.recordedAt : undefined
+  }
+  if (patch.notes !== undefined) {
+    session.notes = patch.notes.trim() ? patch.notes : undefined
+  }
+  if (patch.topicLetter !== undefined) {
+    const letter = patch.topicLetter.trim().toLowerCase()
+    const person = people.find((p) => p.id === session.personId)
+    if (!person?.topics.some((t) => t.letter === letter)) {
+      throw new Error('Topico invalido para esta pessoa')
+    }
+    session.topicLetter = letter
   }
 
   const { error } = await supabase.from(tables.sessions).update(sessionToRow(session)).eq('id', id)
@@ -235,6 +286,8 @@ export type SessionPatch = {
   status?: SessionStatus
   scheduledAt?: string
   recordedAt?: string
+  notes?: string
+  topicLetter?: string
 }
 
 export async function applySessionPatches(
@@ -299,4 +352,62 @@ export async function updatePersonTopicOrder(
   const updated: Person = { ...person, topicOrder: resolved }
   people[idx] = updated
   return updated
+}
+
+export async function deleteSession(id: string): Promise<boolean> {
+  const idx = sessions.findIndex((s) => s.id === id)
+  if (idx === -1) return false
+
+  const { error } = await supabase.from(tables.sessions).delete().eq('id', id)
+  if (error) throw new Error(formatSupabaseError('[data] Falha ao remover sessao', error))
+
+  sessions.splice(idx, 1)
+  console.log(`[data] Sessao removida: ${id}`)
+  return true
+}
+
+export interface CreateSessionInput {
+  personId: string
+  topicLetter: string
+  scheduledAt: string
+  status?: SessionStatus
+}
+
+export async function createSession(input: CreateSessionInput): Promise<Session> {
+  const person = people.find((p) => p.id === input.personId)
+  if (!person) throw new Error('Pessoa nao encontrada')
+
+  const letter = input.topicLetter.trim().toLowerCase()
+  if (!person.topics.some((t) => t.letter === letter)) {
+    throw new Error('Topico invalido para esta pessoa')
+  }
+
+  const scheduledAt = input.scheduledAt?.trim()
+  if (!scheduledAt) throw new Error('scheduledAt e obrigatorio')
+
+  const status: SessionStatus =
+    input.status === 'done' || input.status === 'postponed' ? input.status : 'scheduled'
+
+  const id = generateSessionId(
+    scheduledAt,
+    input.personId,
+    letter,
+    sessions.map((s) => s.id),
+  )
+
+  const session: Session = {
+    id,
+    scheduledAt,
+    personId: input.personId,
+    topicLetter: letter,
+    status,
+  }
+
+  const { error } = await supabase.from(tables.sessions).insert(sessionToRow(session))
+  if (error) throw new Error(formatSupabaseError('[data] Falha ao criar sessao', error))
+
+  sessions.push(session)
+  sessions.sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt))
+  console.log(`[data] Sessao criada: ${id} (${input.personId}/${letter})`)
+  return session
 }
