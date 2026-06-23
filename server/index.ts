@@ -14,6 +14,7 @@ import {
   type SessionPatch,
 } from './data.js'
 import { handleAuthMe, handleLogin, requireEditor } from './auth.js'
+import { startKeepAlive } from './keepAlive.js'
 import { isRateLimited } from './rateLimit.js'
 
 const BATCH_LIMIT = { max: 60, windowMs: 60 * 1000 }
@@ -117,6 +118,7 @@ app.get('/{*path}', (_req, res) => {
 async function main() {
   app.listen(PORT, HOST, () => {
     console.log(`[server] Running on http://${HOST}:${PORT}`)
+    startKeepAlive()
   })
 
   try {

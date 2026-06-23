@@ -1,23 +1,32 @@
-# Evita hibernacao do Render Free (spin-down apos ~15 min sem trafego).
-# Configure o secret RENDER_APP_URL no repo (ex.: https://seu-servico.onrender.com).
+# Acorda a API no Render (plano free). GitHub cron NAO roda a cada N minutos de forma
+# confiavel — horarios fixos + keep-alive interno no servidor (server/keepAlive.ts).
+#
+# Secret ou variable: RENDER_APP_URL (ex.: https://cronograma-gravacoes.onrender.com)
+
 name: Keep Render awake
 
 on:
   schedule:
-    # Seg-Sex, 8h-20h BRT (11-23 UTC), a cada 10 min
-    - cron: '*/10 11-23 * * 1-5'
+    - cron: '2 * * * *'
+    - cron: '17 * * * *'
+    - cron: '32 * * * *'
+    - cron: '47 * * * *'
   workflow_dispatch:
+
+concurrency:
+  group: keep-render-awake
+  cancel-in-progress: false
 
 jobs:
   ping:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: Ping health endpoint
+      - name: Wake API
         env:
-          RENDER_APP_URL: ${{ secrets.RENDER_APP_URL }}
+          RENDER_APP_URL: ${{ secrets.RENDER_APP_URL || vars.RENDER_APP_URL || 'https://cronograma-gravacoes.onrender.com' }}
         run: |
-          if [ -z "$RENDER_APP_URL" ]; then
-            echo "RENDER_APP_URL nao configurado — pulando ping."
-            exit 0
-          fi
-          curl -fsS --max-time 60 "${RENDER_APP_URL%/}/api/health"
+          set -euo pipefail
+          echo "Pinging ${RENDER_APP_URL%/}/api/health"
+          curl -fsS --retry 4 --retry-delay 20 --retry-all-errors --max-time 120 \
+            "${RENDER_APP_URL%/}/api/health"
