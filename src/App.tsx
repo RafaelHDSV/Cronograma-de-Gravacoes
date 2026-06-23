@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ConfirmChangesModal } from './components/ConfirmChangesModal'
+import { FixFridaysModal } from './components/FixFridaysModal'
+import { ScheduleFixModal } from './components/ScheduleFixModal'
 import { Tooltip } from './components/Tooltip'
 import { EditorLoginModal } from './components/EditorLoginModal'
 import { PersonCompleteCelebration } from './components/PersonCompleteCelebration'
-import { applySessionBatch, createSession, deleteSession, fetchAuthMe, fetchSchedule, updatePersonTopicOrder } from './lib/api'
+import { applySessionBatch, createSession, deleteSession, fetchAuthMe, fetchSchedule, fixDayCapacity, fixFridays, resetFromYaml, updatePersonTopicOrder } from './lib/api'
 import { clearEditorToken, getEditorToken } from './lib/authStorage'
 import {
   applyPendingPatches,
@@ -16,6 +18,17 @@ import {
 import { willCompletePersonOnMarkDone } from './lib/personComplete'
 import { formatAlteracoesPendentes } from './lib/ptPlural'
 import { buildPersonIndex, buildScheduledAt, dayKey } from './lib/schedule'
+import {
+  assertDayCapacity,
+  computeFridayFixChanges,
+  hasOverfullDays,
+  hasScheduledFridaySessions,
+  isValidScheduleDate,
+  SCHEDULE_DAY_CAPACITY_ERROR,
+  SCHEDULE_FRIDAY_ERROR,
+  type CapacityFixChange,
+  type FridayFixChange,
+} from './lib/scheduleDates'
 import type { ScheduleData } from './lib/types'
 import { CalendarPage } from './pages/CalendarPage'
 import { PersonPage } from './pages/PersonPage'
@@ -42,6 +55,14 @@ export function App() {
   const [refreshing, setRefreshing] = useState(false)
   const [celebration, setCelebration] = useState<string | null>(null)
   const [slowLoad, setSlowLoad] = useState(false)
+  const [resetting, setResetting] = useState(false)
+  const [showFixFridays, setShowFixFridays] = useState(false)
+  const [fixFridaysChanges, setFixFridaysChanges] = useState<FridayFixChange[]>([])
+  const [fixFridaysLoading, setFixFridaysLoading] = useState(false)
+  const [showFixDayCapacity, setShowFixDayCapacity] = useState(false)
+  const [fixDayCapacityChanges, setFixDayCapacityChanges] = useState<CapacityFixChange[]>([])
+  const [fixDayCapacityLoading, setFixDayCapacityLoading] = useState(false)
+  const [scheduleNotice, setScheduleNotice] = useState<string | null>(null)
 
   const loadSchedule = useCallback(() => {
     return fetchSchedule()
@@ -90,6 +111,18 @@ export function App() {
     [baselineSessions, pending],
   )
 
+  const dayCapacityError = useCallback(
+    (personId: string, scheduledAt: string, exceptId?: string) => {
+      try {
+        assertDayCapacity(displaySessions, personId, scheduledAt, exceptId)
+        return null
+      } catch {
+        return SCHEDULE_DAY_CAPACITY_ERROR
+      }
+    },
+    [displaySessions],
+  )
+
   const personIndex = useMemo(
     () => (data ? buildPersonIndex(data.people) : new Map()),
     [data],
@@ -99,6 +132,105 @@ export function App() {
     [baselineSessions, pending],
   )
   const pendingCount = pendingRows.length
+  const needsFridayFix = useMemo(
+    () => hasScheduledFridaySessions(baselineSessions),
+    [baselineSessions],
+  )
+  const needsDayCapacityFix = useMemo(
+    () => hasOverfullDays(baselineSessions),
+    [baselineSessions],
+  )
+
+  const onResetFromYaml = useCallback(async () => {
+    if (
+      !window.confirm(
+        'Recriar cronograma do YAML?\n\nAs datas serão atualizadas conforme o sessions.yaml. Gravações já concluídas ou adiadas no banco serão preservadas (por pessoa e tópico). Demais alterações locais serão perdidas.',
+      )
+    )
+      return
+    setResetting(true)
+    setScheduleNotice(null)
+    try {
+      const { sessions, preservedCount } = await resetFromYaml()
+      setData((prev) => (prev ? { ...prev, sessions } : prev))
+      setPending(new Map())
+      if (preservedCount > 0) {
+        setScheduleNotice(
+          `Cronograma recriado. ${preservedCount} gravação${preservedCount === 1 ? '' : 'ões'} concluída${preservedCount === 1 ? '' : 's'} preservada${preservedCount === 1 ? '' : 's'}.`,
+        )
+      }
+    } catch (e) {
+      setScheduleNotice(String(e))
+    } finally {
+      setResetting(false)
+    }
+  }, [])
+
+  const openFixFridays = useCallback(async () => {
+    setFixFridaysLoading(true)
+    setScheduleNotice(null)
+    try {
+      const preview = computeFridayFixChanges(baselineSessions)
+      setFixFridaysChanges(preview)
+      setShowFixFridays(true)
+    } finally {
+      setFixFridaysLoading(false)
+    }
+  }, [baselineSessions])
+
+  const commitFixFridays = useCallback(async () => {
+    setFixFridaysLoading(true)
+    setScheduleNotice(null)
+    try {
+      const result = await fixFridays(false)
+      if (result.sessions) {
+        setData((prev) => (prev ? { ...prev, sessions: result.sessions! } : prev))
+      } else {
+        await loadSchedule()
+      }
+      setPending(new Map())
+      setShowFixFridays(false)
+      setFixFridaysChanges([])
+    } catch (e) {
+      setScheduleNotice(String(e))
+    } finally {
+      setFixFridaysLoading(false)
+    }
+  }, [loadSchedule])
+
+  const openFixDayCapacity = useCallback(async () => {
+    setFixDayCapacityLoading(true)
+    setScheduleNotice(null)
+    try {
+      const { changes } = await fixDayCapacity(true)
+      setFixDayCapacityChanges(changes)
+      setShowFixDayCapacity(true)
+    } catch (e) {
+      setScheduleNotice(String(e))
+    } finally {
+      setFixDayCapacityLoading(false)
+    }
+  }, [])
+
+  const commitFixDayCapacity = useCallback(async () => {
+    setFixDayCapacityLoading(true)
+    setScheduleNotice(null)
+    try {
+      const result = await fixDayCapacity(false)
+      if (result.sessions) {
+        setData((prev) => (prev ? { ...prev, sessions: result.sessions! } : prev))
+      } else {
+        await loadSchedule()
+      }
+      setPending(new Map())
+      setShowFixDayCapacity(false)
+      setFixDayCapacityChanges([])
+    } catch (e) {
+      setScheduleNotice(String(e))
+    } finally {
+      setFixDayCapacityLoading(false)
+    }
+  }, [loadSchedule])
 
   const findDisplaySession = useCallback(
     (id: string) => displaySessions.find((s) => s.id === id),
@@ -147,6 +279,15 @@ export function App() {
 
   const onCreateSession = useCallback(
     async (payload: { personId: string; topicLetter: string; scheduledAt: string }) => {
+      if (!isValidScheduleDate(dayKey(payload.scheduledAt))) {
+        setScheduleNotice(SCHEDULE_FRIDAY_ERROR)
+        throw new Error(SCHEDULE_FRIDAY_ERROR)
+      }
+      const capacityErr = dayCapacityError(payload.personId, payload.scheduledAt)
+      if (capacityErr) {
+        setScheduleNotice(capacityErr)
+        throw new Error(capacityErr)
+      }
       const session = await createSession(payload)
       setData((prev) =>
         prev
@@ -159,7 +300,7 @@ export function App() {
           : prev,
       )
     },
-    [],
+    [dayCapacityError],
   )
 
   const onDeleteSession = useCallback(async (id: string) => {
@@ -177,14 +318,23 @@ export function App() {
 
   const onMoveSession = useCallback(
     (id: string, targetDayKey: string) => {
+      if (!isValidScheduleDate(targetDayKey)) {
+        setScheduleNotice(SCHEDULE_FRIDAY_ERROR)
+        return
+      }
       const session = findDisplaySession(id)
       if (!session) return
       const timeParts = session.scheduledAt.split('T')[1]
       const [y, m, d] = targetDayKey.split('-')
       const newScheduledAt = `${y}-${m}-${d}T${timeParts}`
+      const capacityErr = dayCapacityError(session.personId, newScheduledAt, id)
+      if (capacityErr) {
+        setScheduleNotice(capacityErr)
+        return
+      }
       queueChange(id, { scheduledAt: newScheduledAt })
     },
-    [findDisplaySession, queueChange],
+    [findDisplaySession, queueChange, dayCapacityError],
   )
 
   const onPostpone = useCallback(
@@ -196,12 +346,21 @@ export function App() {
 
   const onReschedule = useCallback(
     (id: string, targetDayKey: string, hour: number, minute: number) => {
+      if (!isValidScheduleDate(targetDayKey)) {
+        setScheduleNotice(SCHEDULE_FRIDAY_ERROR)
+        return
+      }
       const session = findDisplaySession(id)
       if (!session) return
       const scheduledAt = buildScheduledAt(targetDayKey, hour, minute)
+      const capacityErr = dayCapacityError(session.personId, scheduledAt, id)
+      if (capacityErr) {
+        setScheduleNotice(capacityErr)
+        return
+      }
       queueChange(id, { status: 'scheduled', scheduledAt })
     },
-    [findDisplaySession, queueChange],
+    [findDisplaySession, queueChange, dayCapacityError],
   )
 
   const onChangeTime = useCallback(
@@ -210,9 +369,14 @@ export function App() {
       if (!session) return
       const dk = dayKey(session.scheduledAt)
       const scheduledAt = buildScheduledAt(dk, hour, minute)
+      const capacityErr = dayCapacityError(session.personId, scheduledAt, id)
+      if (capacityErr) {
+        setScheduleNotice(capacityErr)
+        return
+      }
       queueChange(id, { scheduledAt })
     },
-    [findDisplaySession, queueChange],
+    [findDisplaySession, queueChange, dayCapacityError],
   )
 
   const onChangeTopic = useCallback(
@@ -295,6 +459,38 @@ export function App() {
                 </span>
               </button>
             </Tooltip>
+            {isEditor && (
+              <Tooltip label="Apaga o Supabase e recarrega do sessions.yaml">
+                <button
+                  type="button"
+                  className="btn ghost btn-danger"
+                  onClick={() => void onResetFromYaml()}
+                  disabled={resetting}
+                >
+                  {resetting ? 'Recriando…' : 'Recriar do YAML'}
+                </button>
+              </Tooltip>
+            )}
+            {isEditor && needsDayCapacityFix && (
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => void openFixDayCapacity()}
+                disabled={fixDayCapacityLoading}
+              >
+                Corrigir lotação
+              </button>
+            )}
+            {isEditor && needsFridayFix && (
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => void openFixFridays()}
+                disabled={fixFridaysLoading}
+              >
+                Corrigir sextas
+              </button>
+            )}
             {pendingCount > 0 && (
               <span className="dirty-badge">{formatAlteracoesPendentes(pendingCount)}</span>
             )}
@@ -341,6 +537,9 @@ export function App() {
 
       <main className="content">
         {error && <p className="error">Falha ao carregar os dados: {error}</p>}
+        {scheduleNotice && (
+          <p className="error schedule-notice">{scheduleNotice}</p>
+        )}
         {!data && !error && (
           <p className="empty">
             {slowLoad
@@ -368,6 +567,7 @@ export function App() {
                 onCancelSessionEdit={onCancelSessionEdit}
                 onCreateSession={onCreateSession}
                 onDeleteSession={onDeleteSession}
+                onInvalidScheduleDate={() => setScheduleNotice(SCHEDULE_FRIDAY_ERROR)}
               />
             )}
             {tab === 'person' && (
@@ -396,6 +596,26 @@ export function App() {
         loading={saving}
         onConfirm={commitPending}
         onCancel={() => setShowConfirm(false)}
+      />
+      <FixFridaysModal
+        open={showFixFridays}
+        changes={fixFridaysChanges}
+        personIndex={personIndex}
+        loading={fixFridaysLoading}
+        onConfirm={() => void commitFixFridays()}
+        onCancel={() => setShowFixFridays(false)}
+      />
+      <ScheduleFixModal
+        open={showFixDayCapacity}
+        title="Corrigir lotação"
+        description="Migração única: dias com mais de 2 gravações serão ajustados (14h e 16h), deslocando o excedente em cascata para os próximos dias já agendados de cada pessoa."
+        emptyMessage="Nenhum dia com excesso de sessões para corrigir."
+        confirmLabel="Confirmar migração"
+        changes={fixDayCapacityChanges}
+        personIndex={personIndex}
+        loading={fixDayCapacityLoading}
+        onConfirm={() => void commitFixDayCapacity()}
+        onCancel={() => setShowFixDayCapacity(false)}
       />
       {celebration && (
         <PersonCompleteCelebration

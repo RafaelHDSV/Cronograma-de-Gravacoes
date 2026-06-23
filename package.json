@@ -9,9 +9,12 @@
     "dev:front": "vite",
     "dev:back": "tsx watch server/index.ts",
     "build": "tsc -b && tsc -p tsconfig.server.json && vite build",
-    "start": "node dist-server/index.js",
+    "start": "node dist-server/server/index.js",
     "preview": "vite preview",
     "import": "tsx scripts/import-initial-schedule.ts",
+    "fix-fridays-yaml": "tsx scripts/apply-fridays-yaml.ts",
+    "fix-day-capacity-yaml": "tsx scripts/apply-day-capacity-yaml.ts",
+    "backup-initial": "node scripts/backup-initial-schedule.mjs",
     "blur-demo": "node scripts/blur-demo-names.mjs"
   },
   "dependencies": {

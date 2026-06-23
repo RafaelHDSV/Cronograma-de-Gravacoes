@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { TimeSlotPicker } from './TimeSlotPicker'
 import { DEFAULT_SLOT_HOURS, buildScheduledAt, sortPeopleByName } from '../lib/schedule'
+import { isValidScheduleDate, SCHEDULE_FRIDAY_ERROR } from '../lib/scheduleDates'
 import type { Person } from '../lib/types'
 import { getOrderedTopics } from '../lib/topicOrder'
 
@@ -57,6 +58,10 @@ export function AddSessionModal({ open, people, defaults, onClose, onSubmit }: P
     e.preventDefault()
     if (!personId || !topicLetter || !dayKey) {
       setError('Preencha pessoa, tópico e data.')
+      return
+    }
+    if (!isValidScheduleDate(dayKey)) {
+      setError(SCHEDULE_FRIDAY_ERROR)
       return
     }
     setSaving(true)
@@ -121,7 +126,15 @@ export function AddSessionModal({ open, people, defaults, onClose, onSubmit }: P
               type="date"
               className="date-input"
               value={dayKey}
-              onChange={(e) => setDayKey(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value
+                setDayKey(value)
+                if (value && !isValidScheduleDate(value)) {
+                  setError(SCHEDULE_FRIDAY_ERROR)
+                } else {
+                  setError(null)
+                }
+              }}
               required
             />
           </label>

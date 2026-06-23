@@ -64,7 +64,9 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 | PATCH | `/api/people/:personId/topic-order` | Atualiza ordem de gravacao dos topicos (editor) |
 | PATCH | `/api/sessions/:id` | Atualiza sessão no Supabase |
 | POST | `/api/sessions/swap-time` | Troca horário entre duas sessões |
-| POST | `/api/schedule/reset` | Repõe sessões a partir de `sessions.yaml` |
+| POST | `/api/schedule/fix-fridays` | Migracao unica de sessoes agendadas em sexta (editor) |
+| POST | `/api/schedule/fix-day-capacity` | Migracao unica de dias com mais de 2 sessoes por pessoa (editor) |
+| POST | `/api/schedule/reset` | Repoe sessoes a partir de `sessions.yaml` |
 
 ---
 
@@ -91,6 +93,8 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 10. **`topicOrder`** — ordem de gravacao por pessoa: seed em `people.yaml`; override em Supabase (`cronograma_person_preferences`). Util `getTopicOrder()` / `getOrderedTopics()` em `src/lib/topicOrder.ts` (reexport em `schedule.ts`).
 11. **Multi-sessao por topico** — agrupamento em `src/lib/topicSessions.ts`; IDs novos com sufixo `-2`, `-3` se colidir no mesmo slot.
 12. **Notas por sessao** — campo `notes` no Supabase; edicao no calendario (painel Alterar sessao, fila de rascunho); leitura para visitantes; indicador com tooltip na aba Por pessoa (`src/lib/sessionNotes.ts`).
+13. **Sem gravacoes as sextas** — bloqueio em novo agendamento (sexta); sabado e domingo permitidos manualmente; cascata de migracao usa dias uteis (seg-qui); sessoes `done` em sexta permanecem; util em `shared/scheduleDates.ts`.
+14. **Maximo 2 sessoes por dia no calendario** — slots 14h e 16h (estudio); excedente migrado em cascata para proximos dias ja agendados da mesma pessoa; botao **Corrigir lotacao** no header (editor); validacao em PATCH/POST/swap; util em `shared/dayCapacityMigration.ts`.
 
 ---
 

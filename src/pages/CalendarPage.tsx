@@ -5,6 +5,7 @@ import { StatusBadge } from '../components/StatusBadge'
 import { TimeSlotPicker } from '../components/TimeSlotPicker'
 import { IconButton, Tooltip } from '../components/Tooltip'
 import { hasSessionNotes, sessionNotesText } from '../lib/sessionNotes'
+import { isFridayDayKey, isValidScheduleDate, SCHEDULE_FRIDAY_ERROR } from '../lib/scheduleDates'
 import {
   activeSessions,
   buildCalendarMonth,
@@ -42,6 +43,7 @@ interface Props {
     scheduledAt: string
   }) => Promise<void>
   onDeleteSession: (id: string) => Promise<void>
+  onInvalidScheduleDate?: () => void
 }
 
 const WEEKDAYS_SHORT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -60,6 +62,7 @@ export function CalendarPage({
   onCancelSessionEdit,
   onCreateSession,
   onDeleteSession,
+  onInvalidScheduleDate,
 }: Props) {
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null)
   const [addSessionDefaults, setAddSessionDefaults] = useState<AddSessionDefaults | null>(null)
@@ -108,11 +111,15 @@ export function CalendarPage({
       setDragOverDay(null)
       const sessionId = e.dataTransfer.getData('text/session-id')
       if (sessionId) {
+        if (!isValidScheduleDate(targetDay)) {
+          onInvalidScheduleDate?.()
+          return
+        }
         onMoveSession(sessionId, targetDay)
         setSelectedDay(targetDay)
       }
     },
-    [onMoveSession],
+    [onMoveSession, onInvalidScheduleDate],
   )
 
   const goToToday = useCallback(() => {
@@ -194,18 +201,20 @@ export function CalendarPage({
             (s) => s.status === 'done'
           ).length
 
+          const isFriday = isFridayDayKey(day)
+
           return (
             <div
               key={day}
-              className={`calendar-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${dragOverDay === day ? 'drag-over' : ''}`}
+              className={`calendar-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${isFriday ? 'friday-blocked' : ''} ${dragOverDay === day ? 'drag-over' : ''}`}
               onClick={() => setSelectedDay(day)}
               onDragOver={(e) => {
-                if (!canEdit) return
+                if (!canEdit || isFriday) return
                 e.preventDefault()
                 setDragOverDay(day)
               }}
               onDragLeave={() => setDragOverDay((d) => (d === day ? null : d))}
-              onDrop={(e) => canEdit && handleDrop(e, day)}
+              onDrop={(e) => canEdit && !isFriday && handleDrop(e, day)}
             >
               <div className='cell-header'>
                 <span className='cell-day'>{Number(day.split('-')[2])}</span>
@@ -467,6 +476,7 @@ export function CalendarPage({
                 canEdit={canEdit}
                 onReschedule={onReschedule}
                 onDelete={handleDeleteSession}
+                onInvalidScheduleDate={onInvalidScheduleDate}
               />
             ))}
           </ul>
@@ -482,16 +492,19 @@ function PostponedRow({
   canEdit,
   onReschedule,
   onDelete,
+  onInvalidScheduleDate,
 }: {
   session: Session
   personIndex: Map<string, Person>
   canEdit: boolean
   onReschedule: (id: string, targetDayKey: string, hour: number, minute: number) => void
   onDelete: (id: string) => Promise<void>
+  onInvalidScheduleDate?: () => void
 }) {
   const person = personIndex.get(session.personId)
   const topic = findTopic(person, session.topicLetter)
   const [newDate, setNewDate] = useState('')
+  const [dateError, setDateError] = useState<string | null>(null)
   const { hour, minute } = localTimeParts(session.scheduledAt)
   const [slotHour, setSlotHour] = useState(hour)
   const [slotMinute, setSlotMinute] = useState(minute)
@@ -499,8 +512,14 @@ function PostponedRow({
 
   const handleSchedule = () => {
     if (!newDate) return
+    if (!isValidScheduleDate(newDate)) {
+      setDateError(SCHEDULE_FRIDAY_ERROR)
+      onInvalidScheduleDate?.()
+      return
+    }
     onReschedule(session.id, newDate, slotHour, slotMinute)
     setNewDate('')
+    setDateError(null)
   }
 
   const wasDate =
@@ -537,9 +556,18 @@ function PostponedRow({
               type="date"
               className="date-input"
               value={newDate}
-              onChange={(e) => setNewDate(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value
+                setNewDate(value)
+                if (value && !isValidScheduleDate(value)) {
+                  setDateError(SCHEDULE_FRIDAY_ERROR)
+                } else {
+                  setDateError(null)
+                }
+              }}
             />
           </label>
+          {dateError && <p className="error modal-error">{dateError}</p>}
           <div className="reschedule-field reschedule-field--time">
             <span className="reschedule-label">Horário</span>
             <TimeSlotPicker

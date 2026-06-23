@@ -14,12 +14,15 @@ import {
   updatePersonTopicOrder,
   createSession,
   deleteSession,
+  applyFridayFix,
+  applyDayCapacityFix,
   type CreateSessionInput,
   type SessionPatch,
 } from './data.js'
 import { handleAuthMe, handleLogin, requireEditor } from './auth.js'
 import { startKeepAlive } from './keepAlive.js'
 import { isRateLimited } from './rateLimit.js'
+import { FRIDAY_BLOCKED_MESSAGE, DAY_CAPACITY_MESSAGE } from '../shared/scheduleDates.js'
 
 const BATCH_LIMIT = { max: 60, windowMs: 60 * 1000 }
 
@@ -52,6 +55,19 @@ app.get('/api/schedule', async (_req, res) => {
   }
 })
 
+function scheduleRuleErrorResponse(e: unknown, res: express.Response): boolean {
+  const msg = String(e)
+  if (msg.includes(DAY_CAPACITY_MESSAGE) || msg === DAY_CAPACITY_MESSAGE) {
+    res.status(400).json({ error: DAY_CAPACITY_MESSAGE })
+    return true
+  }
+  if (msg.includes(FRIDAY_BLOCKED_MESSAGE) || msg === FRIDAY_BLOCKED_MESSAGE) {
+    res.status(400).json({ error: FRIDAY_BLOCKED_MESSAGE })
+    return true
+  }
+  return false
+}
+
 app.patch('/api/sessions/:id', requireEditor, async (req, res) => {
   try {
     const id = String(req.params.id)
@@ -63,6 +79,7 @@ app.patch('/api/sessions/:id', requireEditor, async (req, res) => {
     res.json({ session })
   } catch (e) {
     console.error(e)
+    if (scheduleRuleErrorResponse(e, res)) return
     res.status(500).json({ error: String(e) })
   }
 })
@@ -78,6 +95,7 @@ app.post('/api/sessions', requireEditor, async (req, res) => {
   } catch (e) {
     console.error(e)
     const msg = String(e)
+    if (scheduleRuleErrorResponse(e, res)) return
     if (msg.includes('nao encontrada') || msg.includes('invalido')) {
       return res.status(400).json({ error: msg })
     }
@@ -114,6 +132,7 @@ app.post('/api/sessions/apply-batch', requireEditor, async (req, res) => {
     res.json({ sessions })
   } catch (e) {
     console.error(e)
+    if (scheduleRuleErrorResponse(e, res)) return
     res.status(500).json({ error: String(e) })
   }
 })
@@ -131,14 +150,37 @@ app.post('/api/sessions/swap-time', requireEditor, async (req, res) => {
     res.json({ sessions: result })
   } catch (e) {
     console.error(e)
+    if (scheduleRuleErrorResponse(e, res)) return
+    res.status(500).json({ error: String(e) })
+  }
+})
+
+app.post('/api/schedule/fix-day-capacity', requireEditor, async (req, res) => {
+  try {
+    const dryRun = req.body?.dryRun !== false
+    const result = await applyDayCapacityFix(dryRun)
+    res.json(result)
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ error: String(e) })
+  }
+})
+
+app.post('/api/schedule/fix-fridays', requireEditor, async (req, res) => {
+  try {
+    const dryRun = req.body?.dryRun !== false
+    const result = await applyFridayFix(dryRun)
+    res.json(result)
+  } catch (e) {
+    console.error(e)
     res.status(500).json({ error: String(e) })
   }
 })
 
 app.post('/api/schedule/reset', requireEditor, async (_req, res) => {
   try {
-    const sessions = await resetSessionsFromYaml()
-    res.json({ people: getPeople(), sessions })
+    const { sessions, preservedCount } = await resetSessionsFromYaml()
+    res.json({ people: getPeople(), sessions, preservedCount })
   } catch (e) {
     console.error(e)
     res.status(500).json({ error: String(e) })
@@ -163,7 +205,7 @@ app.patch('/api/people/:personId/topic-order', requireEditor, async (req, res) =
   }
 })
 
-const distPath = path.join(__dirname, '..', 'dist')
+const distPath = path.join(process.cwd(), 'dist')
 app.use(express.static(distPath))
 app.get('/{*path}', (_req, res) => {
   res.sendFile(path.join(distPath, 'index.html'))

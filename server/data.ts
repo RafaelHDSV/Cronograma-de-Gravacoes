@@ -4,6 +4,13 @@ import { fileURLToPath } from 'node:url'
 import { load } from 'js-yaml'
 import { formatSupabaseError, isMissingTableError, supabase } from './supabase.js'
 import { tables } from './tables.js'
+import { assertValidScheduleDate } from '../shared/scheduleDates.js'
+import { computeFridayFixChanges, type FridayFixChange } from '../shared/fridayMigration.js'
+import {
+  computeDayCapacityFixChanges,
+  type CapacityFixChange,
+} from '../shared/dayCapacityMigration.js'
+import { applyPersistedSnapshots } from '../shared/sessionPersistMerge.js'
 import { resolveTopicOrder } from './topicOrder.js'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -251,7 +258,10 @@ export async function updateSession(
 
   const session = { ...sessions[idx] }
   if (patch.status !== undefined) session.status = patch.status
-  if (patch.scheduledAt !== undefined) session.scheduledAt = patch.scheduledAt
+  if (patch.scheduledAt !== undefined) {
+    assertValidScheduleDate(patch.scheduledAt)
+    session.scheduledAt = patch.scheduledAt
+  }
   if (patch.recordedAt !== undefined) {
     session.recordedAt = patch.recordedAt.trim() ? patch.recordedAt : undefined
   }
@@ -274,12 +284,19 @@ export async function updateSession(
   return session
 }
 
-export async function resetSessionsFromYaml(): Promise<Session[]> {
+export async function resetSessionsFromYaml(): Promise<{ sessions: Session[]; preservedCount: number }> {
+  const existing = await loadSessionsFromDb()
+  const { sessions: merged, preservedCount } = applyPersistedSnapshots(
+    seedSessionsFromYaml(),
+    existing,
+  )
   await deleteAllSessions()
-  sessions = seedSessionsFromYaml()
+  sessions = merged
   await insertSessions(sessions)
-  console.log(`[data] Reset: ${sessions.length} sessoes de sessions.yaml -> Supabase`)
-  return sessions
+  console.log(
+    `[data] Reset: ${sessions.length} sessoes de sessions.yaml -> Supabase (${preservedCount} gravacoes preservadas)`,
+  )
+  return { sessions, preservedCount }
 }
 
 export type SessionPatch = {
@@ -308,9 +325,12 @@ export async function swapSessionTimes(idA: string, idB: string): Promise<[Sessi
 
   const a = { ...sessions[idxA] }
   const b = { ...sessions[idxB] }
-  const tempAt = a.scheduledAt
-  a.scheduledAt = b.scheduledAt
-  b.scheduledAt = tempAt
+  const newAtA = sessions[idxB].scheduledAt
+  const newAtB = sessions[idxA].scheduledAt
+  assertValidScheduleDate(newAtA)
+  assertValidScheduleDate(newAtB)
+  a.scheduledAt = newAtA
+  b.scheduledAt = newAtB
 
   const { error: errA } = await supabase.from(tables.sessions).update(sessionToRow(a)).eq('id', idA)
   if (errA) throw new Error(formatSupabaseError('[data] Falha ao trocar horario', errA))
@@ -384,6 +404,7 @@ export async function createSession(input: CreateSessionInput): Promise<Session>
 
   const scheduledAt = input.scheduledAt?.trim()
   if (!scheduledAt) throw new Error('scheduledAt e obrigatorio')
+  assertValidScheduleDate(scheduledAt)
 
   const status: SessionStatus =
     input.status === 'done' || input.status === 'postponed' ? input.status : 'scheduled'
@@ -410,4 +431,53 @@ export async function createSession(input: CreateSessionInput): Promise<Session>
   sessions.sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt))
   console.log(`[data] Sessao criada: ${id} (${input.personId}/${letter})`)
   return session
+}
+
+async function applyBulkScheduleChanges(
+  changes: Array<{ sessionId: string; after: string }>,
+): Promise<void> {
+  for (const change of changes) {
+    const idx = sessions.findIndex((s) => s.id === change.sessionId)
+    if (idx === -1) continue
+    assertValidScheduleDate(change.after)
+    const session = { ...sessions[idx], scheduledAt: change.after }
+    const { error } = await supabase
+      .from(tables.sessions)
+      .update(sessionToRow(session))
+      .eq('id', change.sessionId)
+    if (error) {
+      throw new Error(formatSupabaseError('[data] Falha ao atualizar sessao', error))
+    }
+    sessions[idx] = session
+  }
+}
+
+export async function applyFridayFix(
+  dryRun: boolean,
+): Promise<{ changes: FridayFixChange[]; sessions?: Session[] }> {
+  const changes = computeFridayFixChanges(sessions)
+  if (dryRun || changes.length === 0) {
+    return { changes }
+  }
+
+  await applyBulkScheduleChanges(
+    changes.map((c) => ({ sessionId: c.sessionId, after: c.after })),
+  )
+  console.log(`[data] fix-fridays: ${changes.length} sessoes movidas`)
+  return { changes, sessions: await reloadSessionsFromDb() }
+}
+
+export async function applyDayCapacityFix(
+  dryRun: boolean,
+): Promise<{ changes: CapacityFixChange[]; sessions?: Session[] }> {
+  const changes = computeDayCapacityFixChanges(sessions)
+  if (dryRun || changes.length === 0) {
+    return { changes }
+  }
+
+  await applyBulkScheduleChanges(
+    changes.map((c) => ({ sessionId: c.sessionId, after: c.after })),
+  )
+  console.log(`[data] fix-day-capacity: ${changes.length} sessoes movidas`)
+  return { changes, sessions: await reloadSessionsFromDb() }
 }

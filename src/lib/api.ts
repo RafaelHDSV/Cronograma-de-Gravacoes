@@ -1,4 +1,5 @@
 import type { Person, ScheduleData, Session, SessionStatus } from './types'
+import type { FridayFixChange, CapacityFixChange } from './scheduleDates'
 import { getEditorToken } from './authStorage'
 
 const BASE = import.meta.env.VITE_API_URL ?? ''
@@ -117,4 +118,34 @@ export async function createSession(payload: CreateSessionPayload): Promise<Sess
 
 export async function deleteSession(id: string): Promise<void> {
   await request<{ ok: boolean }>(`/api/sessions/${id}`, { method: 'DELETE' })
+}
+
+export async function fixFridays(
+  dryRun: boolean,
+): Promise<{ changes: FridayFixChange[]; sessions?: Session[] }> {
+  return request<{ changes: FridayFixChange[]; sessions?: Session[] }>(
+    '/api/schedule/fix-fridays',
+    {
+      method: 'POST',
+      body: JSON.stringify({ dryRun }),
+    },
+  )
+}
+
+export async function fixDayCapacity(
+  dryRun: boolean,
+): Promise<{ changes: CapacityFixChange[]; sessions?: Session[] }> {
+  return request<{ changes: CapacityFixChange[]; sessions?: Session[] }>(
+    '/api/schedule/fix-day-capacity',
+    {
+      method: 'POST',
+      body: JSON.stringify({ dryRun }),
+    },
+  )
+}
+
+export async function resetFromYaml(): Promise<{ sessions: Session[]; preservedCount: number }> {
+  return request<{ sessions: Session[]; preservedCount: number }>('/api/schedule/reset', {
+    method: 'POST',
+  })
 }

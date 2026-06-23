@@ -1,0 +1,152 @@
+{
+  "exportedAt": "2026-06-23T08:19:19.662Z",
+  "source": "http://127.0.0.1:3334/api/schedule",
+  "count": 18,
+  "sessions": [
+    {
+      "id": "2026-05-28-16-joao-carlos-a",
+      "personId": "joao-carlos",
+      "topicLetter": "a",
+      "scheduledAt": "2026-05-28T19:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-04"
+    },
+    {
+      "id": "2026-06-01-14-robson-a",
+      "personId": "robson",
+      "topicLetter": "a",
+      "scheduledAt": "2026-06-01T17:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-04"
+    },
+    {
+      "id": "2026-06-01-16-marcus-a",
+      "personId": "marcus",
+      "topicLetter": "a",
+      "scheduledAt": "2026-06-01T19:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-04"
+    },
+    {
+      "id": "2026-06-02-14-vieira-a",
+      "personId": "vieira",
+      "topicLetter": "a",
+      "scheduledAt": "2026-06-02T17:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-11"
+    },
+    {
+      "id": "2026-06-02-16-davi-a",
+      "personId": "davi",
+      "topicLetter": "a",
+      "scheduledAt": "2026-06-02T19:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-10"
+    },
+    {
+      "id": "2026-06-03-16-janderson-a",
+      "personId": "janderson",
+      "topicLetter": "a",
+      "scheduledAt": "2026-06-03T19:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-04"
+    },
+    {
+      "id": "2026-06-04-14-vinicius-a",
+      "personId": "vinicius",
+      "topicLetter": "a",
+      "scheduledAt": "2026-06-04T17:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-04"
+    },
+    {
+      "id": "2026-06-04-16-robson-b",
+      "personId": "robson",
+      "topicLetter": "b",
+      "scheduledAt": "2026-06-04T19:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-04"
+    },
+    {
+      "id": "2026-06-08-14-joao-carlos-c",
+      "personId": "joao-carlos",
+      "topicLetter": "c",
+      "scheduledAt": "2026-06-08T17:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-10"
+    },
+    {
+      "id": "2026-06-09-14-janderson-b",
+      "personId": "janderson",
+      "topicLetter": "b",
+      "scheduledAt": "2026-06-09T17:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-10"
+    },
+    {
+      "id": "2026-06-09-16-vinicius-b",
+      "personId": "vinicius",
+      "topicLetter": "b",
+      "scheduledAt": "2026-06-09T19:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-04"
+    },
+    {
+      "id": "2026-06-10-14-robson-c",
+      "personId": "robson",
+      "topicLetter": "c",
+      "scheduledAt": "2026-06-10T17:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-11"
+    },
+    {
+      "id": "2026-06-10-16-marcus-b",
+      "personId": "marcus",
+      "topicLetter": "b",
+      "scheduledAt": "2026-06-10T19:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-05"
+    },
+    {
+      "id": "2026-06-11-14-vieira-b",
+      "personId": "vieira",
+      "topicLetter": "b",
+      "scheduledAt": "2026-06-11T17:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-16"
+    },
+    {
+      "id": "2026-06-15-14-vinicius-c",
+      "personId": "vinicius",
+      "topicLetter": "c",
+      "scheduledAt": "2026-06-15T17:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-10"
+    },
+    {
+      "id": "2026-06-16-14-marcus-c",
+      "personId": "marcus",
+      "topicLetter": "c",
+      "scheduledAt": "2026-06-16T17:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-11"
+    },
+    {
+      "id": "2026-06-16-16-vieira-c",
+      "personId": "vieira",
+      "topicLetter": "c",
+      "scheduledAt": "2026-06-16T19:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-23",
+      "notes": "Fiz a gravação completa do tópico C - Hierarquia de Níveis e finalizei a edição da última gravação (tópico B - Permissões de Escrita e Leitura AGX)"
+    },
+    {
+      "id": "2026-07-13-16-janderson-c",
+      "personId": "janderson",
+      "topicLetter": "c",
+      "scheduledAt": "2026-07-13T19:00:00+00:00",
+      "status": "done",
+      "recordedAt": "2026-06-10"
+    }
+  ]
+}

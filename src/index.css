@@ -190,6 +190,16 @@ body {
   border-color: var(--border-light);
 }
 
+.btn.btn-danger {
+  color: #c0392b;
+  border-color: #c0392b44;
+}
+
+.btn.btn-danger:hover:not(:disabled) {
+  background: #c0392b18;
+  border-color: #c0392b88;
+}
+
 .btn.sm {
   padding: 6px 12px;
   font-size: 12px;
@@ -749,6 +759,25 @@ body {
   border-color: var(--done);
   background: rgba(52, 211, 153, 0.08);
   box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.3);
+}
+
+.calendar-cell.friday-blocked {
+  opacity: 0.55;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 4px,
+    rgba(248, 113, 113, 0.06) 4px,
+    rgba(248, 113, 113, 0.06) 8px
+  );
+}
+
+.calendar-cell.friday-blocked:hover:not(.empty) {
+  cursor: not-allowed;
+}
+
+.schedule-notice {
+  margin-bottom: 12px;
 }
 
 .cell-header {
