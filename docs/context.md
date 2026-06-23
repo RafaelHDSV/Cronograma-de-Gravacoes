@@ -117,4 +117,14 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 
 ---
 
-*Atualizado jun/2026 — Supabase + Yarn.*
+## Alterações recentes (22–23/06/2026)
+
+- Coloquei uma rota leve de *health* e um ping automático no servidor para o Render não hibernar — o painel abre sem ficar minutos na tela de carregamento.
+- Passei a aceitar **várias sessões por tópico** e **notas** em cada gravação. Se não deu para gravar tudo em um dia, a sua próxima gravação pode ser no mesmo tópico. E tudo isso pode ser descrito por meios das notas nas gravações
+- No painel, cada pessoa pode **reordenar os próprios tópicos** — não precisa seguir A, B, C na ordem fixa do catálogo.
+- Seguindo a regra do Zarco (sem gravações às sextas), **reorganizei os tópicos do cronograma**: os dias de cada pessoa continuam os mesmos; só mudei qual tópico cai em cada slot, já que perdemos as sextas.
+- Quem prefere o **texto corrido** em vez do calendário pode **exportar o cronograma atual** pelo botão "Exportar Texto" no topo — sai no mesmo formato que o Zarco enviou o cronograma inicialmente.
+
+---
+
+*Atualizado 23/06/2026.*

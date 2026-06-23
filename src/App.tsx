@@ -16,6 +16,11 @@ import {
   upsertPendingEntry,
 } from './lib/pending'
 import { willCompletePersonOnMarkDone } from './lib/personComplete'
+import {
+  copyScheduleToClipboard,
+  downloadScheduleText,
+  formatScheduleAsText,
+} from './lib/exportScheduleText'
 import { formatAlteracoesPendentes } from './lib/ptPlural'
 import { buildPersonIndex, buildScheduledAt, dayKey } from './lib/schedule'
 import {
@@ -411,6 +416,17 @@ export function App() {
     discardPending()
   }, [discardPending])
 
+  const onExportText = useCallback(() => {
+    if (!data) return
+    const text = formatScheduleAsText(data.people, displaySessions)
+    downloadScheduleText(text)
+    void copyScheduleToClipboard(text).then((ok) => {
+      if (!ok) return
+      setScheduleNotice('Cronograma exportado e copiado para a área de transferência.')
+      window.setTimeout(() => setScheduleNotice(null), 4000)
+    })
+  }, [data, displaySessions])
+
   return (
     <div className="app">
       <header className="app-header">
@@ -431,6 +447,16 @@ export function App() {
                 <span className={`reload-icon${refreshing ? ' spinning' : ''}`} aria-hidden="true">
                   ↻
                 </span>
+              </button>
+            </Tooltip>
+            <Tooltip label="Exportar cronograma em texto (formato Discord)">
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={onExportText}
+                disabled={!data}
+              >
+                Exportar texto
               </button>
             </Tooltip>
             {isEditor && needsDayCapacityFix && (
@@ -499,9 +525,7 @@ export function App() {
 
       <main className="content">
         {error && <p className="error">Falha ao carregar os dados: {error}</p>}
-        {scheduleNotice && (
-          <p className="error schedule-notice">{scheduleNotice}</p>
-        )}
+        {scheduleNotice && <p className="schedule-notice">{scheduleNotice}</p>}
         {!data && !error && (
           <p className="empty">
             {slowLoad

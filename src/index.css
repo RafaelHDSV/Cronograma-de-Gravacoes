@@ -778,6 +778,7 @@ body {
 
 .schedule-notice {
   margin-bottom: 12px;
+  color: var(--text-muted);
 }
 
 .cell-header {

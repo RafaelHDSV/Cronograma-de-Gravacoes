@@ -1,0 +1,232 @@
+# Cronograma atual
+
+28/05 (Qui)
+- 16h — João Carlos (b)
+
+29/05 (Sex)
+- 14h — Janderson (a)
+
+01/06 (Seg)
+- 14h — Robson (a)
+- 16h — Marcus (a)
+
+02/06 (Ter)
+- 16h — João Carlos (a)
+
+03/06 (Qua)
+- 14h — Vinicius (b)
+- 16h — Robson (b)
+
+04/06 (Qui)
+- 14h — Vinicius (a)
+- 16h — Robson (c)
+
+05/06 (Sex)
+- 14h — Marcus (b)
+- 16h — Janderson (b)
+
+08/06 (Seg)
+- 14h — Davi (b)
+- 16h — João Carlos (c)
+
+09/06 (Ter)
+- 14h — Janderson (l)
+- 16h — Vinicius (c)
+
+10/06 (Qua)
+- 14h — Robson (d)
+- 16h — Vieira (a)
+
+11/06 (Qui)
+- 14h — Marcus (c)
+- 16h — Davi (a)
+
+12/06 (Sex)
+- 16h — Janderson (m)
+
+15/06 (Seg)
+- 14h — Robson (e)
+- 16h — Vieira (b)
+
+16/06 (Ter)
+- 16h — Vinicius (d)
+
+17/06 (Qua)
+- 14h — Marcus (d)
+- 16h — Davi (c)
+
+18/06 (Qui)
+- 14h — Janderson (n)
+- 16h — Vinicius (e)
+
+22/06 (Seg)
+- 14h — Vieira (c)
+- 16h — Davi (d)
+
+23/06 (Ter)
+- 14h — João Carlos (d)
+- 16h — Janderson (f)
+
+24/06 (Qua)
+- 14h — Vinicius (f)
+- 16h — Robson (f)
+
+25/06 (Qui)
+- 14h — Marcus (e)
+- 16h — Vieira (d)
+
+29/06 (Seg)
+- 14h — Janderson (e)
+- 16h — Vinicius (g)
+
+30/06 (Ter)
+- 14h — Robson (g)
+- 16h — Marcus (f)
+
+01/07 (Qua)
+- 14h — Vieira (e)
+- 16h — Davi (e)
+
+02/07 (Qui)
+- 14h — João Carlos (e)
+- 16h — Janderson (c)
+
+06/07 (Seg)
+- 14h — Marcus (g)
+- 16h — Vieira (f)
+
+07/07 (Ter)
+- 14h — Davi (f)
+- 16h — João Carlos (f)
+
+08/07 (Qua)
+- 14h — Janderson (d)
+- 16h — Vinicius (h)
+
+09/07 (Qui)
+- 14h — Robson (h)
+- 16h — Marcus (h)
+
+13/07 (Seg)
+- 14h — João Carlos (g)
+- 16h — Janderson (g)
+
+14/07 (Ter)
+- 14h — Vinicius (i)
+- 16h — Robson (i)
+
+15/07 (Qua)
+- 14h — Marcus (i)
+- 16h — Vieira (g)
+
+16/07 (Qui)
+- 14h — Davi (g)
+- 16h — João Carlos (h)
+
+20/07 (Seg)
+- 14h — Robson (j)
+- 16h — Marcus (j)
+
+21/07 (Ter)
+- 14h — Vieira (h)
+- 16h — Davi (h)
+
+22/07 (Qua)
+- 14h — João Carlos (i)
+- 16h — Janderson (h)
+
+23/07 (Qui)
+- 14h — Vinicius (j)
+- 16h — Robson (k)
+
+27/07 (Seg)
+- 14h — Davi (i)
+- 16h — João Carlos (j)
+
+28/07 (Ter)
+- 14h — Janderson (i)
+- 16h — Vinicius (k)
+
+29/07 (Qua)
+- 14h — Robson (l)
+- 16h — Marcus (k)
+
+30/07 (Qui)
+- 14h — Vieira (i)
+- 16h — Davi (j)
+
+03/08 (Seg)
+- 14h — Vinicius (l)
+- 16h — Robson (m)
+
+04/08 (Ter)
+- 14h — Marcus (l)
+- 16h — Vieira (j)
+
+05/08 (Qua)
+- 14h — Davi (k)
+- 16h — João Carlos (k)
+
+06/08 (Qui)
+- 14h — Robson (n)
+- 16h — Marcus (m)
+
+10/08 (Seg)
+- 14h — Robson (o)
+- 16h — Marcus (n)
+
+11/08 (Ter)
+- 14h — Vieira (k)
+- 16h — Davi (l)
+
+12/08 (Qua)
+- 14h — Robson (p)
+- 16h — Vieira (l)
+
+13/08 (Qui)
+- 14h — Davi (m)
+- 16h — Robson (q)
+
+17/08 (Seg)
+- 14h — João Carlos (l)
+- 16h — Janderson (j)
+
+18/08 (Ter)
+- 14h — Robson (r) [encerra Robson]
+- 16h — Marcus (o)
+
+19/08 (Qua)
+- 14h — Vinicius (m)
+- 16h — Davi (n)
+
+20/08 (Qui)
+- 14h — Vieira (m)
+- 16h — João Carlos (m)
+
+24/08 (Seg)
+- 14h — Janderson (k) [encerra Janderson]
+- 16h — Marcus (p) [encerra Marcus]
+
+25/08 (Ter)
+- 14h — Vinicius (n) [encerra Vinicius]
+- 16h — Davi (o)
+
+26/08 (Qua)
+- 14h — Vieira (n)
+- 16h — João Carlos (n)
+
+27/08 (Qui)
+- 14h — João Carlos (o) [encerra João Carlos]
+- 16h — Davi (p)
+
+31/08 (Seg)
+- 14h — Vieira (o)
+- 16h — Davi (q) [encerra Davi]
+
+01/09 (Ter)
+- 14h — Vieira (p)
+- 16h — Vieira (q)
+
+02/09 (Qua)
+- 14h — Vieira (r)
+- 16h — Vieira (s) [encerra Vieira]
