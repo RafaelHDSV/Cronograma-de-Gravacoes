@@ -12,6 +12,7 @@ import {
 } from '../shared/dayCapacityMigration.js'
 import { applyPersistedSnapshots } from '../shared/sessionPersistMerge.js'
 import { resolveTopicOrder } from './topicOrder.js'
+import { resolveProjectRoot } from './paths.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -50,7 +51,7 @@ interface SessionRow {
   recorded_at: string | null
 }
 
-const ROOT = path.resolve(__dirname, '..')
+const ROOT = resolveProjectRoot(__dirname)
 const PEOPLE_YAML = path.join(ROOT, 'public', 'data', 'people.yaml')
 const SESSIONS_YAML = path.join(ROOT, 'public', 'data', 'sessions.yaml')
 
