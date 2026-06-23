@@ -2,8 +2,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { load } from 'js-yaml'
-import { formatSupabaseError, supabase } from './supabase.js'
+import { formatSupabaseError, isMissingTableError, supabase } from './supabase.js'
 import { tables } from './tables.js'
+import { resolveTopicOrder } from './topicOrder.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -17,6 +18,7 @@ export interface Person {
   id: string
   name: string
   topics: Topic[]
+  topicOrder?: string[]
 }
 
 export type SessionStatus = 'scheduled' | 'done' | 'postponed'
@@ -74,10 +76,55 @@ function sessionToRow(session: Session): SessionRow {
   }
 }
 
-function loadPeople(): Person[] {
+interface PreferenceRow {
+  person_id: string
+  topic_order: string[]
+}
+
+function loadPeopleFromYaml(): Person[] {
   const text = fs.readFileSync(PEOPLE_YAML, 'utf-8')
   const parsed = load(text) as { people: Person[] }
   return parsed.people ?? []
+}
+
+async function loadTopicOrderOverrides(): Promise<Map<string, string[]>> {
+  const { data, error } = await supabase
+    .from(tables.personPreferences)
+    .select('person_id, topic_order')
+
+  if (error) {
+    if (isMissingTableError(error)) {
+      console.warn(
+        '[data] Tabela de preferencias ausente — rode supabase/migrations/20260623120000_person_preferences.sql',
+      )
+      return new Map()
+    }
+    throw new Error(formatSupabaseError('[data] Falha ao carregar preferencias', error))
+  }
+
+  const map = new Map<string, string[]>()
+  for (const row of (data ?? []) as PreferenceRow[]) {
+    if (Array.isArray(row.topic_order) && row.topic_order.length > 0) {
+      map.set(row.person_id, row.topic_order)
+    }
+  }
+  return map
+}
+
+function mergePeople(yamlPeople: Person[], overrides: Map<string, string[]>): Person[] {
+  return yamlPeople.map((person) => {
+    const rawOrder = overrides.get(person.id) ?? person.topicOrder
+    if (!rawOrder?.length) return { ...person, topicOrder: undefined }
+
+    const topicOrder = resolveTopicOrder(person.topics, rawOrder, `[data] ${person.id}`)
+    return { ...person, topicOrder }
+  })
+}
+
+async function loadPeople(): Promise<Person[]> {
+  const yamlPeople = loadPeopleFromYaml()
+  const overrides = await loadTopicOrderOverrides()
+  return mergePeople(yamlPeople, overrides)
 }
 
 export function seedSessionsFromYaml(): Session[] {
@@ -122,7 +169,7 @@ async function countSessions(): Promise<number> {
 }
 
 export async function initData(): Promise<void> {
-  people = loadPeople()
+  people = await loadPeople()
 
   const total = await countSessions()
   if (total === 0) {
@@ -221,4 +268,35 @@ export async function swapSessionTimes(idA: string, idB: string): Promise<[Sessi
   sessions[idxA] = a
   sessions[idxB] = b
   return [a, b]
+}
+
+export async function updatePersonTopicOrder(
+  personId: string,
+  topicOrder: string[],
+): Promise<Person | null> {
+  const idx = people.findIndex((p) => p.id === personId)
+  if (idx === -1) return null
+
+  const person = people[idx]
+  const resolved = resolveTopicOrder(person.topics, topicOrder, `[data] ${personId}`)
+  if (resolved.length === 0) {
+    throw new Error('topicOrder invalido: nenhuma letra valida')
+  }
+
+  const { error } = await supabase.from(tables.personPreferences).upsert(
+    {
+      person_id: personId,
+      topic_order: resolved,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'person_id' },
+  )
+
+  if (error) {
+    throw new Error(formatSupabaseError('[data] Falha ao salvar ordem de topicos', error))
+  }
+
+  const updated: Person = { ...person, topicOrder: resolved }
+  people[idx] = updated
+  return updated
 }

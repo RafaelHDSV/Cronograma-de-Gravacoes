@@ -45,9 +45,10 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 
 | Fonte | Papel |
 |-------|--------|
-| `public/data/people.yaml` | Pessoas e tópicos — versionado no git |
+| `public/data/people.yaml` | Pessoas e tópicos — versionado no git; `topicOrder` opcional (seed) |
 | `public/data/sessions.yaml` | Agenda seed — versionado no git |
 | Supabase `sessions` | Estado vivo (status, datas, notas) |
+| Supabase `person_preferences` | Ordem de gravacao por pessoa (`topic_order`); override editavel no painel |
 
 **Status:** `scheduled`, `done`, `postponed`. **Fuso:** `America/Sao_Paulo`.
 
@@ -58,6 +59,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 | Método | Rota | Função |
 |--------|------|--------|
 | GET | `/api/schedule` | `{ people, sessions }` — sessoes relidas do Supabase a cada request |
+| PATCH | `/api/people/:personId/topic-order` | Atualiza ordem de gravacao dos topicos (editor) |
 | PATCH | `/api/sessions/:id` | Atualiza sessão no Supabase |
 | POST | `/api/sessions/swap-time` | Troca horário entre duas sessões |
 | POST | `/api/schedule/reset` | Repõe sessões a partir de `sessions.yaml` |
@@ -84,6 +86,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 7. **Horarios padrao 14h e 16h** — slot custom via picker.
 8. **`base: './'`** no Vite para GitHub Pages / raiz.
 9. **`yarn import`** regenera YAMLs do script legado.
+10. **`topicOrder`** — ordem de gravacao por pessoa: seed em `people.yaml`; override em Supabase (`cronograma_person_preferences`). Util `getTopicOrder()` / `getOrderedTopics()` em `src/lib/topicOrder.ts` (reexport em `schedule.ts`).
 
 ---
 

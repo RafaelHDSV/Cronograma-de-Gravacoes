@@ -1,4 +1,4 @@
-import type { ScheduleData, Session, SessionStatus } from './types'
+import type { Person, ScheduleData, Session, SessionStatus } from './types'
 import { getEditorToken } from './authStorage'
 
 const BASE = import.meta.env.VITE_API_URL ?? ''
@@ -85,4 +85,15 @@ export async function applySessionBatch(
     body: JSON.stringify({ changes }),
   })
   return sessions
+}
+
+export async function updatePersonTopicOrder(
+  personId: string,
+  topicOrder: string[],
+): Promise<Person> {
+  const { person } = await request<{ person: Person }>(`/api/people/${personId}/topic-order`, {
+    method: 'PATCH',
+    body: JSON.stringify({ topicOrder }),
+  })
+  return person
 }

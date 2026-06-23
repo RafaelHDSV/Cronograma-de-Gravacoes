@@ -1427,6 +1427,70 @@ body {
   min-width: 40px;
 }
 
+.person-detail-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.person-detail-toolbar .btn {
+  margin: 12px;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.topic-order-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.topic-order-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: grab;
+}
+
+.topic-order-item.dragging {
+  opacity: 0.5;
+}
+
+.topic-order-item.drag-over {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-soft);
+}
+
+.topic-order-handle {
+  color: var(--muted);
+  font-size: 12px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.topic-order-letter {
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 1.25rem;
+  flex-shrink: 0;
+}
+
+.topic-order-title-text {
+  font-size: 14px;
+  line-height: 1.4;
+  min-width: 0;
+}
+
 .reload-icon {
   display: inline-block;
   font-size: 1.25rem;

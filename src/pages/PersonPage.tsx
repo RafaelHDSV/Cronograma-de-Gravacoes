@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
+import { TopicOrderModal } from '../components/TopicOrderModal'
 import type { Person, Session } from '../lib/types'
+import { getOrderedTopics } from '../lib/topicOrder'
 import { formatDateLong, dayKey, personProgress, STATUS_LABEL } from '../lib/schedule'
 
 interface Props {
@@ -7,11 +9,13 @@ interface Props {
   sessions: Session[]
   canEdit: boolean
   onToggleDone: (id: string) => void
+  onTopicOrderSave: (personId: string, topicOrder: string[]) => Promise<void>
 }
 
-export function PersonPage({ people, sessions, canEdit, onToggleDone }: Props) {
+export function PersonPage({ people, sessions, canEdit, onToggleDone, onTopicOrderSave }: Props) {
   const progress = useMemo(() => personProgress(people, sessions), [people, sessions])
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [orderModalPerson, setOrderModalPerson] = useState<Person | null>(null)
 
   return (
     <section className="person-list">
@@ -19,6 +23,7 @@ export function PersonPage({ people, sessions, canEdit, onToggleDone }: Props) {
         const pct = total === 0 ? 0 : Math.round((done / total) * 100)
         const isExpanded = expandedId === person.id
         const scheduledLetters = new Set(own.map((s) => s.topicLetter))
+        const orderedTopics = getOrderedTopics(person)
 
         return (
           <article key={person.id} className="person-row">
@@ -43,6 +48,20 @@ export function PersonPage({ people, sessions, canEdit, onToggleDone }: Props) {
 
             {isExpanded && (
               <div className="person-row-detail">
+                {canEdit && (
+                  <div className="person-detail-toolbar">
+                    <button
+                      type="button"
+                      className="btn ghost btn-sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setOrderModalPerson(person)
+                      }}
+                    >
+                      Configurar ordem
+                    </button>
+                  </div>
+                )}
                 <table className="topic-table">
                   <thead>
                     <tr>
@@ -54,7 +73,7 @@ export function PersonPage({ people, sessions, canEdit, onToggleDone }: Props) {
                     </tr>
                   </thead>
                   <tbody>
-                    {person.topics.map((t) => {
+                    {orderedTopics.map((t) => {
                       const session = own.find((s) => s.topicLetter === t.letter)
                       const status = session?.status
                       const notScheduled = !scheduledLetters.has(t.letter)
@@ -99,6 +118,15 @@ export function PersonPage({ people, sessions, canEdit, onToggleDone }: Props) {
           </article>
         )
       })}
+
+      {orderModalPerson && (
+        <TopicOrderModal
+          person={orderModalPerson}
+          open={orderModalPerson !== null}
+          onClose={() => setOrderModalPerson(null)}
+          onSave={(topicOrder) => onTopicOrderSave(orderModalPerson.id, topicOrder)}
+        />
+      )}
     </section>
   )
 }

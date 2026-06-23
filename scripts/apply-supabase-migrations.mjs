@@ -11,6 +11,7 @@ const migrationsDir = path.join(__dirname, '../supabase/migrations')
 const files = [
   '20260607120000_cronograma_sessions.sql',
   '20260607120100_rename_legacy_sessions.sql',
+  '20260623120000_person_preferences.sql',
 ]
 
 const url = process.env.DATABASE_URL

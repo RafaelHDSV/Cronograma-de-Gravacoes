@@ -1,5 +1,7 @@
 import type { Person, Session, SessionStatus, Topic } from './types'
 
+export { getTopicOrder, getOrderedTopics } from './topicOrder'
+
 const TZ = 'America/Sao_Paulo'
 
 /** Inicios padrao das janelas 14-16h e 16-18h */

@@ -10,4 +10,5 @@ function validatePrefix(value: string): string {
 
 export const tables = {
   sessions: `${prefix}_sessions`,
+  personPreferences: `${prefix}_person_preferences`,
 } as const

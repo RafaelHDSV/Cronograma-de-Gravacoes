@@ -30,6 +30,16 @@ Confira em **Table Editor** se a tabela `sessions` aparece vazia.
 
 ---
 
+## 2b. Criar a tabela `person_preferences` (ordem de topicos)
+
+No **SQL Editor**, execute tambem:
+
+`supabase/migrations/20260623120000_person_preferences.sql`
+
+Isso cria `public.cronograma_person_preferences` (override editavel da ordem de gravacao por pessoa). Sem essa tabela o painel sobe, mas salvar ordem customizada falha ate a migration ser aplicada.
+
+---
+
 ## 3. Obter URL e chave de API
 
 1. **Project Settings** (engrenagem) -> **API**.
@@ -127,6 +137,7 @@ GitHub Pages **so publica o front estatico**; mutacoes exigem o Express com Supa
 | `row-level security policy` (42501) no insert | Chave **anon** no `.env` ou RLS ligado na tabela | Usar JWT com role `service_role`; rodar `20260604130000_sessions_disable_rls.sql` |
 | `SUPABASE_SERVICE_ROLE_KEY e chave "anon"` | Colou publishable/anon | Settings -> API -> **service_role** (secret) |
 | `relation "sessions" does not exist` | Migration nao aplicada | Rodar SQL em `supabase/migrations/` |
+| `cronograma_person_preferences` / PGRST205 | Migration de preferencias nao aplicada | Rodar `20260623120000_person_preferences.sql` |
 | `Falha ao carregar sessoes` | URL/chave erradas ou projeto pausado | Conferir API keys e status do projeto |
 | Painel vazio apos seed | YAML sem sessoes | Conferir `public/data/sessions.yaml` |
 | Dados antigos do JSON local | `data/sessions.json` ignorado | Usar reset ou editar via UI; estado fica no Supabase |

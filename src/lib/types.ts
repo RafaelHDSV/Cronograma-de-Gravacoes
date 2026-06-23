@@ -9,6 +9,7 @@ export interface Person {
   id: string
   name: string
   topics: Topic[]
+  topicOrder?: string[]
 }
 
 export interface Session {

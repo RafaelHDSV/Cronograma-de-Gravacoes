@@ -11,6 +11,7 @@ import {
   swapSessionTimes,
   resetSessionsFromYaml,
   applySessionPatches,
+  updatePersonTopicOrder,
   type SessionPatch,
 } from './data.js'
 import { handleAuthMe, handleLogin, requireEditor } from './auth.js'
@@ -103,6 +104,24 @@ app.post('/api/schedule/reset', requireEditor, async (_req, res) => {
   try {
     const sessions = await resetSessionsFromYaml()
     res.json({ people: getPeople(), sessions })
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ error: String(e) })
+  }
+})
+
+app.patch('/api/people/:personId/topic-order', requireEditor, async (req, res) => {
+  try {
+    const personId = String(req.params.personId)
+    const { topicOrder } = req.body as { topicOrder?: string[] }
+    if (!Array.isArray(topicOrder) || topicOrder.length === 0) {
+      return res.status(400).json({ error: 'topicOrder array is required' })
+    }
+    const person = await updatePersonTopicOrder(personId, topicOrder)
+    if (!person) {
+      return res.status(404).json({ error: 'Person not found' })
+    }
+    res.json({ person })
   } catch (e) {
     console.error(e)
     res.status(500).json({ error: String(e) })

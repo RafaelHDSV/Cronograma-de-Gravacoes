@@ -39,6 +39,14 @@ export function formatSupabaseError(context: string, error: PostgrestError | nul
   return `${context}: ${detail}`
 }
 
+/** Tabela ausente no Postgres (42P01) ou no cache do PostgREST (PGRST205). */
+export function isMissingTableError(error: PostgrestError | null): boolean {
+  if (!error) return false
+  const msg = error.message ?? ''
+  if (error.code === '42P01' || error.code === 'PGRST205') return true
+  return msg.includes('does not exist') || msg.includes('Could not find the table')
+}
+
 function readJwtRole(token: string): string | null {
   try {
     const payload = token.split('.')[1]

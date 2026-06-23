@@ -3,7 +3,7 @@ import { ConfirmChangesModal } from './components/ConfirmChangesModal'
 import { Tooltip } from './components/Tooltip'
 import { EditorLoginModal } from './components/EditorLoginModal'
 import { PersonCompleteCelebration } from './components/PersonCompleteCelebration'
-import { applySessionBatch, fetchAuthMe, fetchSchedule } from './lib/api'
+import { applySessionBatch, fetchAuthMe, fetchSchedule, updatePersonTopicOrder } from './lib/api'
 import { clearEditorToken, getEditorToken } from './lib/authStorage'
 import {
   applyPendingPatches,
@@ -141,6 +141,18 @@ export function App() {
       setRefreshing(false)
     }
   }, [loadSchedule])
+
+  const onTopicOrderSave = useCallback(async (personId: string, topicOrder: string[]) => {
+    const person = await updatePersonTopicOrder(personId, topicOrder)
+    setData((prev) =>
+      prev
+        ? {
+            ...prev,
+            people: prev.people.map((p) => (p.id === personId ? person : p)),
+          }
+        : prev,
+    )
+  }, [])
 
   const onMoveSession = useCallback(
     (id: string, targetDayKey: string) => {
@@ -328,6 +340,7 @@ export function App() {
                 sessions={displaySessions}
                 canEdit={isEditor}
                 onToggleDone={onToggleDone}
+                onTopicOrderSave={onTopicOrderSave}
               />
             )}
           </>
