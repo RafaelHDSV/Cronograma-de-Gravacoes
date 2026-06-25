@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { DEFAULT_SLOT_HOURS } from '../lib/schedule'
 
 interface Props {
@@ -12,6 +12,10 @@ export function TimeSlotPicker({ hour, minute, onChange, disabled }: Props) {
   const id = useId()
   const isDefault = DEFAULT_SLOT_HOURS.some((h) => h === hour && minute === 0)
   const [custom, setCustom] = useState(!isDefault)
+
+  useEffect(() => {
+    if (isDefault) setCustom(false)
+  }, [isDefault])
 
   const timeValue = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
 

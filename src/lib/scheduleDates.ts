@@ -30,6 +30,8 @@ export {
 export {
   assertDayCapacity,
   computeDayCapacityFixChanges,
+  findSlotConflict,
   hasOverfullDays,
+  snapToSlotHour,
   type CapacityFixChange,
 } from '../../shared/dayCapacityMigration'

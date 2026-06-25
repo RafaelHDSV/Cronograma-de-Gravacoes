@@ -9,6 +9,7 @@ import { applySessionBatch, createSession, deleteSession, fetchAuthMe, fetchSche
 import { clearEditorToken, getEditorToken } from './lib/authStorage'
 import {
   applyPendingPatches,
+  applyPendingPatchesBatch,
   buildPendingRows,
   mergeSessionsFromServer,
   type PendingEntry,
@@ -22,15 +23,17 @@ import {
   formatScheduleAsText,
 } from './lib/exportScheduleText'
 import { formatAlteracoesPendentes } from './lib/ptPlural'
-import { buildPersonIndex, buildScheduledAt, dayKey } from './lib/schedule'
+import { buildPersonIndex, buildScheduledAt, dayKey, localTimeParts, scheduledAtEqual } from './lib/schedule'
 import {
   assertDayCapacity,
   computeFridayFixChanges,
+  findSlotConflict,
   hasOverfullDays,
   hasScheduledFridaySessions,
   isValidScheduleDate,
   SCHEDULE_DAY_CAPACITY_ERROR,
   SCHEDULE_FRIDAY_ERROR,
+  snapToSlotHour,
   type CapacityFixChange,
   type FridayFixChange,
 } from './lib/scheduleDates'
@@ -106,6 +109,14 @@ export function App() {
     (sessionId: string, patch: SessionPatch) => {
       if (!isEditor) return
       setPending((prev) => upsertPendingEntry(baselineSessions, prev, sessionId, patch))
+    },
+    [isEditor, baselineSessions],
+  )
+
+  const queueChanges = useCallback(
+    (changes: Array<{ sessionId: string; patch: SessionPatch }>) => {
+      if (!isEditor || changes.length === 0) return
+      setPending((prev) => applyPendingPatchesBatch(baselineSessions, prev, changes))
     },
     [isEditor, baselineSessions],
   )
@@ -332,6 +343,18 @@ export function App() {
       const session = findDisplaySession(id)
       if (!session) return
       const scheduledAt = buildScheduledAt(targetDayKey, hour, minute)
+      const conflict = findSlotConflict(displaySessions, scheduledAt, id)
+      if (conflict) {
+        const otherHour = snapToSlotHour(hour) === 14 ? 16 : 14
+        queueChanges([
+          { sessionId: id, patch: { status: 'scheduled', scheduledAt } },
+          {
+            sessionId: conflict.id,
+            patch: { scheduledAt: buildScheduledAt(targetDayKey, otherHour, 0) },
+          },
+        ])
+        return
+      }
       const capacityErr = dayCapacityError(session.personId, scheduledAt, id)
       if (capacityErr) {
         setScheduleNotice(capacityErr)
@@ -339,7 +362,7 @@ export function App() {
       }
       queueChange(id, { status: 'scheduled', scheduledAt })
     },
-    [findDisplaySession, queueChange, dayCapacityError],
+    [findDisplaySession, queueChange, queueChanges, dayCapacityError, displaySessions],
   )
 
   const onChangeTime = useCallback(
@@ -348,6 +371,21 @@ export function App() {
       if (!session) return
       const dk = dayKey(session.scheduledAt)
       const scheduledAt = buildScheduledAt(dk, hour, minute)
+      if (scheduledAtEqual(session.scheduledAt, scheduledAt)) return
+
+      const conflict = findSlotConflict(displaySessions, scheduledAt, id)
+      if (conflict) {
+        const { hour: curH, minute: curM } = localTimeParts(session.scheduledAt)
+        queueChanges([
+          { sessionId: id, patch: { scheduledAt } },
+          {
+            sessionId: conflict.id,
+            patch: { scheduledAt: buildScheduledAt(dk, curH, curM) },
+          },
+        ])
+        return
+      }
+
       const capacityErr = dayCapacityError(session.personId, scheduledAt, id)
       if (capacityErr) {
         setScheduleNotice(capacityErr)
@@ -355,7 +393,7 @@ export function App() {
       }
       queueChange(id, { scheduledAt })
     },
-    [findDisplaySession, queueChange, dayCapacityError],
+    [findDisplaySession, queueChange, queueChanges, dayCapacityError, displaySessions],
   )
 
   const onChangeTopic = useCallback(

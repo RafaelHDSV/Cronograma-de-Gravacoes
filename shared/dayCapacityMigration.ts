@@ -241,6 +241,23 @@ export function hasOverfullDays(sessions: CapacitySession[]): boolean {
   return false
 }
 
+/** Sessao agendada que ja ocupa o mesmo slot (14h ou 16h) no dia, se houver. */
+export function findSlotConflict(
+  sessions: CapacitySession[],
+  scheduledAtIso: string,
+  exceptId: string,
+): CapacitySession | undefined {
+  const day = dayKeyFromIso(scheduledAtIso)
+  const hour = snapToSlotHour(localTimeParts(scheduledAtIso).hour)
+  return sessions.find(
+    (s) =>
+      s.status === 'scheduled' &&
+      s.id !== exceptId &&
+      dayKeyFromIso(s.scheduledAt) === day &&
+      snapToSlotHour(localTimeParts(s.scheduledAt).hour) === hour,
+  )
+}
+
 export function assertDayCapacity(
   sessions: CapacitySession[],
   _personId: string,

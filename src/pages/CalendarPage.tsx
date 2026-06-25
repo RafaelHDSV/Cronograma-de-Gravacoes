@@ -399,6 +399,7 @@ export function CalendarPage({
                         <div className="session-edit-field">
                           <span className="session-edit-label">Horário</span>
                           <TimeSlotPicker
+                            key={s.id}
                             hour={hour}
                             minute={minute}
                             onChange={(h, m) => onChangeTime(s.id, h, m)}
