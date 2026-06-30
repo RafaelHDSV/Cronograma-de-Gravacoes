@@ -153,10 +153,19 @@ export function rescheduleSession(session: Session, targetDayKey: string): strin
   return buildScheduledAt(targetDayKey, hour, minute)
 }
 
+export interface CalendarDayCell {
+  day: string
+  inMonth: boolean
+}
+
 export interface CalendarMonth {
   year: number
   month: number
-  weeks: (string | null)[][]
+  weeks: CalendarDayCell[][]
+}
+
+function formatDayKey(y: number, m: number, d: number): string {
+  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`
 }
 
 export function buildCalendarMonth(year: number, month: number): CalendarMonth {
@@ -164,14 +173,31 @@ export function buildCalendarMonth(year: number, month: number): CalendarMonth {
   const startDow = first.getUTCDay()
   const daysInMonth = new Date(Date.UTC(year, month, 0, 12)).getUTCDate()
 
-  const cells: (string | null)[] = []
-  for (let i = 0; i < startDow; i++) cells.push(null)
-  for (let d = 1; d <= daysInMonth; d++) {
-    cells.push(`${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`)
-  }
-  while (cells.length % 7 !== 0) cells.push(null)
+  const cells: CalendarDayCell[] = []
 
-  const weeks: (string | null)[][] = []
+  if (startDow > 0) {
+    const prevMonth = month === 1 ? 12 : month - 1
+    const prevYear = month === 1 ? year - 1 : year
+    const daysInPrevMonth = new Date(Date.UTC(prevYear, prevMonth, 0, 12)).getUTCDate()
+    for (let i = startDow - 1; i >= 0; i--) {
+      const d = daysInPrevMonth - i
+      cells.push({ day: formatDayKey(prevYear, prevMonth, d), inMonth: false })
+    }
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ day: formatDayKey(year, month, d), inMonth: true })
+  }
+
+  let nextYear = month === 12 ? year + 1 : year
+  let nextMonth = month === 12 ? 1 : month + 1
+  let d = 1
+  while (cells.length % 7 !== 0) {
+    cells.push({ day: formatDayKey(nextYear, nextMonth, d), inMonth: false })
+    d++
+  }
+
+  const weeks: CalendarDayCell[][] = []
   for (let i = 0; i < cells.length; i += 7) {
     weeks.push(cells.slice(i, i + 7))
   }

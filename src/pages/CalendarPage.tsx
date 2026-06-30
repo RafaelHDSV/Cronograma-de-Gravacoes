@@ -105,8 +105,20 @@ export function CalendarPage({
     e.dataTransfer.effectAllowed = 'move'
   }, [])
 
+  const goToMonthForDay = useCallback(
+    (dayKeyStr: string) => {
+      const [y, m] = dayKeyStr.split('-').map(Number)
+      const idx = monthRange.findIndex((mo) => mo.year === y && mo.month === m)
+      if (idx >= 0) {
+        setMonthIndex(idx)
+      }
+      setSelectedDay(dayKeyStr)
+    },
+    [monthRange],
+  )
+
   const handleDrop = useCallback(
-    (e: React.DragEvent, targetDay: string) => {
+    (e: React.DragEvent, targetDay: string, inMonth: boolean) => {
       e.preventDefault()
       setDragOverDay(null)
       const sessionId = e.dataTransfer.getData('text/session-id')
@@ -116,19 +128,19 @@ export function CalendarPage({
           return
         }
         onMoveSession(sessionId, targetDay)
-        setSelectedDay(targetDay)
+        if (!inMonth) {
+          goToMonthForDay(targetDay)
+        } else {
+          setSelectedDay(targetDay)
+        }
       }
     },
-    [onMoveSession, onInvalidScheduleDate],
+    [onMoveSession, onInvalidScheduleDate, goToMonthForDay],
   )
 
   const goToToday = useCallback(() => {
-    const idx = monthRange.findIndex((mo) => mo.year === ty && mo.month === tm)
-    if (idx >= 0) {
-      setMonthIndex(idx)
-    }
-    setSelectedDay(today)
-  }, [monthRange, ty, tm, today])
+    goToMonthForDay(today)
+  }, [goToMonthForDay, today])
 
   const selectedSessions = selectedDay ? sessionsForDay(sessions, selectedDay) : []
   const peopleList = useMemo(() => sortPeopleByName(Array.from(personIndex.values())), [personIndex])
@@ -190,10 +202,7 @@ export function CalendarPage({
             {wd}
           </div>
         ))}
-        {calendar.weeks.flat().map((day, i) => {
-          if (!day) {
-            return <div key={`empty-${i}`} className='calendar-cell empty' />
-          }
+        {calendar.weeks.flat().map(({ day, inMonth }) => {
           const daySessions = sessionsByDay.get(day) ?? []
           const isToday = day === today
           const isSelected = day === selectedDay
@@ -206,15 +215,15 @@ export function CalendarPage({
           return (
             <div
               key={day}
-              className={`calendar-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${isFriday ? 'friday-blocked' : ''} ${dragOverDay === day ? 'drag-over' : ''}`}
-              onClick={() => setSelectedDay(day)}
+              className={`calendar-cell ${!inMonth ? 'outside-month' : ''} ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${isFriday ? 'friday-blocked' : ''} ${dragOverDay === day ? 'drag-over' : ''}`}
+              onClick={() => goToMonthForDay(day)}
               onDragOver={(e) => {
                 if (!canEdit || isFriday) return
                 e.preventDefault()
                 setDragOverDay(day)
               }}
               onDragLeave={() => setDragOverDay((d) => (d === day ? null : d))}
-              onDrop={(e) => canEdit && !isFriday && handleDrop(e, day)}
+              onDrop={(e) => canEdit && !isFriday && handleDrop(e, day, inMonth)}
             >
               <div className='cell-header'>
                 <span className='cell-day'>{Number(day.split('-')[2])}</span>

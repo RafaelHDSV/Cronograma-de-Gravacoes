@@ -725,6 +725,22 @@ body {
   min-height: 0;
 }
 
+.calendar-cell.outside-month {
+  background: color-mix(in srgb, var(--panel) 50%, transparent);
+  border-color: color-mix(in srgb, var(--border) 65%, transparent);
+}
+
+.calendar-cell.outside-month .cell-day {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.calendar-cell.outside-month.selected .cell-day,
+.calendar-cell.outside-month.today .cell-day {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .calendar-cell:hover:not(.empty):not(.selected) {
   border-color: var(--border-light);
   background: var(--panel-hover);
