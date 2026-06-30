@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import { AddSessionModal, type AddSessionDefaults } from '../components/AddSessionModal'
+import { SessionDateEditor } from '../components/SessionDateEditor'
 import { SessionNoteIndicator } from '../components/SessionNoteIndicator'
 import { TopicOrderModal } from '../components/TopicOrderModal'
 import type { Person, Session } from '../lib/types'
 import { formatTopicSessionSummary } from '../lib/ptPlural'
-import { formatDateLong, dayKey, STATUS_LABEL } from '../lib/schedule'
+import { STATUS_LABEL } from '../lib/schedule'
 import { personTopicProgress, type TopicGroup } from '../lib/topicSessions'
 
 interface Props {
@@ -18,6 +19,9 @@ interface Props {
     topicLetter: string
     scheduledAt: string
   }) => Promise<void>
+  onMoveSession: (id: string, targetDayKey: string) => void
+  onReschedule: (id: string, targetDayKey: string, hour: number, minute: number) => void
+  onInvalidScheduleDate?: () => void
 }
 
 export function PersonPage({
@@ -27,6 +31,9 @@ export function PersonPage({
   onToggleDone,
   onTopicOrderSave,
   onCreateSession,
+  onMoveSession,
+  onReschedule,
+  onInvalidScheduleDate,
 }: Props) {
   const progress = useMemo(() => personTopicProgress(people, sessions), [people, sessions])
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -95,6 +102,9 @@ export function PersonPage({
                         multiLayout={multiLayout}
                         canEdit={canEdit}
                         onToggleDone={onToggleDone}
+                        onMoveSession={onMoveSession}
+                        onReschedule={onReschedule}
+                        onInvalidScheduleDate={onInvalidScheduleDate}
                         onAddSession={() =>
                           setAddSessionDefaults({
                             personId: person.id,
@@ -138,12 +148,18 @@ function TopicGroupRows({
   multiLayout,
   canEdit,
   onToggleDone,
+  onMoveSession,
+  onReschedule,
+  onInvalidScheduleDate,
   onAddSession,
 }: {
   group: TopicGroup
   multiLayout: boolean
   canEdit: boolean
   onToggleDone: (id: string) => void
+  onMoveSession: (id: string, targetDayKey: string) => void
+  onReschedule: (id: string, targetDayKey: string, hour: number, minute: number) => void
+  onInvalidScheduleDate?: () => void
   onAddSession: () => void
 }) {
   if (!multiLayout || group.sessionCount <= 1) {
@@ -152,6 +168,9 @@ function TopicGroupRows({
         group={group}
         canEdit={canEdit}
         onToggleDone={onToggleDone}
+        onMoveSession={onMoveSession}
+        onReschedule={onReschedule}
+        onInvalidScheduleDate={onInvalidScheduleDate}
         onAddSession={onAddSession}
       />
     )
@@ -206,7 +225,13 @@ function TopicGroupRows({
             </td>
             <td className="col-letter topic-session-index">{idx + 1}</td>
             <td className="col-topic topic-session-meta">
-              {formatDateLong(dayKey(session.scheduledAt)).split(',')[1]?.trim()}
+              <SessionDateEditor
+                session={session}
+                canEdit={canEdit}
+                onMoveSession={onMoveSession}
+                onReschedule={onReschedule}
+                onInvalidScheduleDate={onInvalidScheduleDate}
+              />
             </td>
             <td className="col-sessions"></td>
             <td className="col-status">
@@ -226,11 +251,17 @@ function SimpleTopicRow({
   group,
   canEdit,
   onToggleDone,
+  onMoveSession,
+  onReschedule,
+  onInvalidScheduleDate,
   onAddSession,
 }: {
   group: TopicGroup
   canEdit: boolean
   onToggleDone: (id: string) => void
+  onMoveSession: (id: string, targetDayKey: string) => void
+  onReschedule: (id: string, targetDayKey: string, hour: number, minute: number) => void
+  onInvalidScheduleDate?: () => void
   onAddSession: () => void
 }) {
   const session = group.sessions[0]
@@ -262,7 +293,13 @@ function SimpleTopicRow({
             '—'
           )
         ) : (
-          formatDateLong(dayKey(session.scheduledAt)).split(',')[1]?.trim()
+          <SessionDateEditor
+            session={session}
+            canEdit={canEdit}
+            onMoveSession={onMoveSession}
+            onReschedule={onReschedule}
+            onInvalidScheduleDate={onInvalidScheduleDate}
+          />
         )}
       </td>
       <td className="col-status">

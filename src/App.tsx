@@ -602,6 +602,9 @@ export function App() {
                 onToggleDone={onToggleDone}
                 onTopicOrderSave={onTopicOrderSave}
                 onCreateSession={onCreateSession}
+                onMoveSession={onMoveSession}
+                onReschedule={onReschedule}
+                onInvalidScheduleDate={() => setScheduleNotice(SCHEDULE_FRIDAY_ERROR)}
               />
             )}
           </>
