@@ -20,7 +20,7 @@ import {
   type SessionPatch,
 } from './data.js'
 import { handleAuthMe, handleLogin, requireEditor } from './auth.js'
-import { startKeepAlive } from './keepAlive.js'
+import { startKeepAlive } from '@rafaelhdsv/keep-alive'
 import { isRateLimited } from './rateLimit.js'
 import { FRIDAY_BLOCKED_MESSAGE, DAY_CAPACITY_MESSAGE } from '../shared/scheduleDates.js'
 
