@@ -137,7 +137,10 @@ function buildPageviewPayload(config) {
   const url = new URL(window.location.href);
   let timezone = "";
   try {
-    timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const resolved = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (resolved && resolved !== "Etc/Unknown") {
+      timezone = resolved;
+    }
   } catch {
   }
   return {
@@ -170,7 +173,7 @@ function isLocalhost() {
 }
 
 // src/constants.ts
-var ANALYTICS_API_BASE = "https://personal-vieira-analytics.onrender.com/v1";
+var ANALYTICS_API_BASE = "https://vieira-analytics.vercel.app/v1";
 
 // src/transport.ts
 function isCrossOrigin(url) {

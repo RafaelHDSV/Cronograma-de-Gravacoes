@@ -1,6 +1,6 @@
 import {
   trackPageview
-} from "./chunk-Z4GIK4DN.js";
+} from "./chunk-MUQD7SU7.js";
 export {
   trackPageview
 };
