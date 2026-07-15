@@ -1,7 +1,6 @@
 import {
   buildScheduledAt,
   dayKeyFromIso,
-  DAY_CAPACITY_MESSAGE,
   isCascadeBusinessDay,
   localTimeParts,
   nextCascadeBusinessDayKey,
@@ -258,30 +257,13 @@ export function findSlotConflict(
   )
 }
 
+/** Lotação máx. 2/dia desativada — mantido por compatibilidade de imports. */
 export function assertDayCapacity(
-  sessions: CapacitySession[],
+  _sessions: CapacitySession[],
   _personId: string,
-  scheduledAtIso: string,
-  exceptId?: string,
-): void {
-  const day = dayKeyFromIso(scheduledAtIso)
-  const hour = snapToSlotHour(localTimeParts(scheduledAtIso).hour)
-  const onDay = sessions.filter(
-    (s) =>
-      s.status === 'scheduled' &&
-      s.id !== exceptId &&
-      dayKeyFromIso(s.scheduledAt) === day,
-  )
-  if (onDay.length >= MAX_SESSIONS_PER_DAY) {
-    throw new Error(DAY_CAPACITY_MESSAGE)
-  }
-  const slotTaken = onDay.some(
-    (s) => snapToSlotHour(localTimeParts(s.scheduledAt).hour) === hour,
-  )
-  if (slotTaken) {
-    throw new Error(DAY_CAPACITY_MESSAGE)
-  }
-}
+  _scheduledAtIso: string,
+  _exceptId?: string,
+): void {}
 
 export function countSessionsOnDay(
   sessions: CapacitySession[],

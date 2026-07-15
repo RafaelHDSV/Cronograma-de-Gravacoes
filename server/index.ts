@@ -22,7 +22,7 @@ import {
 import { handleAuthMe, handleLogin, requireEditor } from './auth.js'
 import { startKeepAlive } from '@rafaelhdsv/keep-alive'
 import { isRateLimited } from './rateLimit.js'
-import { FRIDAY_BLOCKED_MESSAGE, DAY_CAPACITY_MESSAGE } from '../shared/scheduleDates.js'
+import { FRIDAY_BLOCKED_MESSAGE } from '../shared/scheduleDates.js'
 
 const BATCH_LIMIT = { max: 60, windowMs: 60 * 1000 }
 
@@ -57,10 +57,6 @@ app.get('/api/schedule', async (_req, res) => {
 
 function scheduleRuleErrorResponse(e: unknown, res: express.Response): boolean {
   const msg = String(e)
-  if (msg.includes(DAY_CAPACITY_MESSAGE) || msg === DAY_CAPACITY_MESSAGE) {
-    res.status(400).json({ error: DAY_CAPACITY_MESSAGE })
-    return true
-  }
   if (msg.includes(FRIDAY_BLOCKED_MESSAGE) || msg === FRIDAY_BLOCKED_MESSAGE) {
     res.status(400).json({ error: FRIDAY_BLOCKED_MESSAGE })
     return true

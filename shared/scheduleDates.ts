@@ -3,9 +3,6 @@ export const SCHEDULE_TZ = 'America/Sao_Paulo'
 export const FRIDAY_BLOCKED_MESSAGE =
   'Nao e permitido agendar gravacoes as sextas-feiras.'
 
-export const DAY_CAPACITY_MESSAGE =
-  'Cada dia permite no maximo 2 gravacoes (14h e 16h).'
-
 const WEEKDAY_SHORT: Record<string, number> = {
   Sun: 0,
   Mon: 1,

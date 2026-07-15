@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ConfirmChangesModal } from './components/ConfirmChangesModal'
 import { FixFridaysModal } from './components/FixFridaysModal'
-import { ScheduleFixModal } from './components/ScheduleFixModal'
 import { Tooltip } from './components/Tooltip'
 import { EditorLoginModal } from './components/EditorLoginModal'
 import { PersonCompleteCelebration } from './components/PersonCompleteCelebration'
-import { applySessionBatch, createSession, deleteSession, fetchAuthMe, fetchSchedule, fixDayCapacity, fixFridays, updatePersonTopicOrder } from './lib/api'
+import { applySessionBatch, createSession, deleteSession, fetchAuthMe, fetchSchedule, fixFridays, updatePersonTopicOrder } from './lib/api'
 import { clearEditorToken, getEditorToken } from './lib/authStorage'
 import {
   applyPendingPatches,
@@ -25,16 +24,12 @@ import {
 import { formatAlteracoesPendentes } from './lib/ptPlural'
 import { buildPersonIndex, buildScheduledAt, dayKey, localTimeParts, scheduledAtEqual } from './lib/schedule'
 import {
-  assertDayCapacity,
   computeFridayFixChanges,
   findSlotConflict,
-  hasOverfullDays,
   hasScheduledFridaySessions,
   isValidScheduleDate,
-  SCHEDULE_DAY_CAPACITY_ERROR,
   SCHEDULE_FRIDAY_ERROR,
   snapToSlotHour,
-  type CapacityFixChange,
   type FridayFixChange,
 } from './lib/scheduleDates'
 import type { ScheduleData } from './lib/types'
@@ -66,9 +61,6 @@ export function App() {
   const [showFixFridays, setShowFixFridays] = useState(false)
   const [fixFridaysChanges, setFixFridaysChanges] = useState<FridayFixChange[]>([])
   const [fixFridaysLoading, setFixFridaysLoading] = useState(false)
-  const [showFixDayCapacity, setShowFixDayCapacity] = useState(false)
-  const [fixDayCapacityChanges, setFixDayCapacityChanges] = useState<CapacityFixChange[]>([])
-  const [fixDayCapacityLoading, setFixDayCapacityLoading] = useState(false)
   const [scheduleNotice, setScheduleNotice] = useState<string | null>(null)
 
   const loadSchedule = useCallback(() => {
@@ -126,18 +118,6 @@ export function App() {
     [baselineSessions, pending],
   )
 
-  const dayCapacityError = useCallback(
-    (personId: string, scheduledAt: string, exceptId?: string) => {
-      try {
-        assertDayCapacity(displaySessions, personId, scheduledAt, exceptId)
-        return null
-      } catch {
-        return SCHEDULE_DAY_CAPACITY_ERROR
-      }
-    },
-    [displaySessions],
-  )
-
   const personIndex = useMemo(
     () => (data ? buildPersonIndex(data.people) : new Map()),
     [data],
@@ -149,10 +129,6 @@ export function App() {
   const pendingCount = pendingRows.length
   const needsFridayFix = useMemo(
     () => hasScheduledFridaySessions(baselineSessions),
-    [baselineSessions],
-  )
-  const needsDayCapacityFix = useMemo(
-    () => hasOverfullDays(baselineSessions),
     [baselineSessions],
   )
 
@@ -185,40 +161,6 @@ export function App() {
       setScheduleNotice(String(e))
     } finally {
       setFixFridaysLoading(false)
-    }
-  }, [loadSchedule])
-
-  const openFixDayCapacity = useCallback(async () => {
-    setFixDayCapacityLoading(true)
-    setScheduleNotice(null)
-    try {
-      const { changes } = await fixDayCapacity(true)
-      setFixDayCapacityChanges(changes)
-      setShowFixDayCapacity(true)
-    } catch (e) {
-      setScheduleNotice(String(e))
-    } finally {
-      setFixDayCapacityLoading(false)
-    }
-  }, [])
-
-  const commitFixDayCapacity = useCallback(async () => {
-    setFixDayCapacityLoading(true)
-    setScheduleNotice(null)
-    try {
-      const result = await fixDayCapacity(false)
-      if (result.sessions) {
-        setData((prev) => (prev ? { ...prev, sessions: result.sessions! } : prev))
-      } else {
-        await loadSchedule()
-      }
-      setPending(new Map())
-      setShowFixDayCapacity(false)
-      setFixDayCapacityChanges([])
-    } catch (e) {
-      setScheduleNotice(String(e))
-    } finally {
-      setFixDayCapacityLoading(false)
     }
   }, [loadSchedule])
 
@@ -273,11 +215,6 @@ export function App() {
         setScheduleNotice(SCHEDULE_FRIDAY_ERROR)
         throw new Error(SCHEDULE_FRIDAY_ERROR)
       }
-      const capacityErr = dayCapacityError(payload.personId, payload.scheduledAt)
-      if (capacityErr) {
-        setScheduleNotice(capacityErr)
-        throw new Error(capacityErr)
-      }
       const session = await createSession(payload)
       setData((prev) =>
         prev
@@ -290,7 +227,7 @@ export function App() {
           : prev,
       )
     },
-    [dayCapacityError],
+    [],
   )
 
   const onDeleteSession = useCallback(async (id: string) => {
@@ -317,14 +254,9 @@ export function App() {
       const timeParts = session.scheduledAt.split('T')[1]
       const [y, m, d] = targetDayKey.split('-')
       const newScheduledAt = `${y}-${m}-${d}T${timeParts}`
-      const capacityErr = dayCapacityError(session.personId, newScheduledAt, id)
-      if (capacityErr) {
-        setScheduleNotice(capacityErr)
-        return
-      }
       queueChange(id, { scheduledAt: newScheduledAt })
     },
-    [findDisplaySession, queueChange, dayCapacityError],
+    [findDisplaySession, queueChange],
   )
 
   const onPostpone = useCallback(
@@ -355,14 +287,9 @@ export function App() {
         ])
         return
       }
-      const capacityErr = dayCapacityError(session.personId, scheduledAt, id)
-      if (capacityErr) {
-        setScheduleNotice(capacityErr)
-        return
-      }
       queueChange(id, { status: 'scheduled', scheduledAt })
     },
-    [findDisplaySession, queueChange, queueChanges, dayCapacityError, displaySessions],
+    [findDisplaySession, queueChange, queueChanges, displaySessions],
   )
 
   const onChangeTime = useCallback(
@@ -386,14 +313,9 @@ export function App() {
         return
       }
 
-      const capacityErr = dayCapacityError(session.personId, scheduledAt, id)
-      if (capacityErr) {
-        setScheduleNotice(capacityErr)
-        return
-      }
       queueChange(id, { scheduledAt })
     },
-    [findDisplaySession, queueChange, queueChanges, dayCapacityError, displaySessions],
+    [findDisplaySession, queueChange, queueChanges, displaySessions],
   )
 
   const onChangeTopic = useCallback(
@@ -497,16 +419,6 @@ export function App() {
                 Exportar texto
               </button>
             </Tooltip>
-            {isEditor && needsDayCapacityFix && (
-              <button
-                type="button"
-                className="btn ghost"
-                onClick={() => void openFixDayCapacity()}
-                disabled={fixDayCapacityLoading}
-              >
-                Corrigir lotação
-              </button>
-            )}
             {isEditor && needsFridayFix && (
               <button
                 type="button"
@@ -631,18 +543,6 @@ export function App() {
         loading={fixFridaysLoading}
         onConfirm={() => void commitFixFridays()}
         onCancel={() => setShowFixFridays(false)}
-      />
-      <ScheduleFixModal
-        open={showFixDayCapacity}
-        title="Corrigir lotação"
-        description="Migração única: dias com mais de 2 gravações serão ajustados (14h e 16h), deslocando o excedente em cascata para os próximos dias já agendados de cada pessoa."
-        emptyMessage="Nenhum dia com excesso de sessões para corrigir."
-        confirmLabel="Confirmar migração"
-        changes={fixDayCapacityChanges}
-        personIndex={personIndex}
-        loading={fixDayCapacityLoading}
-        onConfirm={() => void commitFixDayCapacity()}
-        onCancel={() => setShowFixDayCapacity(false)}
       />
       {celebration && (
         <PersonCompleteCelebration
