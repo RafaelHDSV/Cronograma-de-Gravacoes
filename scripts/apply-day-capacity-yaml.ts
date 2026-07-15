@@ -1,5 +1,5 @@
 /**
- * Aplica cascata de lotacao (max 2 sessoes/dia, 14h e 16h) ao sessions.yaml (seed).
+ * Legado: lotacao max. 2/dia foi desativada — computeDayCapacityFixChanges e no-op.
  * Uso: npx tsx scripts/apply-day-capacity-yaml.ts
  */
 import fs from 'node:fs'

@@ -29,7 +29,6 @@ import {
   hasScheduledFridaySessions,
   isValidScheduleDate,
   SCHEDULE_FRIDAY_ERROR,
-  snapToSlotHour,
   type FridayFixChange,
 } from './lib/scheduleDates'
 import type { ScheduleData } from './lib/types'
@@ -277,13 +276,9 @@ export function App() {
       const scheduledAt = buildScheduledAt(targetDayKey, hour, minute)
       const conflict = findSlotConflict(displaySessions, scheduledAt, id)
       if (conflict) {
-        const otherHour = snapToSlotHour(hour) === 14 ? 16 : 14
         queueChanges([
           { sessionId: id, patch: { status: 'scheduled', scheduledAt } },
-          {
-            sessionId: conflict.id,
-            patch: { scheduledAt: buildScheduledAt(targetDayKey, otherHour, 0) },
-          },
+          { sessionId: conflict.id, patch: { scheduledAt: session.scheduledAt } },
         ])
         return
       }

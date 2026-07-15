@@ -25,5 +25,5 @@ export {
 
 export {
   findSlotConflict,
-  snapToSlotHour,
+  type CapacityFixChange,
 } from '../../shared/dayCapacityMigration'

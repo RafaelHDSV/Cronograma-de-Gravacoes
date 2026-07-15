@@ -65,7 +65,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 | PATCH | `/api/sessions/:id` | Atualiza sessão no Supabase |
 | POST | `/api/sessions/swap-time` | Troca horário entre duas sessões |
 | POST | `/api/schedule/fix-fridays` | Migracao unica de sessoes agendadas em sexta (editor) |
-| POST | `/api/schedule/fix-day-capacity` | Migracao unica de dias com mais de 2 sessoes por pessoa (editor) |
+| POST | `/api/schedule/fix-day-capacity` | Legado no-op (lotacao max. 2/dia desativada) |
 | POST | `/api/schedule/reset` | Repoe sessoes a partir de `sessions.yaml` |
 
 ---
@@ -94,7 +94,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 11. **Multi-sessao por topico** — agrupamento em `src/lib/topicSessions.ts`; IDs novos com sufixo `-2`, `-3` se colidir no mesmo slot.
 12. **Notas por sessao** — campo `notes` no Supabase; edicao no calendario (painel Alterar sessao, fila de rascunho); leitura para visitantes; indicador com tooltip na aba Por pessoa (`src/lib/sessionNotes.ts`).
 13. **Sem gravacoes as sextas** — bloqueio em novo agendamento (sexta); sabado e domingo permitidos manualmente; cascata de migracao usa dias uteis (seg-qui); sessoes `done` em sexta permanecem; util em `shared/scheduleDates.ts`.
-14. **Maximo 2 sessoes por dia no calendario** — slots 14h e 16h (estudio); excedente migrado em cascata para proximos dias ja agendados da mesma pessoa; botao **Corrigir lotacao** no header (editor); validacao em PATCH/POST/swap; util em `shared/dayCapacityMigration.ts`.
+14. **Sem limite de sessoes por dia** — conflito so no horario exato (mesmo dia + hora + minuto); 14h e 16h sao atalhos do picker; swap troca os dois horarios em colisao; rota/script `fix-day-capacity` legado retorna vazio; util em `shared/dayCapacityMigration.ts`.
 
 ---
 
@@ -127,4 +127,8 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 
 ---
 
-*Atualizado 23/06/2026.*
+## Alterações recentes (15/07/2026)
+
+- Removido o teto de **2 sessões por dia**: o calendário aceita 3+ no mesmo dia (ex.: uma pessoa em um tópico e outra em dois). Conflito só no **mesmo horário exato**; 14h/16h seguem como atalho no picker.
+
+*Atualizado 15/07/2026.*
