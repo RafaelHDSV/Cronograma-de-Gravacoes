@@ -1,4 +1,4 @@
-export type SessionStatus = 'scheduled' | 'done' | 'postponed'
+export type SessionStatus = 'scheduled' | 'done' | 'postponed' | 'cancelled'
 
 export interface Topic {
   letter: string

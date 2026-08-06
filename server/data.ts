@@ -29,7 +29,7 @@ export interface Person {
   topicOrder?: string[]
 }
 
-export type SessionStatus = 'scheduled' | 'done' | 'postponed'
+export type SessionStatus = 'scheduled' | 'done' | 'postponed' | 'cancelled'
 
 export interface Session {
   id: string
@@ -176,7 +176,13 @@ export function seedSessionsFromYaml(): Session[] {
   return raw.map((s) => ({
     ...s,
     status:
-      s.status === 'done' ? 'done' : s.status === 'postponed' ? 'postponed' : 'scheduled',
+      s.status === 'done'
+        ? 'done'
+        : s.status === 'postponed'
+          ? 'postponed'
+          : s.status === 'cancelled'
+            ? 'cancelled'
+            : 'scheduled',
   }))
 }
 
@@ -408,7 +414,11 @@ export async function createSession(input: CreateSessionInput): Promise<Session>
   assertValidScheduleDate(scheduledAt)
 
   const status: SessionStatus =
-    input.status === 'done' || input.status === 'postponed' ? input.status : 'scheduled'
+    input.status === 'done' ||
+    input.status === 'postponed' ||
+    input.status === 'cancelled'
+      ? input.status
+      : 'scheduled'
 
   const id = generateSessionId(
     scheduledAt,

@@ -55,8 +55,11 @@ export function deriveChangeLabels(before: Session, after: Session): string[] {
     else if (before.status === 'done' && after.status === 'scheduled') {
       labels.push('Desmarcar gravação')
     } else if (after.status === 'postponed') labels.push('Adiar gravação')
+    else if (after.status === 'cancelled') labels.push('Cancelar gravação')
     else if (before.status === 'postponed' && after.status === 'scheduled') {
       labels.push('Reagendar')
+    } else if (before.status === 'cancelled' && after.status === 'scheduled') {
+      labels.push('Reativar gravação')
     } else labels.push('Alterar status')
   }
   if (!scheduledAtEqual(before.scheduledAt, after.scheduledAt)) {

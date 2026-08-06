@@ -81,6 +81,29 @@ export function IconNote() {
   )
 }
 
+/** Circulo barrado — cancelar gravação */
+export function IconCancel() {
+  return (
+    <svg className="session-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle
+        cx="12"
+        cy="12"
+        r="9"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <path
+        d="M8 8l8 8M16 8l-8 8"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 export function IconDelete() {
   return (
     <svg className="session-icon" viewBox="0 0 24 24" aria-hidden="true">

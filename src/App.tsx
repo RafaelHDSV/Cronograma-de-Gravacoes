@@ -265,6 +265,22 @@ export function App() {
     [queueChange],
   )
 
+  const onCancel = useCallback(
+    (id: string) => {
+      const session = findDisplaySession(id)
+      if (!session || session.status === 'done') return
+      queueChange(id, { status: 'cancelled' })
+    },
+    [findDisplaySession, queueChange],
+  )
+
+  const onReactivate = useCallback(
+    (id: string) => {
+      queueChange(id, { status: 'scheduled' })
+    },
+    [queueChange],
+  )
+
   const onReschedule = useCallback(
     (id: string, targetDayKey: string, hour: number, minute: number) => {
       if (!isValidScheduleDate(targetDayKey)) {
@@ -491,6 +507,8 @@ export function App() {
                 onMoveSession={onMoveSession}
                 onToggleDone={onToggleDone}
                 onPostpone={onPostpone}
+                onCancel={onCancel}
+                onReactivate={onReactivate}
                 onReschedule={onReschedule}
                 onChangeTime={onChangeTime}
                 onChangeTopic={onChangeTopic}

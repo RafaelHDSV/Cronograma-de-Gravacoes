@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { AddSessionModal, type AddSessionDefaults } from '../components/AddSessionModal'
-import { IconEdit, IconPostpone, IconDelete } from '../components/SessionIcons'
+import { IconEdit, IconPostpone, IconDelete, IconCancel } from '../components/SessionIcons'
 import { StatusBadge } from '../components/StatusBadge'
 import { TimeSlotPicker } from '../components/TimeSlotPicker'
 import { IconButton, Tooltip } from '../components/Tooltip'
@@ -32,6 +32,8 @@ interface Props {
   onMoveSession: (id: string, targetDayKey: string) => void
   onToggleDone: (id: string) => void
   onPostpone: (id: string) => void
+  onCancel: (id: string) => void
+  onReactivate: (id: string) => void
   onReschedule: (id: string, targetDayKey: string, hour: number, minute: number) => void
   onChangeTime: (id: string, hour: number, minute: number) => void
   onChangeTopic: (id: string, topicLetter: string) => void
@@ -55,6 +57,8 @@ export function CalendarPage({
   onMoveSession,
   onToggleDone,
   onPostpone,
+  onCancel,
+  onReactivate,
   onReschedule,
   onChangeTime,
   onChangeTopic,
@@ -206,8 +210,8 @@ export function CalendarPage({
           const daySessions = sessionsByDay.get(day) ?? []
           const isToday = day === today
           const isSelected = day === selectedDay
-          const doneCount = daySessions.filter(
-            (s) => s.status === 'done'
+          const resolvedCount = daySessions.filter(
+            (s) => s.status === 'done' || s.status === 'cancelled',
           ).length
 
           const isFriday = isFridayDayKey(day)
@@ -229,7 +233,7 @@ export function CalendarPage({
                 <span className='cell-day'>{Number(day.split('-')[2])}</span>
                 {daySessions.length > 0 && (
                   <span className='cell-count'>
-                    {doneCount}/{daySessions.length}
+                    {resolvedCount}/{daySessions.length}
                   </span>
                 )}
               </div>
@@ -243,7 +247,7 @@ export function CalendarPage({
                     <div
                       key={s.id}
                       className={`session-chip ${s.status}`}
-                      draggable={canEdit}
+                      draggable={canEdit && s.status === 'scheduled'}
                       onDragStart={(e) => canEdit && handleDragStart(e, s.id)}
                       onClick={(e) => e.stopPropagation()}
                       title={`${person?.name} — ${topic?.title ?? s.topicLetter}${progressLabel ? ` (${progressLabel})` : ''} · ${formatTime(s.scheduledAt)}`}
@@ -313,6 +317,7 @@ export function CalendarPage({
                 const progressLabel = group ? topicProgressLabel(group) : null
                 const isDone = s.status === 'done'
                 const isScheduled = s.status === 'scheduled'
+                const isCancelled = s.status === 'cancelled'
                 const { hour, minute } = localTimeParts(s.scheduledAt)
                 const isEditing = editingSessionId === s.id
                 const personTopics = person ? getOrderedTopics(person) : []
@@ -350,7 +355,7 @@ export function CalendarPage({
                           ·
                         </span>
                         <span className='detail-topic'>{topic?.title ?? '—'}</span>
-                        {isDone && <StatusBadge status={s.status} />}
+                        {(isDone || isCancelled) && <StatusBadge status={s.status} />}
                       </div>
                       {canEdit && (isScheduled || isDone) && (
                         <div className='detail-actions'>
@@ -380,6 +385,13 @@ export function CalendarPage({
                                 <IconPostpone />
                               </IconButton>
                               <IconButton
+                                label='Cancelar gravação'
+                                className='cancel-btn'
+                                onClick={() => onCancel(s.id)}
+                              >
+                                <IconCancel />
+                              </IconButton>
+                              <IconButton
                                 label="Nova sessão deste tópico"
                                 className="add-session-btn"
                                 onClick={() =>
@@ -394,6 +406,24 @@ export function CalendarPage({
                               </IconButton>
                             </>
                           )}
+                        </div>
+                      )}
+                      {canEdit && isCancelled && (
+                        <div className='detail-actions'>
+                          <button
+                            type="button"
+                            className="btn ghost btn-sm"
+                            onClick={() => onReactivate(s.id)}
+                          >
+                            Reativar
+                          </button>
+                          <IconButton
+                            label='Excluir sessão'
+                            className='session-delete-btn'
+                            onClick={() => void handleDeleteSession(s.id)}
+                          >
+                            <IconDelete />
+                          </IconButton>
                         </div>
                       )}
                     </div>
@@ -486,6 +516,7 @@ export function CalendarPage({
                 canEdit={canEdit}
                 onReschedule={onReschedule}
                 onDelete={handleDeleteSession}
+                onCancel={onCancel}
                 onInvalidScheduleDate={onInvalidScheduleDate}
               />
             ))}
@@ -502,6 +533,7 @@ function PostponedRow({
   canEdit,
   onReschedule,
   onDelete,
+  onCancel,
   onInvalidScheduleDate,
 }: {
   session: Session
@@ -509,6 +541,7 @@ function PostponedRow({
   canEdit: boolean
   onReschedule: (id: string, targetDayKey: string, hour: number, minute: number) => void
   onDelete: (id: string) => Promise<void>
+  onCancel: (id: string) => void
   onInvalidScheduleDate?: () => void
 }) {
   const person = personIndex.get(session.personId)
@@ -599,6 +632,13 @@ function PostponedRow({
               Agendar
             </button>
           </Tooltip>
+          <IconButton
+            label="Cancelar gravação"
+            className="cancel-btn"
+            onClick={() => onCancel(session.id)}
+          >
+            <IconCancel />
+          </IconButton>
           <IconButton
             label="Excluir sessão"
             className="session-delete-btn"

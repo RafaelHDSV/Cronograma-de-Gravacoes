@@ -176,10 +176,10 @@ function TopicGroupRows({
     )
   }
 
-  const summary = formatTopicSessionSummary(group.sessionCount, group.doneCount)
+  const summary = formatTopicSessionSummary(group.sessionCount, group.resolvedCount)
   const topicStatus = group.isComplete
     ? 'done'
-    : group.doneCount > 0
+    : group.resolvedCount > 0
       ? 'partial'
       : 'scheduled'
 
@@ -200,7 +200,7 @@ function TopicGroupRows({
         <td className="col-status">
           {group.isComplete ? (
             <span className="badge-inline done">Gravado</span>
-          ) : group.doneCount > 0 ? (
+          ) : group.resolvedCount > 0 ? (
             <span className="badge-inline partial">Parcial</span>
           ) : (
             <span className="badge-inline scheduled">Agendado</span>

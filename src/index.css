@@ -13,6 +13,7 @@
   --done: #34d399;
   --scheduled: #5b8cff;
   --postponed: #fbbf24;
+  --cancelled: #94a3b8;
   --error: #f87171;
   --remaining: #cbd5e1;
   --radius: 12px;
@@ -416,6 +417,10 @@ body {
 .badge-postponed {
   background: rgba(251, 191, 36, 0.15);
   color: var(--postponed);
+}
+.badge-cancelled {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--cancelled);
 }
 /* Person list (accordion) */
 .person-list {
@@ -887,6 +892,11 @@ body {
   border-left-color: var(--postponed);
 }
 
+.session-chip.cancelled {
+  border-left-color: var(--cancelled);
+  opacity: 0.65;
+}
+
 .session-chip.mini {
   padding: 4px 8px;
   cursor: grab;
@@ -953,6 +963,11 @@ body {
 .calendar-detail-row.done {
   border-left-color: var(--done);
   opacity: 0.92;
+}
+
+.calendar-detail-row.cancelled {
+  border-left-color: var(--cancelled);
+  opacity: 0.75;
 }
 
 .calendar-detail-row .detail-body {
@@ -1069,6 +1084,16 @@ body {
 .postpone-btn:hover {
   background: rgba(251, 191, 36, 0.12) !important;
   color: var(--postponed) !important;
+}
+
+.cancel-btn {
+  color: var(--cancelled) !important;
+  border-color: rgba(148, 163, 184, 0.35) !important;
+}
+
+.cancel-btn:hover {
+  background: rgba(148, 163, 184, 0.12) !important;
+  color: var(--cancelled) !important;
 }
 
 .detail-actions .session-delete-btn {
@@ -1540,6 +1565,11 @@ body {
 .badge-inline.postponed {
   background: rgba(251, 191, 36, 0.15);
   color: var(--postponed);
+}
+
+.badge-inline.cancelled {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--cancelled);
 }
 
 .stat-postponed .stat-value {

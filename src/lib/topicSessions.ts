@@ -8,6 +8,7 @@ export interface TopicGroup {
   sessions: Session[]
   sessionCount: number
   doneCount: number
+  resolvedCount: number
   isComplete: boolean
   hasAnySession: boolean
 }
@@ -22,21 +23,27 @@ export function sessionsForTopic(
     .sort(compareSessionsByTime)
 }
 
+export function isSessionResolved(session: Session): boolean {
+  return session.status === 'done' || session.status === 'cancelled'
+}
+
 export function isTopicComplete(topicSessions: Session[]): boolean {
   if (topicSessions.length === 0) return false
-  return topicSessions.every((s) => s.status === 'done')
+  return topicSessions.every(isSessionResolved)
 }
 
 export function groupPersonTopics(person: Person, sessions: Session[]): TopicGroup[] {
   return getOrderedTopics(person).map((topic) => {
     const topicSessions = sessionsForTopic(sessions, person.id, topic.letter)
     const doneCount = topicSessions.filter((s) => s.status === 'done').length
+    const resolvedCount = topicSessions.filter(isSessionResolved).length
     return {
       topicLetter: topic.letter,
       topic,
       sessions: topicSessions,
       sessionCount: topicSessions.length,
       doneCount,
+      resolvedCount,
       isComplete: isTopicComplete(topicSessions),
       hasAnySession: topicSessions.length > 0,
     }
@@ -55,7 +62,7 @@ export function topicGroupForSession(
 /** Badge curto ex.: "a · 2/3" — null quando so 1 sessao. */
 export function topicProgressLabel(group: TopicGroup): string | null {
   if (group.sessionCount <= 1) return null
-  return `${group.topicLetter} · ${group.doneCount}/${group.sessionCount}`
+  return `${group.topicLetter} · ${group.resolvedCount}/${group.sessionCount}`
 }
 
 export interface GlobalTopicStats {
@@ -68,6 +75,7 @@ export interface GlobalTopicStats {
   doneSessions: number
   scheduledSessions: number
   postponedSessions: number
+  cancelledSessions: number
 }
 
 export function globalTopicStats(people: Person[], sessions: Session[]): GlobalTopicStats {
@@ -95,6 +103,7 @@ export function globalTopicStats(people: Person[], sessions: Session[]): GlobalT
     doneSessions: sessions.filter((s) => s.status === 'done').length,
     scheduledSessions: sessions.filter((s) => s.status === 'scheduled').length,
     postponedSessions: sessions.filter((s) => s.status === 'postponed').length,
+    cancelledSessions: sessions.filter((s) => s.status === 'cancelled').length,
   }
 }
 

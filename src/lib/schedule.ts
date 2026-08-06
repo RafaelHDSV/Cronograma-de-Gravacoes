@@ -76,18 +76,21 @@ export interface GlobalStats {
   done: number
   scheduled: number
   postponed: number
+  cancelled: number
   remaining: number
 }
 
 export function globalStats(sessions: Session[]): GlobalStats {
   const done = sessions.filter((s) => s.status === 'done').length
   const postponed = sessions.filter((s) => s.status === 'postponed').length
+  const cancelled = sessions.filter((s) => s.status === 'cancelled').length
   return {
     total: sessions.length,
     done,
     scheduled: sessions.filter((s) => s.status === 'scheduled').length,
     postponed,
-    remaining: sessions.length - done - postponed,
+    cancelled,
+    remaining: sessions.length - done - postponed - cancelled,
   }
 }
 
@@ -119,6 +122,7 @@ export const STATUS_LABEL: Record<SessionStatus, string> = {
   scheduled: 'Agendado',
   done: 'Gravado',
   postponed: 'Adiado',
+  cancelled: 'Cancelada',
 }
 
 export function localTimeParts(iso: string): { hour: number; minute: number } {

@@ -50,7 +50,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 | Supabase `sessions` | Estado vivo (status, datas, notas) — N sessoes por topico permitidas |
 | Supabase `person_preferences` | Ordem de gravacao por pessoa (`topic_order`); override editavel no painel |
 
-**Status:** `scheduled`, `done`, `postponed`. **Fuso:** `America/Sao_Paulo`. Um topico pode ter **N sessoes**; o video so conta como concluido quando todas estao `done`.
+**Status:** `scheduled`, `done`, `postponed`, `cancelled`. **Fuso:** `America/Sao_Paulo`. Um topico pode ter **N sessoes**; o video so conta como concluido quando todas estao `done` ou `cancelled`.
 
 ---
 
@@ -95,6 +95,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 12. **Notas por sessao** — campo `notes` no Supabase; edicao no calendario (painel Alterar sessao, fila de rascunho); leitura para visitantes; indicador com tooltip na aba Por pessoa (`src/lib/sessionNotes.ts`).
 13. **Sem gravacoes as sextas** — bloqueio em novo agendamento (sexta); sabado e domingo permitidos manualmente; cascata de migracao usa dias uteis (seg-qui); sessoes `done` em sexta permanecem; util em `shared/scheduleDates.ts`.
 14. **Sem limite de sessoes por dia** — conflito so no horario exato (mesmo dia + hora + minuto); 14h e 16h sao atalhos do picker; swap troca os dois horarios em colisao; rota/script `fix-day-capacity` legado retorna vazio; util em `shared/dayCapacityMigration.ts`.
+15. **Cancelar gravação** — status `cancelled` preserva historico no dia original (badge no calendario e Por pessoa); reativavel para `scheduled`; tópico concluido quando todas sessoes `done` ou `cancelled`; acao via fila de confirmacao (nao DELETE).
 
 ---
 
@@ -112,7 +113,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 
 - Contas individuais / OAuth por usuario.
 - `people` / tópicos no Supabase.
-- Botão Discord no UI; deep link `?date=`; status `cancelled`.
+- Botão Discord no UI; deep link `?date=`.
 - GitHub Pages com API (só estático no workflow atual).
 
 ---
@@ -131,4 +132,4 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 
 - Removido o teto de **2 sessões por dia**: o calendário aceita 3+ no mesmo dia (ex.: uma pessoa em um tópico e outra em dois). Conflito só no **mesmo horário exato**; 14h/16h seguem como atalho no picker.
 
-*Atualizado 15/07/2026.*
+*Atualizado 06/08/2026.*

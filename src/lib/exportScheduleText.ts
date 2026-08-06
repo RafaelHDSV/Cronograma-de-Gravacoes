@@ -71,7 +71,8 @@ export function formatScheduleAsText(people: Person[], sessions: Session[]): str
       const hour = formatHour(s.scheduledAt)
       const personSessions = active.filter((x) => x.personId === s.personId)
       const suffix = person ? encerraSuffix(s, person, personSessions) : ''
-      lines.push(`- ${hour} — ${name} (${s.topicLetter})${suffix}`)
+      const cancelled = s.status === 'cancelled' ? ' (cancelada)' : ''
+      lines.push(`- ${hour} — ${name} (${s.topicLetter})${suffix}${cancelled}`)
     }
     lines.push('')
   }

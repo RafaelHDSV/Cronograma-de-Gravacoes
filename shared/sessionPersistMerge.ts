@@ -1,4 +1,4 @@
-export type SessionStatus = 'scheduled' | 'done' | 'postponed'
+export type SessionStatus = 'scheduled' | 'done' | 'postponed' | 'cancelled'
 
 export interface MergeableSession {
   id: string
@@ -21,7 +21,7 @@ function personTopicKey(personId: string, topicLetter: string): string {
 }
 
 function isPersistedStatus(status: SessionStatus): boolean {
-  return status === 'done' || status === 'postponed'
+  return status === 'done' || status === 'postponed' || status === 'cancelled'
 }
 
 /** Agrupa gravações concluídas/adiadas do banco por pessoa+tópico (ordem de scheduledAt). */
