@@ -16,6 +16,13 @@
   --cancelled: #94a3b8;
   --error: #f87171;
   --remaining: #cbd5e1;
+  --vi-fg: var(--text);
+  --vi-muted: var(--muted);
+  --vi-bg: var(--bg);
+  --vi-surface: var(--panel);
+  --vi-border: var(--border);
+  --vi-accent: var(--accent);
+  --vi-accent-fg: #041018;
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
@@ -33,6 +40,16 @@ body {
   color: var(--text);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+}
+
+.app-legal-footer {
+  margin: 0 auto;
+  max-width: 1200px;
+  border-top: none;
+  padding-top: 0.25rem;
+  padding-bottom: 1.25rem;
+  font-size: 0.75rem;
+  opacity: 0.75;
 }
 
 .app {

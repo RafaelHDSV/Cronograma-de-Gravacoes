@@ -1,0 +1,429 @@
+/*
+ * @vieira/institucional — estilos base.
+ * Tudo dentro de @layer components: com Tailwind, entra na camada de mesmo nome (acima do
+ * preflight, abaixo dos utilitários); sem Tailwind, qualquer CSS do app sem camada vence.
+ * Importe este arquivo DEPOIS do CSS do app, para a ordem de camadas do Tailwind valer.
+ * Seletores em :where() mantêm a especificidade zero dentro da camada.
+ * Para casar com o tema do app, sobrescreva as variáveis --vi-* no :root.
+ */
+@layer components {
+  :root {
+    --vi-font: inherit;
+    --vi-fg: #1a1a1a;
+    --vi-muted: #5f6368;
+    --vi-bg: #ffffff;
+    --vi-surface: #f6f6f4;
+    --vi-border: #dedcd6;
+    --vi-accent: #2f5bd3;
+    --vi-accent-fg: #ffffff;
+    --vi-danger: #c62828;
+    --vi-danger-fg: #ffffff;
+    --vi-radius: 10px;
+    --vi-max-width: 44rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --vi-fg: #ecebe8;
+      --vi-muted: #a3a29e;
+      --vi-bg: #121212;
+      --vi-surface: #1c1c1c;
+      --vi-border: #33322f;
+      --vi-accent: #8aa8ff;
+      --vi-accent-fg: #0d1430;
+      --vi-danger: #ef6b6b;
+      --vi-danger-fg: #240606;
+    }
+  }
+
+  :where(.vi-page) {
+    font-family: var(--vi-font);
+    color: var(--vi-fg);
+    background: var(--vi-bg);
+    min-height: 100vh;
+    min-height: 100dvh;
+    box-sizing: border-box;
+  }
+
+  :where(.vi-page *, .vi-gate *, .vi-footer *, .vi-account-data *) {
+    box-sizing: border-box;
+  }
+
+  :where(.vi-link) {
+    color: var(--vi-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  :where(.vi-button) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 1.1rem;
+    border: 1px solid var(--vi-border);
+    border-radius: var(--vi-radius);
+    background: var(--vi-surface);
+    color: var(--vi-fg);
+    font: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  :where(.vi-button:disabled) {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  :where(.vi-button:focus-visible, .vi-link:focus-visible, .vi-consent__checkbox:focus-visible, .vi-field__input:focus-visible) {
+    outline: 2px solid var(--vi-accent);
+    outline-offset: 2px;
+  }
+
+  :where(.vi-button--primary) {
+    background: var(--vi-accent);
+    border-color: var(--vi-accent);
+    color: var(--vi-accent-fg);
+  }
+
+  :where(.vi-button--danger) {
+    background: var(--vi-danger);
+    border-color: var(--vi-danger);
+    color: var(--vi-danger-fg);
+  }
+
+  /* 404 e "algo deu errado" */
+  :where(.vi-status-page) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 3rem 1.5rem;
+    text-align: center;
+  }
+
+  :where(.vi-status-page__code) {
+    margin: 0;
+    font-size: clamp(3.5rem, 12vw, 6rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--vi-muted);
+  }
+
+  :where(.vi-status-page__title) {
+    margin: 0;
+    font-size: 1.6rem;
+    line-height: 1.2;
+  }
+
+  :where(.vi-status-page__text, .vi-status-page__help, .vi-status-page__event) {
+    margin: 0;
+    max-width: 32rem;
+    color: var(--vi-muted);
+    line-height: 1.55;
+  }
+
+  :where(.vi-status-page__actions) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 0.75rem 0;
+  }
+
+  :where(.vi-status-page__event code) {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    user-select: all;
+  }
+
+  /* Páginas legais */
+  :where(.vi-legal) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  :where(.vi-legal--embedded) {
+    min-height: 0;
+    background: transparent;
+  }
+
+  :where(.vi-legal__main) {
+    width: 100%;
+    max-width: var(--vi-max-width);
+    margin: 0 auto;
+    padding: 2rem 1.5rem 5rem;
+    line-height: 1.65;
+  }
+
+  :where(.vi-legal--embedded .vi-legal__main) {
+    max-width: none;
+    padding: 0 0 2rem;
+  }
+
+  :where(.vi-legal__back) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    text-decoration: none;
+  }
+
+  :where(.vi-legal__back:hover) {
+    text-decoration: underline;
+  }
+
+  :where(.vi-legal__eyebrow) {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--vi-muted);
+  }
+
+  :where(.vi-legal__title) {
+    margin: 0.25rem 0 0.5rem;
+    font-size: clamp(1.8rem, 5vw, 2.4rem);
+    line-height: 1.15;
+  }
+
+  :where(.vi-legal__version) {
+    margin: 0 0 1.5rem;
+    color: var(--vi-muted);
+    font-size: 0.95rem;
+  }
+
+  :where(.vi-legal__toc) {
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--vi-border);
+    border-radius: var(--vi-radius);
+    background: var(--vi-surface);
+  }
+
+  :where(.vi-legal__toc ol) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  :where(.vi-legal__section) {
+    scroll-margin-top: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  :where(.vi-legal__section:last-of-type) {
+    margin-bottom: 0;
+  }
+
+  :where(.vi-legal__section h2) {
+    margin: 0 0 0.6rem;
+    font-size: 1.2rem;
+    line-height: 1.3;
+  }
+
+  :where(.vi-legal__section p, .vi-legal__section ul) {
+    margin: 0 0 0.75rem;
+  }
+
+  :where(.vi-legal__section ul) {
+    padding-left: 1.25rem;
+  }
+
+  /* Rodapé público (páginas legais e auth) */
+  :where(.vi-footer) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 1.25rem;
+    padding: 2rem 1.5rem 2.5rem;
+    border-top: 1px solid var(--vi-border);
+    font-family: var(--vi-font);
+    font-size: 0.85rem;
+    color: var(--vi-muted);
+  }
+
+  :where(.vi-footer__nav, .vi-legal-links__nav) {
+    display: flex;
+    gap: 1rem;
+  }
+
+  :where(.vi-legal-links) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--vi-muted);
+  }
+
+  :where(.vi-legal-links__support) {
+    margin: 0;
+  }
+
+  /* Aceite e consentimento */
+  :where(.vi-consent) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  :where(.vi-consent--highlight) {
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--vi-accent);
+    border-radius: var(--vi-radius);
+    background: var(--vi-surface);
+  }
+
+  :where(.vi-consent__title) {
+    margin: 0;
+    font-weight: 700;
+    color: var(--vi-fg);
+  }
+
+  :where(.vi-consent__label) {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    cursor: pointer;
+  }
+
+  :where(.vi-consent__checkbox) {
+    flex-shrink: 0;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0.2rem 0 0;
+    accent-color: var(--vi-accent);
+  }
+
+  :where(.vi-consent__error) {
+    margin: 0;
+    color: var(--vi-danger);
+    font-size: 0.875rem;
+  }
+
+  /* Modal de aceite */
+  :where(.vi-gate) {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    overflow-y: auto;
+    background: color-mix(in srgb, var(--vi-bg) 92%, transparent);
+    font-family: var(--vi-font);
+    color: var(--vi-fg);
+  }
+
+  :where(.vi-gate__card) {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 30rem;
+    padding: 1.75rem;
+    border: 1px solid var(--vi-border);
+    border-radius: calc(var(--vi-radius) * 1.4);
+    background: var(--vi-bg);
+    box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.35);
+  }
+
+  :where(.vi-gate__title) {
+    margin: 0;
+    font-size: 1.4rem;
+    line-height: 1.25;
+  }
+
+  :where(.vi-gate__text) {
+    margin: 0;
+    color: var(--vi-muted);
+    line-height: 1.55;
+  }
+
+  :where(.vi-gate__actions, .vi-account-data__actions) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  /* Privacidade e dados */
+  :where(.vi-account-data) {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    font-family: var(--vi-font);
+    color: var(--vi-fg);
+  }
+
+  :where(.vi-account-data__title) {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  :where(.vi-account-data__block) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--vi-border);
+    border-radius: var(--vi-radius);
+  }
+
+  :where(.vi-account-data__block h3) {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  :where(.vi-account-data__block p) {
+    margin: 0;
+    color: var(--vi-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  :where(.vi-account-data__block--danger) {
+    border-color: color-mix(in srgb, var(--vi-danger) 45%, var(--vi-border));
+  }
+
+  :where(.vi-account-data__confirm) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  :where(.vi-field) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    max-width: 22rem;
+  }
+
+  :where(.vi-field__label) {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  :where(.vi-field__input) {
+    min-height: 2.6rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--vi-border);
+    border-radius: var(--vi-radius);
+    background: var(--vi-bg);
+    color: var(--vi-fg);
+    font: inherit;
+  }
+}

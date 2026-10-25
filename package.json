@@ -20,7 +20,9 @@
     "blur-demo": "node scripts/blur-demo-names.mjs"
   },
   "dependencies": {
+    "@sentry/react": "^10",
     "@vieira/analytics": "file:./vendor/vieira-analytics",
+    "@vieira/institucional": "file:./vendor/vieira-institucional",
     "@rafaelhdsv/keep-alive": "^1.0.2",
     "@supabase/supabase-js": "^2.49.1",
     "concurrently": "^10.0.3",
@@ -32,6 +34,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@sentry/vite-plugin": "^4",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/js-yaml": "^4.0.9",
