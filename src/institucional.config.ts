@@ -5,7 +5,7 @@ import { defineInstitucionalConfig } from '@vieira/institucional'
  * `VITE_PUBLIC_URL` substitui se o serviço no Render usar outro nome.
  */
 const publicUrl = (
-  import.meta.env.VITE_PUBLIC_URL || 'https://cronograma-gravacoes.onrender.com'
+  import.meta.env.VITE_PUBLIC_URL || 'https://cronograma.getvieira.com'
 ).replace(/\/$/, '')
 
 export const institucionalConfig = defineInstitucionalConfig({
