@@ -1,3 +1,43 @@
+// src/optOut.ts
+var OPT_OUT_STORAGE_KEY = "vieira:analytics:optout";
+var OPT_OUT_MEMORY_KEY = "__vieiraAnalyticsOptOut";
+function memoryFlag() {
+  try {
+    return globalThis[OPT_OUT_MEMORY_KEY] === true;
+  } catch {
+    return false;
+  }
+}
+function setMemoryFlag(value) {
+  try {
+    ;
+    globalThis[OPT_OUT_MEMORY_KEY] = value;
+  } catch {
+  }
+}
+function isOptedOut() {
+  if (memoryFlag()) return true;
+  try {
+    return window.localStorage.getItem(OPT_OUT_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+function optOut() {
+  setMemoryFlag(true);
+  try {
+    window.localStorage.setItem(OPT_OUT_STORAGE_KEY, "1");
+  } catch {
+  }
+}
+function optIn() {
+  setMemoryFlag(false);
+  try {
+    window.localStorage.removeItem(OPT_OUT_STORAGE_KEY);
+  } catch {
+  }
+}
+
 // src/collectClientContext.ts
 var CACHE_KEY = "vieira_client_ctx";
 function readCache() {
@@ -173,7 +213,7 @@ function isLocalhost() {
 }
 
 // src/constants.ts
-var ANALYTICS_API_BASE = "https://vieira-analytics.vercel.app/v1";
+var ANALYTICS_API_BASE = "https://analytics.getvieira.com/v1";
 
 // src/transport.ts
 function isCrossOrigin(url) {
@@ -213,6 +253,7 @@ function send(config, payload) {
 function trackPageview(config) {
   if (typeof window === "undefined") return;
   if (isLocalhost()) return;
+  if (isOptedOut()) return;
   if (config.respectDnt !== false && typeof navigator !== "undefined" && navigator.doNotTrack === "1") {
     return;
   }
@@ -222,5 +263,10 @@ function trackPageview(config) {
 }
 
 export {
+  OPT_OUT_STORAGE_KEY,
+  OPT_OUT_MEMORY_KEY,
+  isOptedOut,
+  optOut,
+  optIn,
   trackPageview
 };
