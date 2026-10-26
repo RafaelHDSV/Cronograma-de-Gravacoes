@@ -160,7 +160,6 @@
   }
 
   :where(.vi-legal--embedded .vi-legal__main) {
-    max-width: none;
     padding: 0 0 2rem;
   }
 
