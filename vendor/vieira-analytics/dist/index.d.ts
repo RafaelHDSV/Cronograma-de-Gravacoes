@@ -27,4 +27,11 @@ interface PageviewPayload {
 
 declare function trackPageview(config: VieiraConfig): void;
 
-export { type PageviewPayload, type VieiraConfig, trackPageview };
+declare const OPT_OUT_STORAGE_KEY = "vieira:analytics:optout";
+/** Flag de sessão no `globalThis`, lida também por `@vieira/institucional`. */
+declare const OPT_OUT_MEMORY_KEY = "__vieiraAnalyticsOptOut";
+declare function isOptedOut(): boolean;
+declare function optOut(): void;
+declare function optIn(): void;
+
+export { OPT_OUT_MEMORY_KEY, OPT_OUT_STORAGE_KEY, type PageviewPayload, type VieiraConfig, isOptedOut, optIn, optOut, trackPageview };

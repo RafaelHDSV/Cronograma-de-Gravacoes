@@ -1,6 +1,16 @@
 import {
+  OPT_OUT_MEMORY_KEY,
+  OPT_OUT_STORAGE_KEY,
+  isOptedOut,
+  optIn,
+  optOut,
   trackPageview
-} from "./chunk-MUQD7SU7.js";
+} from "./chunk-JWWRLKYG.js";
 export {
+  OPT_OUT_MEMORY_KEY,
+  OPT_OUT_STORAGE_KEY,
+  isOptedOut,
+  optIn,
+  optOut,
   trackPageview
 };
