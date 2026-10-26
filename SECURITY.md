@@ -1,21 +1,23 @@
-# Politica de seguranca
+# Política de segurança
 
 ## Como reportar uma vulnerabilidade
 
-Se voce encontrou uma vulnerabilidade em **Cronograma-de-Gravacoes**, por favor:
+Se você encontrou uma vulnerabilidade no **Cronograma de Gravações**, por favor:
 
-- **Nao** abra uma issue publica.
-- Entre em contato direto com o mantenedor via e-mail ou DM privada.
-- Inclua passos para reproduzir, impacto e, se possivel, uma sugestao de correcao.
+- **Não** abra uma issue pública.
+- Escreva para **rafaelvieira1720@gmail.com** com o assunto `[Cronograma] Seguranca`.
+- Inclua passos para reproduzir, impacto e, se possível, uma sugestão de correção.
 
-A resposta inicial ocorre em ate 7 dias uteis. Apos a correcao, voce sera creditado se desejar.
+A resposta inicial ocorre em até 5 dias úteis. Após a correção, você será creditado se desejar.
 
-## Versoes suportadas
+Pedidos sobre dados pessoais (acesso, correção, exclusão) vão para o mesmo e-mail, com resposta em até 15 dias.
 
-Apenas a versao mais recente recebe correcoes de seguranca.
+## Versões suportadas
 
-## Boas praticas
+Apenas a versão mais recente recebe correções de segurança.
+
+## Boas práticas
 
 - Nunca commite secrets (`.env`, tokens, chaves privadas).
 - Use o `.gitignore` do projeto como base.
-- Atualize dependencias regularmente.
+- Atualize dependências regularmente.

@@ -169,3 +169,13 @@ Deploy: [deploy-render.md](deploy-render.md) — incluir env vars de seguranca.
 ---
 
 *Documento para avaliacao e registro da decisao. Implementacao alinhada ao modelo D.*
+
+---
+
+## 9. Páginas legais e reporte
+
+O painel não tem conta por pessoa. `/privacidade` e `/termos` descrevem o cronograma da equipe e o modo editor. O `index.html` pede `noindex`.
+
+Vulnerabilidade ou pedido de titular: e-mail em `SECURITY.md` (`rafaelvieira1720@gmail.com`, assunto `[Cronograma] Seguranca`). Não abrir issue pública com o detalhe.
+
+O Sentry do front só envia erro em produção, e só se `VITE_SENTRY_DSN` estiver definido no host. A senha do editor não entra nesse fluxo: ela continua só no servidor.

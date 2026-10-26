@@ -17,6 +17,8 @@ dist-ssr
 # allow vendor SDK dist
 !vendor/vieira-analytics/dist/
 !vendor/vieira-analytics/dist/**
+!vendor/vieira-institucional/dist/
+!vendor/vieira-institucional/dist/**
 *.local
 
 # Editor directories and files
@@ -50,3 +52,4 @@ cursor
 .cursor/*
 *.cursor
 *.cursor/*
+vite.config.ts.timestamp-*.mjs

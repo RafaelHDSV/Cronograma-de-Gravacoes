@@ -96,6 +96,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 13. **Sem gravacoes as sextas** — bloqueio em novo agendamento (sexta); sabado e domingo permitidos manualmente; cascata de migracao usa dias uteis (seg-qui); sessoes `done` em sexta permanecem; util em `shared/scheduleDates.ts`.
 14. **Sem limite de sessoes por dia** — conflito so no horario exato (mesmo dia + hora + minuto); 14h e 16h sao atalhos do picker; swap troca os dois horarios em colisao; rota/script `fix-day-capacity` legado retorna vazio; util em `shared/dayCapacityMigration.ts`.
 15. **Cancelar gravação** — status `cancelled` preserva historico no dia original (badge no calendario e Por pessoa); reativavel para `scheduled`; tópico concluido quando todas sessoes `done` ou `cancelled`; acao via fila de confirmacao (nao DELETE).
+16. **Sem conta individual.** `/privacidade` e `/termos` são páginas do pacote institucional; qualquer outro caminho que não seja `/` cai em 404. As abas não usam a URL. O modo editor continua o modal em `/`. O painel pede `noindex` (dados da equipe). Canal de segurança: `SECURITY.md`.
 
 ---
 
