@@ -1,4 +1,4 @@
-# Cronograma de Gravações
+﻿# Cronograma de Gravações
 
 Painel web para coordenar as gravações de vídeo das funcionalidades do sistema — sem planilha infinita, sem mensagem gigante no Discord.
 
@@ -84,3 +84,7 @@ Especificação técnica completa: **[docs/context.md](docs/context.md)**.
 ## Licença
 
 MIT — ver [LICENSE](LICENSE).
+
+---
+
+Comunidade: [CHANGELOG](CHANGELOG.md) · [CONTRIBUTING](CONTRIBUTING.md) · [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)
