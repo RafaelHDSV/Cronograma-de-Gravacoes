@@ -87,7 +87,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 5. **Leitura publica; escrita com modo editor** — JWT em `localStorage` apos senha (`docs/seguranca.md`).
 6. **Alteracoes em rascunho** — confirmacao em modal antes de `apply-batch`; acoes que voltam ao estado do servidor saem da fila; textos de contagem com plural pt-BR (`1 sessao` / `N sessoes`).
 7. **Atualizar** — botao reload no header; **celebracao** ao marcar ultima gravacao de uma pessoa; rate limit login/batch (`server/rateLimit.ts`).
-7. **Horarios padrao 14h e 16h** — slot custom via picker.
+8. **Horarios padrao 14h e 16h** — slot custom via picker.
 8. **`base: './'`** no Vite para GitHub Pages / raiz.
 9. **`yarn import`** regenera YAMLs do script legado.
 10. **`topicOrder`** — ordem de gravacao por pessoa: seed em `people.yaml`; override em Supabase (`cronograma_person_preferences`). Util `getTopicOrder()` / `getOrderedTopics()` em `src/lib/topicOrder.ts` (reexport em `schedule.ts`).
@@ -96,7 +96,7 @@ Variáveis: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (servidor). Opcional no 
 13. **Sem gravacoes as sextas** — bloqueio em novo agendamento (sexta); sabado e domingo permitidos manualmente; cascata de migracao usa dias uteis (seg-qui); sessoes `done` em sexta permanecem; util em `shared/scheduleDates.ts`.
 14. **Sem limite de sessoes por dia** — conflito so no horario exato (mesmo dia + hora + minuto); 14h e 16h sao atalhos do picker; swap troca os dois horarios em colisao; rota/script `fix-day-capacity` legado retorna vazio; util em `shared/dayCapacityMigration.ts`.
 15. **Cancelar gravação** — status `cancelled` preserva historico no dia original (badge no calendario e Por pessoa); reativavel para `scheduled`; tópico concluido quando todas sessoes `done` ou `cancelled`; acao via fila de confirmacao (nao DELETE).
-16. **Sem conta individual.** `/privacidade` e `/termos` são páginas do pacote institucional; qualquer outro caminho que não seja `/` cai em 404. As abas não usam a URL. O modo editor continua o modal em `/`. O painel pede `noindex` (dados da equipe). Canal de segurança: `SECURITY.md`.
+16. **Sem conta individual.** `/privacidade` e `/termos` são páginas do pacote institucional; qualquer outro caminho que não seja `/` cai em 404. As abas não usam a URL. O modo editor continua o modal em `/`. O painel pede `noindex` (dados da equipe): `index.html`, `public/robots.txt` (`Disallow: /`) e `InstitucionalGate`. Mapa: [`frontend.md`](frontend.md). Canal de segurança: `SECURITY.md`.
 
 ---
 
