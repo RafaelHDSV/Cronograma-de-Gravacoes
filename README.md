@@ -31,6 +31,26 @@ Este painel centraliza a agenda em dados estruturados e oferece três formas de 
 
 **Público:** coordenação do treinamento e quem grava. **Uso típico:** abrir a URL publicada, acompanhar o dia, atualizar o cronograma após cada gravação ou imprevisto.
 
+## Como funciona
+
+```text
+Catálogo (pessoas/tópicos no repo) + estado da agenda (Supabase)
+        ↓
+Painel React: Resumo · Calendário · por pessoa
+        ↓
+Fila de alterações + confirmação  →  grava no banco
+```
+
+OG: [`public/og.png`](public/og.png).
+
+## Posicionamento
+
+| Este painel é | Não é |
+|---|---|
+| Cronograma vivo de gravações | Planilha infinita / texto corrido no Discord |
+| Consulta + edição controlada | Wiki solta sem confirmação |
+| Uma URL para a equipe | App nativo de vídeo |
+
 ---
 
 ## Funcionalidades
@@ -67,17 +87,15 @@ Repositório e painel podem ser públicos: ver é aberto; mudar o cronograma só
 
 **Quem desenvolve ou hospeda:**
 
-1. Clone o repositório e instale dependências: `yarn`
-2. Configure Supabase e variáveis de ambiente (guia passo a passo)
-3. Suba localmente: `yarn dev` → http://localhost:3333
+Setup e env: [`docs/ambiente-e-operacao.md`](docs/ambiente-e-operacao.md) (e guias Supabase em `docs/`). Resumo: `yarn` → configurar env → `yarn dev` → http://localhost:3333.
 
 ---
 
 ## Stack (resumo)
 
-React + Vite no front, API Node/Express, persistência das sessões no **Supabase**. Catálogo de pessoas e tópicos versionado no repositório; estado da agenda (gravado, adiado, datas) no banco.
+React + Vite · API Node/Express · Supabase.
 
-Especificação técnica completa: **[docs/context.md](docs/context.md)**.
+Living docs: [`docs/context.md`](docs/context.md) · especificação: [`docs/especificacao.md`](docs/especificacao.md).
 
 ---
 
