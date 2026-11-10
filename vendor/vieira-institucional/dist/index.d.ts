@@ -56,8 +56,23 @@ interface InstitucionalConfig {
     };
     /** Parágrafos extras da política, específicos do app. */
     extraPrivacyNotes?: string[];
+    /**
+     * O app embute o SDK do Vieira Analytics (cookie `_va_sid`).
+     * Padrão: há um processor cujo nome contém "analytics".
+     */
+    tracksVisits?: boolean;
+    /**
+     * Convenção para o contador público no rodapé. O `SiteFooter` não lê isto —
+     * o app monta `<VisitCountFooter />` e passa em `visitCount` quando quiser.
+     */
+    analytics?: {
+        showVisitCount?: boolean;
+        /** Default sugerido: `appSlug`. */
+        projectKey?: string;
+    };
     routes?: Partial<InstitucionalRoutes>;
 }
+declare function tracksVisits(config: InstitucionalConfig): boolean;
 declare const DEFAULT_ROUTES: InstitucionalRoutes;
 declare function defineInstitucionalConfig(config: InstitucionalConfig): InstitucionalConfig;
 declare function hasLegalPages(config: InstitucionalConfig): boolean;
@@ -183,9 +198,14 @@ declare function Seo({ title, description, noindex, path }: SeoProps): null;
 
 interface SiteFooterProps {
     className?: string;
+    /**
+     * Conteúdo opcional abaixo dos links legais (ex.: `<VisitCountFooter />` do
+     * `@vieira/analytics/react`). O institucional não importa o SDK.
+     */
+    visitCount?: ReactNode;
 }
 /** Rodapé institucional: Privacidade e Termos. Sem nome do app e sem e-mail de suporte. */
-declare function SiteFooter({ className }: SiteFooterProps): react.JSX.Element | null;
+declare function SiteFooter({ className, visitCount }: SiteFooterProps): react.JSX.Element | null;
 
 interface SupportLinkProps {
     subject?: string;
@@ -204,4 +224,4 @@ interface TermsAcceptanceProps {
 /** Checkbox obrigatório do cadastro. Desmarcado por padrão; links abrem em nova aba. */
 declare function TermsAcceptance({ checked, onChange, error, id }: TermsAcceptanceProps): react.JSX.Element;
 
-export { type AcceptInput, AccountDataSection, type AccountDataSectionProps, CONTROLLER_NAME, DATA_SUBJECT_SLA, DEFAULT_ROUTES, type DataGroup, ErrorPage, type ErrorPageProps, HealthConsent, type HealthConsentProps, type InstitucionalConfig, InstitucionalProvider, type InstitucionalProviderProps, type InstitucionalRoutes, type InternalLinkProps, type LegalAcceptance, type LegalBasis, LegalGate, type LegalGateProps, LegalLinks, type LegalLinksProps, LegalPage, type LegalPageProps, type LinkComponent, NotFoundPage, type NotFoundPageProps, type Processor, SUPPORT_EMAIL, SUPPORT_SLA, type SensitiveKind, Seo, type SeoProps, SiteFooter, type SiteFooterProps, SupportLink, type SupportLinkProps, TermsAcceptance, type TermsAcceptanceProps, defineInstitucionalConfig, deletedAccountMessage, formatLegalDate, hasLegalPages, needsLegalAcceptance, resolveRoutes, supportMailto, useInstitucional };
+export { type AcceptInput, AccountDataSection, type AccountDataSectionProps, CONTROLLER_NAME, DATA_SUBJECT_SLA, DEFAULT_ROUTES, type DataGroup, ErrorPage, type ErrorPageProps, HealthConsent, type HealthConsentProps, type InstitucionalConfig, InstitucionalProvider, type InstitucionalProviderProps, type InstitucionalRoutes, type InternalLinkProps, type LegalAcceptance, type LegalBasis, LegalGate, type LegalGateProps, LegalLinks, type LegalLinksProps, LegalPage, type LegalPageProps, type LinkComponent, NotFoundPage, type NotFoundPageProps, type Processor, SUPPORT_EMAIL, SUPPORT_SLA, type SensitiveKind, Seo, type SeoProps, SiteFooter, type SiteFooterProps, SupportLink, type SupportLinkProps, TermsAcceptance, type TermsAcceptanceProps, defineInstitucionalConfig, deletedAccountMessage, formatLegalDate, hasLegalPages, needsLegalAcceptance, resolveRoutes, supportMailto, tracksVisits, useInstitucional };

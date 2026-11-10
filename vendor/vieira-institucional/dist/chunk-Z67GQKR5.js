@@ -3,6 +3,10 @@ var SUPPORT_EMAIL = "rafaelvieira1720@gmail.com";
 var SUPPORT_SLA = "at\xE9 5 dias \xFAteis";
 var DATA_SUBJECT_SLA = "at\xE9 15 dias";
 var CONTROLLER_NAME = "Rafael Vieira";
+function tracksVisits(config) {
+  if (config.tracksVisits != null) return config.tracksVisits;
+  return config.processors.some((processor) => /analytics/i.test(processor.name));
+}
 var DEFAULT_ROUTES = {
   home: "/",
   privacy: "/privacidade",
@@ -116,6 +120,7 @@ export {
   SUPPORT_SLA,
   DATA_SUBJECT_SLA,
   CONTROLLER_NAME,
+  tracksVisits,
   DEFAULT_ROUTES,
   defineInstitucionalConfig,
   hasLegalPages,

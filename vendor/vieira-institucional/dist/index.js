@@ -14,8 +14,9 @@ import {
   hasLegalPages,
   resolveRoutes,
   supportMailto,
+  tracksVisits,
   useInstitucional
-} from "./chunk-KSNJRWDB.js";
+} from "./chunk-Z67GQKR5.js";
 
 // src/components/AccountDataSection.tsx
 import { useState } from "react";
@@ -513,17 +514,19 @@ function buildPrivacySections(config) {
             /* @__PURE__ */ jsx7("strong", { children: "Prefer\xEAncias da interface:" }),
             " tema claro ou escuro e, quando o app tiver, volume ou filtros \u2014 tudo local, sem ir para o servidor."
           ] }),
-          /* @__PURE__ */ jsxs6("li", { children: [
-            /* @__PURE__ */ jsx7("strong", { children: "M\xE9tricas de visita:" }),
-            " o Vieira Analytics usa um cookie pr\xF3prio, ",
-            /* @__PURE__ */ jsx7("code", { children: "_va_sid" }),
-            ", que dura 30 minutos e serve s\xF3 para agrupar as p\xE1ginas de uma mesma visita. O endere\xE7o IP \xE9 usado na hora para estimar o pa\xEDs e descartado em seguida; n\xE3o fica gravado."
-          ] }),
-          /* @__PURE__ */ jsxs6("li", { children: [
-            /* @__PURE__ */ jsx7("strong", { children: "Como recusar as visitas:" }),
-            ' se o navegador envia o sinal "Do Not Track", nenhuma visita \xE9 contada. Voc\xEA tamb\xE9m pode pedir a recusa pelo ',
-            mail,
-            "."
+          tracksVisits(config) && /* @__PURE__ */ jsxs6(Fragment2, { children: [
+            /* @__PURE__ */ jsxs6("li", { children: [
+              /* @__PURE__ */ jsx7("strong", { children: "M\xE9tricas de visita:" }),
+              " o Vieira Analytics usa um cookie pr\xF3prio, ",
+              /* @__PURE__ */ jsx7("code", { children: "_va_sid" }),
+              ", que dura 30 minutos e serve s\xF3 para agrupar as p\xE1ginas de uma mesma visita. O endere\xE7o IP \xE9 usado na hora para estimar o pa\xEDs e descartado em seguida; n\xE3o fica gravado."
+            ] }),
+            /* @__PURE__ */ jsxs6("li", { children: [
+              /* @__PURE__ */ jsx7("strong", { children: "Como recusar as visitas:" }),
+              ' se o navegador envia o sinal "Do Not Track", nenhuma visita \xE9 contada. Voc\xEA tamb\xE9m pode pedir a recusa pelo ',
+              mail,
+              "."
+            ] })
           ] })
         ] }),
         /* @__PURE__ */ jsx7("p", { children: "N\xE3o usamos cookies de publicidade, pixels de redes sociais nem rastreamento entre sites." })
@@ -584,9 +587,12 @@ function buildPrivacySections(config) {
       id: "direitos",
       title: "Seus direitos",
       body: /* @__PURE__ */ jsx7(Fragment2, { children: /* @__PURE__ */ jsxs6("p", { children: [
-        "Mesmo sem conta, a LGPD (art. 18) vale para as m\xE9tricas de visita e para qualquer dado que esta p\xE1gina trate. Escreva para ",
+        "Mesmo sem conta, a LGPD (art. 18) vale para qualquer dado que esta p\xE1gina trate",
+        tracksVisits(config) ? ", inclusive as m\xE9tricas de visita" : "",
+        ". Escreva para ",
         mail,
-        "; respondemos em ",
+        "; respondemos em",
+        " ",
         DATA_SUBJECT_SLA,
         ". Voc\xEA tamb\xE9m pode reclamar \xE0 ",
         anpd,
@@ -601,14 +607,16 @@ function buildPrivacySections(config) {
       body: /* @__PURE__ */ jsxs6("p", { children: [
         "O ",
         config.appName,
-        " \xE9 destinado a pessoas com 18 anos ou mais. N\xE3o coletamos dados de crian\xE7as de forma intencional. Se soubermos que uma conta foi criada por algu\xE9m com menos de 18 anos, apagamos os dados e encerramos o acesso."
+        " \xE9 destinado a pessoas com 18 anos ou mais. N\xE3o coletamos dados de crian\xE7as de forma intencional.",
+        " ",
+        config.hasAccount ? "Se soubermos que uma conta foi criada por algu\xE9m com menos de 18 anos, apagamos os dados e encerramos o acesso." : "Se soubermos que algu\xE9m com menos de 18 anos est\xE1 usando o app de forma identific\xE1vel, apagamos o que houver neste aparelho."
       ] })
     },
     {
       id: "seguranca",
       title: "Seguran\xE7a",
       body: /* @__PURE__ */ jsxs6(Fragment2, { children: [
-        /* @__PURE__ */ jsx7("p", { children: "Senhas s\xE3o guardadas com hash pelo provedor de autentica\xE7\xE3o e nunca em texto. Toda comunica\xE7\xE3o usa HTTPS. Cada conta s\xF3 acessa os pr\xF3prios dados: a interface p\xFAblica do banco recusa leitura an\xF4nima, e a API identifica voc\xEA pelo token da sess\xE3o." }),
+        /* @__PURE__ */ jsx7("p", { children: config.hasAccount ? "Senhas s\xE3o guardadas com hash pelo provedor de autentica\xE7\xE3o e nunca em texto. Toda comunica\xE7\xE3o usa HTTPS. Cada conta s\xF3 acessa os pr\xF3prios dados: a interface p\xFAblica do banco recusa leitura an\xF4nima, e a API identifica voc\xEA pelo token da sess\xE3o." : "Toda comunica\xE7\xE3o usa HTTPS. N\xE3o h\xE1 conta, senha nem API de dados pessoais neste app." }),
         /* @__PURE__ */ jsx7("p", { children: "Nenhum sistema \xE9 infal\xEDvel. Se identificarmos um incidente que possa trazer risco relevante a voc\xEA, avisaremos voc\xEA e a ANPD, no prazo da lei." })
       ] })
     },
@@ -877,14 +885,17 @@ function Seo({ title, description, noindex = false, path }) {
 
 // src/components/SiteFooter.tsx
 import { jsx as jsx9, jsxs as jsxs8 } from "react/jsx-runtime";
-function SiteFooter({ className }) {
+function SiteFooter({ className, visitCount }) {
   const { config, Link } = useInstitucional();
   const routes = resolveRoutes(config);
   if (!hasLegalPages(config)) return null;
-  return /* @__PURE__ */ jsx9("footer", { className: ["vi-footer", className].filter(Boolean).join(" "), children: /* @__PURE__ */ jsxs8("nav", { "aria-label": "Documentos legais", className: "vi-footer__nav", children: [
-    /* @__PURE__ */ jsx9(Link, { to: routes.privacy, className: "vi-link", children: "Privacidade" }),
-    /* @__PURE__ */ jsx9(Link, { to: routes.terms, className: "vi-link", children: "Termos" })
-  ] }) });
+  return /* @__PURE__ */ jsxs8("footer", { className: ["vi-footer", className].filter(Boolean).join(" "), children: [
+    /* @__PURE__ */ jsxs8("nav", { "aria-label": "Documentos legais", className: "vi-footer__nav", children: [
+      /* @__PURE__ */ jsx9(Link, { to: routes.privacy, className: "vi-link", children: "Privacidade" }),
+      /* @__PURE__ */ jsx9(Link, { to: routes.terms, className: "vi-link", children: "Termos" })
+    ] }),
+    visitCount ? /* @__PURE__ */ jsx9("div", { className: "vi-footer__visits", children: visitCount }) : null
+  ] });
 }
 
 // src/components/LegalPage.tsx
@@ -986,5 +997,6 @@ export {
   needsLegalAcceptance,
   resolveRoutes,
   supportMailto,
+  tracksVisits,
   useInstitucional
 };

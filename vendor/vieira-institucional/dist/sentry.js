@@ -1,6 +1,6 @@
 import {
   ErrorPage
-} from "./chunk-KSNJRWDB.js";
+} from "./chunk-Z67GQKR5.js";
 
 // src/sentry.tsx
 import * as Sentry from "@sentry/react";
