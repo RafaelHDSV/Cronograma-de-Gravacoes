@@ -262,11 +262,66 @@ function trackPageview(config) {
   send(config, payload);
 }
 
+// src/publicSummary.ts
+function resolveApiRoot(apiHost) {
+  if (!apiHost) return ANALYTICS_API_BASE.replace(/\/$/, "");
+  const trimmed = apiHost.replace(/\/$/, "");
+  return trimmed.endsWith("/v1") ? trimmed : `${trimmed}/v1`;
+}
+function formatVisitCountLabel(pageviews) {
+  const formatted = new Intl.NumberFormat("pt-BR").format(pageviews);
+  return `${formatted} visitas nos \xFAltimos 30 dias`;
+}
+function shouldShowVisitCount(summary) {
+  return summary != null && summary.pageviews > 0;
+}
+async function fetchPublicSummary(projectKey, options = {}) {
+  if (!projectKey) return null;
+  const period = options.period ?? "30d";
+  if (period !== "30d") return null;
+  const root = resolveApiRoot(options.apiHost);
+  const url = `${root}/public/projects/${encodeURIComponent(projectKey)}/summary?period=${period}`;
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const timeoutMs = options.timeoutMs ?? 3e3;
+  const controller = new AbortController();
+  const onAbort = () => controller.abort();
+  if (options.signal) {
+    if (options.signal.aborted) {
+      return null;
+    }
+    options.signal.addEventListener("abort", onAbort, { once: true });
+  }
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetchImpl(url, {
+      method: "GET",
+      signal: controller.signal,
+      headers: { Accept: "application/json" }
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    if (typeof data?.projectKey !== "string" || data.period !== "30d" || typeof data.pageviews !== "number" || typeof data.asOf !== "string") {
+      return null;
+    }
+    return data;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+    if (options.signal) {
+      options.signal.removeEventListener("abort", onAbort);
+    }
+  }
+}
+
 export {
   OPT_OUT_STORAGE_KEY,
   OPT_OUT_MEMORY_KEY,
   isOptedOut,
   optOut,
   optIn,
-  trackPageview
+  trackPageview,
+  formatVisitCountLabel,
+  shouldShowVisitCount,
+  fetchPublicSummary
 };
