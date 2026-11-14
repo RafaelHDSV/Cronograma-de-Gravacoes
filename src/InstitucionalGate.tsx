@@ -1,3 +1,4 @@
+import { VisitCountFooter } from '@vieira/analytics/react'
 import { LegalPage, NotFoundPage, Seo, SiteFooter } from '@vieira/institucional'
 import { useEffect, useState } from 'react'
 import { App } from './App'
@@ -54,7 +55,12 @@ export function InstitucionalGate() {
     <>
       <Seo noindex />
       <App />
-      <SiteFooter className="app-legal-footer" />
+      <SiteFooter
+        className="app-legal-footer"
+        visitCount={
+          <VisitCountFooter projectKey="gravacoes-treinamento" />
+        }
+      />
     </>
   )
 }

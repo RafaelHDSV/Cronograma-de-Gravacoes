@@ -1,14 +1,56 @@
 import {
+  fetchPublicSummary,
+  formatVisitCountLabel,
+  isLocalDevHost,
+  resolveVisitCountLabel,
+  shouldShowVisitCount,
   trackPageview
-} from "./chunk-JWWRLKYG.js";
+} from "./chunk-7RC3YH4P.js";
 
 // src/react.ts
-import { useEffect, useRef } from "react";
+import { useEffect as useEffect2, useRef } from "react";
+
+// src/VisitCountFooter.tsx
+import { useEffect, useState } from "react";
+import { jsx } from "react/jsx-runtime";
+var style = {
+  margin: 0,
+  fontSize: "0.75rem",
+  lineHeight: 1.4,
+  opacity: 0.7,
+  textAlign: "center"
+};
+function VisitCountFooter({
+  projectKey,
+  apiHost,
+  className
+}) {
+  const local = isLocalDevHost();
+  const [label, setLabel] = useState(
+    () => resolveVisitCountLabel(null, { local })
+  );
+  useEffect(() => {
+    let cancelled = false;
+    const isLocal = isLocalDevHost();
+    void (async () => {
+      const summary = await fetchPublicSummary(projectKey, { apiHost });
+      if (cancelled) return;
+      setLabel(resolveVisitCountLabel(summary, { local: isLocal }));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [projectKey, apiHost]);
+  if (!label) return null;
+  return /* @__PURE__ */ jsx("p", { className, style, "data-vieira-visit-count": true, children: label });
+}
+
+// src/react.ts
 var DEBOUNCE_MS = 300;
 function VieiraAnalytics(props) {
   const lastPathRef = useRef(null);
   const timerRef = useRef(null);
-  useEffect(() => {
+  useEffect2(() => {
     if (typeof window === "undefined") return;
     const config = {
       projectKey: props.projectKey,
@@ -50,5 +92,11 @@ function VieiraAnalytics(props) {
   return null;
 }
 export {
-  VieiraAnalytics
+  VieiraAnalytics,
+  VisitCountFooter,
+  fetchPublicSummary,
+  formatVisitCountLabel,
+  isLocalDevHost,
+  resolveVisitCountLabel,
+  shouldShowVisitCount
 };

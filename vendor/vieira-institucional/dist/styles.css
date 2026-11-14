@@ -240,6 +240,7 @@
   /* Rodapé público (páginas legais e auth) */
   :where(.vi-footer) {
     display: flex;
+    flex-direction: column;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
@@ -254,6 +255,18 @@
   :where(.vi-footer__nav, .vi-legal-links__nav) {
     display: flex;
     gap: 1rem;
+  }
+
+  :where(.vi-footer__visits) {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--vi-muted);
+    text-align: center;
+  }
+
+  :where(.vi-footer__visits .va-visit-count) {
+    margin: 0;
   }
 
   :where(.vi-legal-links) {
