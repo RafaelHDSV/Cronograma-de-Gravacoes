@@ -1,9 +1,11 @@
 import {
   fetchPublicSummary,
   formatVisitCountLabel,
+  isLocalDevHost,
+  resolveVisitCountLabel,
   shouldShowVisitCount,
   trackPageview
-} from "./chunk-F4VXVQNP.js";
+} from "./chunk-7RC3YH4P.js";
 
 // src/react.ts
 import { useEffect as useEffect2, useRef } from "react";
@@ -11,40 +13,36 @@ import { useEffect as useEffect2, useRef } from "react";
 // src/VisitCountFooter.tsx
 import { useEffect, useState } from "react";
 import { jsx } from "react/jsx-runtime";
+var style = {
+  margin: 0,
+  fontSize: "0.75rem",
+  lineHeight: 1.4,
+  opacity: 0.7,
+  textAlign: "center"
+};
 function VisitCountFooter({
   projectKey,
   apiHost,
   className
 }) {
-  const [label, setLabel] = useState(null);
+  const local = isLocalDevHost();
+  const [label, setLabel] = useState(
+    () => resolveVisitCountLabel(null, { local })
+  );
   useEffect(() => {
-    if (!projectKey) return;
     let cancelled = false;
-    const controller = new AbortController();
-    void fetchPublicSummary(projectKey, { apiHost, signal: controller.signal }).then(
-      (summary) => {
-        if (cancelled) return;
-        if (!shouldShowVisitCount(summary) || !summary) {
-          setLabel(null);
-          return;
-        }
-        setLabel(formatVisitCountLabel(summary.pageviews));
-      }
-    );
+    const isLocal = isLocalDevHost();
+    void (async () => {
+      const summary = await fetchPublicSummary(projectKey, { apiHost });
+      if (cancelled) return;
+      setLabel(resolveVisitCountLabel(summary, { local: isLocal }));
+    })();
     return () => {
       cancelled = true;
-      controller.abort();
     };
   }, [projectKey, apiHost]);
   if (!label) return null;
-  return /* @__PURE__ */ jsx(
-    "p",
-    {
-      className: ["va-visit-count", className].filter(Boolean).join(" "),
-      "aria-live": "polite",
-      children: label
-    }
-  );
+  return /* @__PURE__ */ jsx("p", { className, style, "data-vieira-visit-count": true, children: label });
 }
 
 // src/react.ts
@@ -98,5 +96,7 @@ export {
   VisitCountFooter,
   fetchPublicSummary,
   formatVisitCountLabel,
+  isLocalDevHost,
+  resolveVisitCountLabel,
   shouldShowVisitCount
 };

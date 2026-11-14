@@ -1,15 +1,16 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
-export { F as FetchPublicSummaryOptions, P as PublicSummary, f as fetchPublicSummary, a as formatVisitCountLabel, s as shouldShowVisitCount } from './publicSummary-BYRY9kjD.js';
+export { F as FetchPublicSummaryOptions, P as PublicSummary, V as VisitCountVisibilityOptions, f as fetchPublicSummary, a as formatVisitCountLabel, i as isLocalDevHost, r as resolveVisitCountLabel, s as shouldShowVisitCount } from './publicSummary-BHF2Sqxn.js';
 
-interface VisitCountFooterProps {
+type VisitCountFooterProps = {
     projectKey: string;
-    /** Host da API sem path. Default: produção. */
+    /** Override do host da API (default: produção). */
     apiHost?: string;
     className?: string;
-}
+};
 /**
- * Linha de rodapé com pageviews dos últimos 30 dias.
- * Não dispara coleta; falha silenciosa (não renderiza).
+ * Contador público de visitas (últimos 30 dias). Em localhost / 127.0.0.1 / [::1]
+ * sempre renderiza (mesmo com 0 ou falha da API). Em produção só aparece com
+ * pageviews > 0. Não dispara coleta.
  */
 declare function VisitCountFooter({ projectKey, apiHost, className }: VisitCountFooterProps): react_jsx_runtime.JSX.Element | null;
 
