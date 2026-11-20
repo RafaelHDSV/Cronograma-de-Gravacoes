@@ -1,108 +1,103 @@
-﻿# Cronograma de Gravações
+﻿<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logos/logo-lockup.svg">
+    <img src="assets/logos/logo-lockup-light.svg" alt="Cronograma de Gravações" width="96">
+  </picture>
+</p>
 
-Painel web para coordenar as gravações de vídeo das funcionalidades do sistema — sem planilha infinita, sem mensagem gigante no Discord.
+<p align="center">
+  <strong>Quem grava o quê — no calendário e por pessoa.</strong><br>
+  Painel interno para remarcar, marcar como gravado e acompanhar o progresso da equipe.
+</p>
 
-Substitui o “texto corrido” da coordenação por um cronograma vivo: quem grava o quê, o que já foi gravado, o que foi adiado e o que ainda falta, em uma única URL que qualquer pessoa da equipe pode abrir.
+<p align="center">
+  <img alt="Uso interno" src="https://img.shields.io/badge/uso-interno-3B82F6">
+  <img alt="React 18" src="https://img.shields.io/badge/React-18-3B82F6?logo=react&logoColor=white">
+  <img alt="Vite 5" src="https://img.shields.io/badge/Vite-5-3B82F6?logo=vite&logoColor=white">
+  <img alt="Express 5" src="https://img.shields.io/badge/Express-5-64748B?logo=express&logoColor=white">
+  <img alt="Supabase" src="https://img.shields.io/badge/Supabase-cronograma__*-3FCF8E?logo=supabase&logoColor=white">
+</p>
 
-![Visão geral do painel — aba Resumo](demo.png)
+<p align="center">
+  <img src="assets/screenshots/resumo.png" alt="Resumo: totais e progresso por pessoa" width="560">
+</p>
 
----
+<p align="center">
+  🇧🇷 Português · <a href="README.en.md">🇺🇸 English</a>
+</p>
 
-## O problema que resolve
+## 🤔 O problema
 
-Em projetos com dezenas de tópicos e várias pessoas gravando, o cronograma vira um arquivo difícil de manter:
+Cronograma de treinamento em planilha ou chat vira texto corrido: difícil ver quem falta, o que cai no mês e o que já foi gravado. Remarcar e marcar como feito vira conversa paralela.
 
-- Não dá para ver de relance o progresso geral.
-- Remarcar um dia ou trocar horário vira edição manual e risco de erro.
-- Quem só precisa **consultar** acaba no mesmo canal de quem **altera** tudo.
+**Cronograma de Gravações** estrutura isso em três abas — resumo, calendário e por pessoa — com sessões no Supabase e catálogo de pessoas em YAML.
 
-Este painel centraliza a agenda em dados estruturados e oferece três formas de enxergar a mesma informação, com alterações controladas e confirmação antes de gravar no banco.
+## ✨ O que só ele garante
 
----
+| | |
+|---|---|
+| 📊 **Resumo por tópico** | Totais concluídos, pendentes e parciais — com barra de progresso. |
+| 📅 **Calendário com drag** | Remarcar, swap de horário e notas por sessão no mês. |
+| 👤 **Carga por pessoa** | Progresso por tópico, multi-sessão e indicador de notas. |
+| 🔒 **Leitura pública, escrita editor** | Visitante vê; editor autentica e confirma o lote antes de aplicar. |
 
-## O que você ganha
+## 🧭 Como usar
 
-| Antes | Com o painel |
-|--------|----------------|
-| Texto longo ou planilha compartilhada | Resumo numérico e barras de progresso |
-| “Quem grava hoje?” exige busca manual | Calendário mensal com o dia e os horários |
-| Status espalhado por mensagens | Marcar gravado, adiar ou remarcar na interface |
-| Medo de clicar errado | Fila de alterações + modal de confirmação antes de salvar |
+1. **Abrir** o painel e olhar o **Resumo** (totais e progresso por pessoa).
+2. **Calendário** para remarcar, anotar ou marcar sessões.
+3. **Por pessoa** para ver a carga e o restante de cada integrante.
 
-**Público:** coordenação do treinamento e quem grava. **Uso típico:** abrir a URL publicada, acompanhar o dia, atualizar o cronograma após cada gravação ou imprevisto.
+<details>
+<summary><strong>📸 Ver as telas</strong></summary>
+<br>
 
-## Como funciona
+<table>
+  <tr>
+    <td width="50%"><a href="assets/screenshots/resumo.png"><img src="assets/screenshots/resumo.png" alt="Resumo"></a><br><sub><b>Resumo</b>: totais e progresso por pessoa</sub></td>
+    <td width="50%"><a href="assets/screenshots/calendario.png"><img src="assets/screenshots/calendario.png" alt="Calendário"></a><br><sub><b>Calendário</b>: mês com sessões e status</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="assets/screenshots/por-pessoa.png"><img src="assets/screenshots/por-pessoa.png" alt="Por pessoa"></a><br><sub><b>Por pessoa</b>: carga e tópicos por integrante</sub></td>
+    <td width="50%"></td>
+  </tr>
+</table>
 
-```text
-Catálogo (pessoas/tópicos no repo) + estado da agenda (Supabase)
-        ↓
-Painel React: Resumo · Calendário · por pessoa
-        ↓
-Fila de alterações + confirmação  →  grava no banco
+</details>
+
+## 🚀 Rodar
+
+**Precisa de:** Node 22+, Yarn 1, projeto Supabase e as variáveis do `.env.example`.
+
+```bash
+yarn
+cp .env.example .env
+yarn dev
 ```
 
-OG: [`public/og.png`](public/og.png).
+Front em http://localhost:3333 · API em http://localhost:3334. Detalhes: [`docs/ambiente-e-operacao.md`](docs/ambiente-e-operacao.md) · Supabase: [`docs/supabase-setup.md`](docs/supabase-setup.md).
 
-## Posicionamento
+## 🧰 Comandos do dia a dia
 
-| Este painel é | Não é |
+| Comando | Para quê |
 |---|---|
-| Cronograma vivo de gravações | Planilha infinita / texto corrido no Discord |
-| Consulta + edição controlada | Wiki solta sem confirmação |
-| Uma URL para a equipe | App nativo de vídeo |
+| `yarn dev` | Front (3333) e API (3334) juntos |
+| `yarn build` | Build front + server |
+| `yarn start` | Serve produção (API + `dist/`) |
+| `yarn import` | Regenera YAMLs do script legado |
+| `yarn blur-demo` | Ofusca nomes para captura/demo |
 
----
+## 📚 Documentação
 
-## Funcionalidades
+| Para | Leia |
+|---|---|
+| Entender o projeto | [`docs/context.md`](docs/context.md) |
+| O que o produto faz | [`docs/especificacao.md`](docs/especificacao.md) |
+| Telas e rotas | [`docs/frontend.md`](docs/frontend.md) |
+| Rodar e publicar | [`docs/ambiente-e-operacao.md`](docs/ambiente-e-operacao.md) · [`docs/deploy-render.md`](docs/deploy-render.md) |
+| Auth do editor | [`docs/seguranca.md`](docs/seguranca.md) |
 
-### Resumo
+## 🔐 Governança
 
-Visão executiva: quantas gravações já foram feitas, quantas faltam, adiadas e agendadas, com percentual global e tabela por pessoa.
-
-### Calendário
-
-Grade mensal com as sessões do dia (horários padrão 14h e 16h, com opção de **outro horário** quando alguém grava fora da faixa). Arraste para mudar o dia mantendo o horário; no detalhe do dia, marque como gravada, adie, troque ordem no mesmo dia ou ajuste o horário. Lista de **adiadas** com reagendamento por data e hora.
-
-### Por pessoa
-
-Progresso individual e checklist por tópico (a, b, c…), para ver de uma vez o que cada gravador ainda deve entregar.
-
-### Modo leitura e modo editor
-
-- **Qualquer visitante** da URL vê o cronograma completo (ideal para link fixo no canal da equipe).
-- **Edição** exige entrar no modo editor (senha da equipe, salva no navegador para não digitar sempre).
-- Alterações ficam em **rascunho** até você revisar tudo no modal **Confirmar alterações** e salvar de uma vez no banco.
-
----
-
-## Segurança em uma frase
-
-Repositório e painel podem ser públicos: ver é aberto; mudar o cronograma só com autenticação de editor. Detalhes e alternativas avaliadas estão em [docs/seguranca.md](docs/seguranca.md).
-
----
-
-## Começar a usar
-
-**Quem só consulta:** acesse a URL publicada (ex.: Render) — não precisa instalar nada.
-
-**Quem desenvolve ou hospeda:**
-
-Setup e env: [`docs/ambiente-e-operacao.md`](docs/ambiente-e-operacao.md) (e guias Supabase em `docs/`). Resumo: `yarn` → configurar env → `yarn dev` → http://localhost:3333.
-
----
-
-## Stack (resumo)
-
-React + Vite · API Node/Express · Supabase.
-
-Living docs: [`docs/context.md`](docs/context.md) · especificação: [`docs/especificacao.md`](docs/especificacao.md).
-
----
-
-## Licença
-
-MIT — ver [LICENSE](LICENSE).
-
----
-
-Comunidade: [CHANGELOG](CHANGELOG.md) · [CONTRIBUTING](CONTRIBUTING.md) · [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)
+- Uso **interno**; repositório privado (`RafaelHDSV/Cronograma-de-Gravacoes`).
+- Capturas do README usam **nomes fictícios** (`yarn blur-demo`).
+- Sugestão: skill `logo` para lockup claro/escuro (hoje o título é texto).
