@@ -1,5 +1,8 @@
 <p align="center">
-  <strong>Recording Schedule</strong>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logos/logo-lockup.svg">
+    <img src="assets/logos/logo-lockup-light.svg" alt="Recording Schedule" width="96">
+  </picture>
 </p>
 
 <p align="center">

@@ -1,5 +1,8 @@
 ﻿<p align="center">
-  <strong>Cronograma de Gravações</strong>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logos/logo-lockup.svg">
+    <img src="assets/logos/logo-lockup-light.svg" alt="Cronograma de Gravações" width="96">
+  </picture>
 </p>
 
 <p align="center">
