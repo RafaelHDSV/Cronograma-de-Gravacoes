@@ -4,6 +4,10 @@
 > **Fonte da verdade:** `package.json`, `.env.example`, scripts de CI/deploy
 > **Relacionados:** [context](context.md) · [seguranca](seguranca.md)
 
+## CI (GitHub Actions)
+
+Workflow `.github/workflows/ci.yml` — `yarn build` em push/PR para `main`. Substitui os antigos pings “Keep Render awake” (removidos): o site público é `cronograma.getvieira.com`; keep-alive do Render Free, se ainda usado, fica no processo (`RENDER_EXTERNAL_URL`), não no Actions.
+
 ## Setup
 
 # Publicar o painel no Render
