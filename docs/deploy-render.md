@@ -49,10 +49,12 @@ Se ja existe um servico da v1:
 | Campo | Valor |
 |-------|--------|
 | **Runtime** | Node |
-| **Build Command** | `yarn install --frozen-lockfile && yarn build` |
+| **Build Command** | `yarn install --frozen-lockfile --check-files && yarn build` |
 | **Start Command** | `yarn start` |
 
-Versoes antigas com `npm` devem trocar para **yarn** (o repo tem `yarn.lock`, sem `package-lock.json`).
+`--check-files` evita `node_modules` velho no cache do Render quando o conteúdo de `vendor/@vieira/*` muda sem o Yarn achar o lock “desatualizado”. Versoes antigas com `npm` devem trocar para **yarn** (o repo tem `yarn.lock`, sem `package-lock.json`).
+
+Se o build falhar com exports ausentes em `@vieira/*` após bump de vendor: **Clear build cache & deploy** no painel do serviço.
 
 ### Variaveis de ambiente
 

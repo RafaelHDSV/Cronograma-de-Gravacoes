@@ -1101,10 +1101,10 @@
     "@types/node" "*"
 
 "@vieira/analytics@file:./vendor/vieira-analytics":
-  version "0.1.2"
+  version "0.2.2"
 
 "@vieira/institucional@file:./vendor/vieira-institucional":
-  version "0.1.1"
+  version "0.1.2"
 
 "@vitejs/plugin-react@^4.3.4":
   version "4.7.0"

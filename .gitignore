@@ -53,3 +53,5 @@ cursor
 *.cursor
 *.cursor/*
 vite.config.ts.timestamp-*.mjs
+
+package-lock.json

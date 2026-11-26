@@ -6,7 +6,11 @@
 
 ## CI (GitHub Actions)
 
-Workflow `.github/workflows/ci.yml` — `yarn build` em push/PR para `main`. Substitui os antigos pings “Keep Render awake” (removidos): o site público é `cronograma.getvieira.com`; keep-alive do Render Free, se ainda usado, fica no processo (`RENDER_EXTERNAL_URL`), não no Actions.
+Workflow `.github/workflows/ci.yml` — `yarn install --frozen-lockfile --check-files` + `yarn build` em push/PR para `main`. Substitui os antigos pings “Keep Render awake” (removidos): o site público é `cronograma.getvieira.com`; keep-alive do Render Free, se ainda usado, fica no processo (`RENDER_EXTERNAL_URL`), não no Actions.
+
+## Render / vendor `@vieira/*`
+
+Pacotes em `vendor/` via `file:`. Se o log mostrar `Already up-to-date` e o `tsc` reclamar de `VisitCountFooter` / `visitCount` ausentes, o cache do build ficou com `node_modules` antigo: atualize o Build Command com `--check-files` (ver `deploy-render.md`) e, uma vez, use **Clear build cache & deploy**.
 
 ## Setup
 
