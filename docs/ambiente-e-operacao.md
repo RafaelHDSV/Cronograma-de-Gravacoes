@@ -10,7 +10,7 @@ Workflow `.github/workflows/ci.yml` — `yarn install --frozen-lockfile --check-
 
 ## Render / vendor `@vieira/*`
 
-Pacotes em `vendor/` via `file:`. Se o log mostrar `Already up-to-date` e o `tsc` reclamar de `VisitCountFooter` / `visitCount` ausentes, o cache do build ficou com `node_modules` antigo: atualize o Build Command com `--check-files` (ver `deploy-render.md`) e, uma vez, use **Clear build cache & deploy**.
+Pacotes em `vendor/` via `file:`. O script `prebuild` (`refresh-vieira-vendor.mjs`) recopia `vendor/` → `node_modules/@vieira/*` em todo `yarn build`, para o cache do Render não deixar exports velhos (ex.: `VisitCountFooter`). Preferir também `--check-files` no install (ver `deploy-render.md`).
 
 ## Setup
 
